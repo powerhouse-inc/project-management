@@ -5,18 +5,72 @@
  */
 
 import type { ScopeOfWorkAgentsOperations } from "../../gen/agents/operations.js";
+import type { AgentType } from "../../gen/types.js";
 
 export const reducer: ScopeOfWorkAgentsOperations = {
   addAgentOperation(state, action, dispatch) {
-    // TODO: Implement "addAgentOperation" reducer
-    throw new Error('Reducer "addAgentOperation" not yet implemented');
+    try {
+
+      if (action.input.id === undefined || action.input.name === undefined) {
+        throw new Error("Invalid input");
+      }
+
+      const agent = {
+        id: action.input.id,
+        name: action.input.name,
+        agentType: action.input.agentType as AgentType || 'HUMAN',
+        code: action.input.code || "",
+        imageUrl: action.input.imageUrl || "",
+      };
+
+      state.agents.push(agent);
+
+    } catch (error) {
+      console.error(error);
+    }
   },
   removeAgentOperation(state, action, dispatch) {
-    // TODO: Implement "removeAgentOperation" reducer
-    throw new Error('Reducer "removeAgentOperation" not yet implemented');
+    try {
+
+      if (action.input.id === undefined) {
+        throw new Error("Invalid agent id input");
+      }
+
+      const agent = state.agents.find((agent) => agent.id === action.input.id);
+      if (!agent) {
+        throw new Error("Agent not found");
+      }
+
+      state.agents = state.agents.filter((agent) => agent.id !== action.input.id);
+
+    } catch (error) {
+      console.error(error);
+    }
   },
   editAgentOperation(state, action, dispatch) {
-    // TODO: Implement "editAgentOperation" reducer
-    throw new Error('Reducer "editAgentOperation" not yet implemented');
+    try {
+
+      if (action.input.id === undefined) {
+        throw new Error("Invalid agent id input");
+      }
+
+      const agent = state.agents.find((agent) => agent.id === action.input.id);
+      if (!agent) {
+        throw new Error("Agent not found");
+      }
+
+      const updatedAgent = {
+        ...agent,
+        name: action.input.name || agent.name,
+        agentType: action.input.agentType as AgentType || agent.agentType,
+        code: action.input.code || agent.code,
+        imageUrl: action.input.imageUrl || agent.imageUrl,
+      };
+
+      state.agents = state.agents.map((agent) => agent.id === action.input.id ? updatedAgent : agent);
+
+    } catch (error) {
+      console.error(error);
+    }
   },
 };
