@@ -324,11 +324,7 @@ export const schema: DocumentNode = gql`
     isBinary: Boolean!
   }
 
-  type ScopeOfWork_ProgressInput {
-    percentage: PercentageInput
-    storyPoint: StoryPointInput
-    binary: BinaryInput
-  }
+  union ProgressInput = PercentageInput | StoryPointInput | BinaryInput
   input ScopeOfWork_AddKeyResultInput {
     id: OID!
     deliverableId: OID!
@@ -441,11 +437,7 @@ export const schema: DocumentNode = gql`
     isBinary: Boolean!
   }
 
-  type ScopeOfWork_ProgressInput {
-    percentage: PercentageInput
-    storyPoint: StoryPointInput
-    binary: BinaryInput
-  }
+  union ProgressInput = PercentageInput | StoryPointInput | BinaryInput
 
   """
   Module: Agents
