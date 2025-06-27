@@ -30,7 +30,6 @@ import type {
   Milestone,
   Percentage,
   PercentageInput,
-  ProgressInput,
   RemoveAgentInput,
   RemoveCoordinatorInput,
   RemoveDeliverableInSetInput,
@@ -378,13 +377,12 @@ export function ProgressSchema() {
   return z.union([BinarySchema(), PercentageSchema(), StoryPointSchema()]);
 }
 
-export function ProgressInputSchema(): z.ZodObject<Properties<ProgressInput>> {
-  return z.object({
-    __typename: z.literal("ProgressInput").optional(),
-    binary: z.lazy(() => BinaryInputSchema().nullable()),
-    percentage: z.lazy(() => PercentageInputSchema().nullable()),
-    storyPoint: z.lazy(() => StoryPointInputSchema().nullable()),
-  });
+export function ProgressInputSchema() {
+  return z.union([
+    BinaryInputSchema(),
+    PercentageInputSchema(),
+    StoryPointInputSchema(),
+  ]);
 }
 
 export function RemoveAgentInputSchema(): z.ZodObject<

@@ -261,11 +261,7 @@ export type PercentageInput = {
 
 export type Progress = Binary | Percentage | StoryPoint;
 
-export type ProgressInput = {
-  binary: Maybe<BinaryInput>;
-  percentage: Maybe<PercentageInput>;
-  storyPoint: Maybe<StoryPointInput>;
-};
+export type ProgressInput = BinaryInput | PercentageInput | StoryPointInput;
 
 export type RemoveAgentInput = {
   id: Scalars["OID"]["input"];

@@ -207,11 +207,7 @@ input BinaryInput {
   isBinary: Boolean!
 }
 
-type ProgressInput {
-  percentage: PercentageInput
-  storyPoint: StoryPointInput
-  binary: BinaryInput
-}
+union ProgressInput = PercentageInput | StoryPointInput | BinaryInput
 
 input AddKeyResultInput {
   id: OID!
@@ -332,11 +328,7 @@ input BinaryInput {
   isBinary: Boolean!
 }
 
-type ProgressInput {
-  percentage: PercentageInput
-  storyPoint: StoryPointInput
-  binary: BinaryInput
-}
+union ProgressInput = PercentageInput | StoryPointInput | BinaryInput
 
 # agents
 

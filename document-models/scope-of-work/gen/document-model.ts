@@ -154,7 +154,7 @@ export const documentModel: DocumentModelState = {
               name: "SET_DELIVERABLE_PROGRESS",
               description: "",
               schema:
-                "input SetDeliverableProgressInput {\n  id: OID! #deliverable id\n  workProgress: ProgressInput!\n}\n\ninput PercentageInput {\n  value: Float!\n}\n\ninput StoryPointInput {\n  total: Int!\n  completed: Int!\n}\n\ninput BinaryInput {\n  isBinary: Boolean!\n}\n\ntype ProgressInput {\n  percentage: PercentageInput\n  storyPoint: StoryPointInput\n  binary: BinaryInput\n}",
+                "input SetDeliverableProgressInput {\n  id: OID! #deliverable id\n  workProgress: ProgressInput!\n}\n\ninput PercentageInput {\n  value: Float!\n}\n\ninput StoryPointInput {\n  total: Int!\n  completed: Int!\n}\n\ninput BinaryInput {\n  isBinary: Boolean!\n}\n\nunion ProgressInput = PercentageInput | StoryPointInput | BinaryInput",
               template: "",
               reducer: "",
               errors: [],
@@ -389,7 +389,7 @@ export const documentModel: DocumentModelState = {
               name: "SET_PROGRESS_IN_DELIVERABLES_SET",
               description: "",
               schema:
-                "input SetProgressInDeliverablesSetInput {\n  milestoneId: ID!\n  progress: ProgressInput!\n}\n\ninput PercentageInput {\n  value: Float!\n}\n\ninput StoryPointInput {\n  total: Int!\n  completed: Int!\n}\n\ninput BinaryInput {\n  isBinary: Boolean!\n}\n\ntype ProgressInput {\n  percentage: PercentageInput\n  storyPoint: StoryPointInput\n  binary: BinaryInput\n}",
+                "input SetProgressInDeliverablesSetInput {\n  milestoneId: ID!\n  progress: ProgressInput!\n}\n\ninput PercentageInput {\n  value: Float!\n}\n\ninput StoryPointInput {\n  total: Int!\n  completed: Int!\n}\n\ninput BinaryInput {\n  isBinary: Boolean!\n}\n\nunion ProgressInput = PercentageInput | StoryPointInput | BinaryInput",
               template: "",
               reducer: "",
               errors: [],
