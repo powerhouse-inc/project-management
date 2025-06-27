@@ -88,8 +88,6 @@ describe("Agents Operations", () => {
 
     updatedDocument = reducer(updatedDocument, creators.editAgent(editInput));
 
-    console.log('updatedDocument', updatedDocument.state.global);
-
     expect(updatedDocument.operations.global).toHaveLength(2);
     expect(updatedDocument.operations.global[1].type).toBe("EDIT_AGENT");
     expect(updatedDocument.operations.global[1].input).toStrictEqual(editInput);
