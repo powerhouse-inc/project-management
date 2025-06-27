@@ -8,15 +8,57 @@ import type { ScopeOfWorkRoadmapsOperations } from "../../gen/roadmaps/operation
 
 export const reducer: ScopeOfWorkRoadmapsOperations = {
   editRoadmapOperation(state, action, dispatch) {
-    // TODO: Implement "editRoadmapOperation" reducer
-    throw new Error('Reducer "editRoadmapOperation" not yet implemented');
+    try {
+      const roadmap = state.roadmaps.find((roadmap) => String(roadmap.id) === String(action.input.id));
+      if (!roadmap) {
+        throw new Error("Roadmap not found");
+      }
+
+      const updatedRoadmap = {
+        ...roadmap,
+        title: action.input.title || roadmap.title,
+        slug: action.input.slug || roadmap.slug,
+        description: action.input.description || roadmap.description,
+      };
+
+      state.roadmaps = state.roadmaps.map((roadmap) => String(roadmap.id) === String(action.input.id) ? updatedRoadmap : roadmap);
+    } catch (error) {
+      console.error(error);
+    }
   },
-  addMilestoneOperation(state, action, dispatch) {
-    // TODO: Implement "addMilestoneOperation" reducer
-    throw new Error('Reducer "addMilestoneOperation" not yet implemented');
+  addRoadmapOperation(state, action, dispatch) {
+    try {
+      if (action.input.id === undefined || action.input.title === undefined) {
+        throw new Error("Invalid input");
+      }
+
+      const roadmap = {
+        id: action.input.id,
+        title: action.input.title,
+        slug: action.input.slug || "",
+        description: action.input.description || "",
+        milestones: [],
+      };
+
+      state.roadmaps.push(roadmap);
+    } catch (error) {
+      console.error(error);
+    }
   },
-  removeMilestoneOperation(state, action, dispatch) {
-    // TODO: Implement "removeMilestoneOperation" reducer
-    throw new Error('Reducer "removeMilestoneOperation" not yet implemented');
+  removeRoadmapOperation(state, action, dispatch) {
+    try {
+      if (action.input.id === undefined) {
+        throw new Error("Invalid roadmap id input");
+      }
+
+      const roadmap = state.roadmaps.find((roadmap) => String(roadmap.id) === String(action.input.id));
+      if (!roadmap) {
+        throw new Error("Roadmap not found");
+      }
+
+      state.roadmaps = state.roadmaps.filter((roadmap) => String(roadmap.id) !== String(action.input.id));
+    } catch (error) {
+      console.error(error);
+    }
   },
 };

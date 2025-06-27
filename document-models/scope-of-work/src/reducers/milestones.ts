@@ -8,25 +8,144 @@ import type { ScopeOfWorkMilestonesOperations } from "../../gen/milestones/opera
 
 export const reducer: ScopeOfWorkMilestonesOperations = {
   editMilestoneOperation(state, action, dispatch) {
-    // TODO: Implement "editMilestoneOperation" reducer
-    throw new Error('Reducer "editMilestoneOperation" not yet implemented');
+    try {
+      const foundRoadmap = state.roadmaps.find((roadmap) => String(roadmap.id) === String(action.input.roadmapId));
+      if (!foundRoadmap) {
+        throw new Error("Roadmap not found");
+      }
+
+      const foundMilestone = foundRoadmap.milestones.find((milestone) => String(milestone.id) === String(action.input.id));
+      if (!foundMilestone) {
+        throw new Error("Milestone not found");
+      }
+
+      const updatedMilestone = {
+        ...foundMilestone,
+        sequenceCode: action.input.sequenceCode || foundMilestone.sequenceCode,
+        title: action.input.title || foundMilestone.title,
+        description: action.input.description || foundMilestone.description,
+        deliveryTarget: action.input.deliveryTarget || foundMilestone.deliveryTarget,
+        estimatedBudgetCap: action.input.estimatedBudgetCap || foundMilestone.estimatedBudgetCap,
+      };
+
+      foundRoadmap.milestones = foundRoadmap.milestones.map((milestone) => String(milestone.id) === String(action.input.id) ? updatedMilestone : milestone);
+      state.roadmaps = state.roadmaps.map((roadmap) => {
+        return String(roadmap.id) === String(action.input.roadmapId) ? foundRoadmap : roadmap;
+      });
+    } catch (error) {
+      console.error(error);
+    }
   },
   addCoordinatorOperation(state, action, dispatch) {
-    // TODO: Implement "addCoordinatorOperation" reducer
-    throw new Error('Reducer "addCoordinatorOperation" not yet implemented');
+    try {
+      const foundRoadmap = state.roadmaps.find((roadmap) => {
+        return roadmap.milestones.some((milestone) => String(milestone.id) === String(action.input.milestoneId));
+      });
+      if (!foundRoadmap) {
+        throw new Error(`Roadmap with milestone ${action.input.milestoneId} not found`);
+      }
+
+      const foundMilestone = foundRoadmap.milestones.find((milestone) => String(milestone.id) === String(action.input.milestoneId));
+      if (!foundMilestone) {
+        throw new Error("Milestone not found");
+      }
+
+      if (!foundMilestone.coordinators.includes(action.input.id)) {
+        foundMilestone.coordinators.push(action.input.id);
+      }
+
+      state.roadmaps = state.roadmaps.map((roadmap) => {
+        return String(roadmap.id) === String(foundRoadmap.id) ? foundRoadmap : roadmap;
+      });
+    } catch (error) {
+      console.error(error);
+    }
   },
   removeCoordinatorOperation(state, action, dispatch) {
-    // TODO: Implement "removeCoordinatorOperation" reducer
-    throw new Error('Reducer "removeCoordinatorOperation" not yet implemented');
+    try {
+      const foundRoadmap = state.roadmaps.find((roadmap) => {
+        return roadmap.milestones.some((milestone) => String(milestone.id) === String(action.input.milestoneId));
+      });
+      if (!foundRoadmap) {
+        throw new Error(`Roadmap with milestone ${action.input.milestoneId} not found`);
+      }
+
+      const foundMilestone = foundRoadmap.milestones.find((milestone) => String(milestone.id) === String(action.input.milestoneId));
+      if (!foundMilestone) {
+        throw new Error("Milestone not found");
+      }
+
+      foundMilestone.coordinators = foundMilestone.coordinators.filter((coordinatorId) => coordinatorId !== action.input.id);
+
+      state.roadmaps = state.roadmaps.map((roadmap) => {
+        return String(roadmap.id) === String(foundRoadmap.id) ? foundRoadmap : roadmap;
+      });
+    } catch (error) {
+      console.error(error);
+    }
   },
-  addDeliverablesOperation(state, action, dispatch) {
-    // TODO: Implement "addDeliverablesOperation" reducer
-    throw new Error('Reducer "addDeliverablesOperation" not yet implemented');
+  addMilestoneOperation(state, action, dispatch) {
+    try {
+      if (action.input.id === undefined || action.input.roadmapId === undefined) {
+        throw new Error("Invalid input");
+      }
+
+      const foundRoadmap = state.roadmaps.find((roadmap) => String(roadmap.id) === String(action.input.roadmapId));
+      if (!foundRoadmap) {
+        throw new Error("Roadmap not found");
+      }
+
+      const milestone = {
+        id: action.input.id,
+        sequenceCode: action.input.sequenceCode || "",
+        title: action.input.title || "",
+        description: action.input.description || "",
+        deliveryTarget: action.input.deliveryTarget || "",
+        estimatedBudgetCap: action.input.estimatedBudgetCap || "",
+        coordinators: [],
+        scope: {
+          deliverables: [],
+          status: "DRAFT" as const,
+          progress: {
+            value: 0,
+          },
+          deliverablesCompleted: {
+            total: 0,
+            completed: 0,
+          },
+        },
+      };
+
+      foundRoadmap.milestones.push(milestone);
+      state.roadmaps = state.roadmaps.map((roadmap) => {
+        return String(roadmap.id) === String(action.input.roadmapId) ? foundRoadmap : roadmap;
+      });
+    } catch (error) {
+      console.error(error);
+    }
   },
-  removeDeliverablesOperation(state, action, dispatch) {
-    // TODO: Implement "removeDeliverablesOperation" reducer
-    throw new Error(
-      'Reducer "removeDeliverablesOperation" not yet implemented',
-    );
+  removeMilestoneOperation(state, action, dispatch) {
+    try {
+      if (action.input.id === undefined || action.input.roadmapId === undefined) {
+        throw new Error("Invalid input");
+      }
+
+      const foundRoadmap = state.roadmaps.find((roadmap) => String(roadmap.id) === String(action.input.roadmapId));
+      if (!foundRoadmap) {
+        throw new Error("Roadmap not found");
+      }
+
+      const foundMilestone = foundRoadmap.milestones.find((milestone) => String(milestone.id) === String(action.input.id));
+      if (!foundMilestone) {
+        throw new Error("Milestone not found");
+      }
+
+      foundRoadmap.milestones = foundRoadmap.milestones.filter((milestone) => String(milestone.id) !== String(action.input.id));
+      state.roadmaps = state.roadmaps.map((roadmap) => {
+        return String(roadmap.id) === String(foundRoadmap.id) ? foundRoadmap : roadmap;
+      });
+    } catch (error) {
+      console.error(error);
+    }
   },
 };
