@@ -104,7 +104,6 @@
   /* Adding a generic focus style, adjust to match your design system's focus indicators */
   outline: 2px solid transparent;
   outline-offset: 2px;
-  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px rgba(59, 130, 246, 0.5); /* Example focus ring */
 }
 */
 /* End of Selection */
