@@ -8,9 +8,10 @@ import Sidebar from "./sidebar/sidebar.js";
 export type IProps = EditorProps<ScopeOfWorkDocument>;
 
 export default function Editor(props: IProps) {
+
   return (
     <div className="html-defaults-container">
-      <Sidebar />
+      <Sidebar {...props} />
     </div>
   );
 }

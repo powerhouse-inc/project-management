@@ -10,7 +10,10 @@ const SIDEBAR_OPTIONS = [
   { key: "deliverables", label: "Deliverables" },
 ];
 
-const Sidebar = () => {
+const Sidebar = (props: any) => {
+  const { dispatch, document } = props;
+
+
   const [selected, setSelected] = useState("sow");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -117,7 +120,7 @@ const Sidebar = () => {
 
       {/* Main View */}
       <div className="flex-1 ml-2 md:ml-4 w-full">
-        {selected === "sow" && <ScopeOfWork />}
+        {selected === "sow" && <ScopeOfWork {...props} />}
         {selected === "roadmaps" && <Roadmaps />}
         {selected === "milestones" && <Milestones />}
         {selected === "deliverables" && <Deliverables />}
