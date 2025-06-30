@@ -1,4 +1,8 @@
 import React, { useState } from "react";
+import Roadmaps from "./roadmaps.js";
+import Milestones from "./milestones.js";
+import Deliverables from "./deliverables.js";
+import ScopeOfWork from "./scopeOfWork.js";
 
 const SIDEBAR_OPTIONS = [
   { key: "roadmaps", label: "Roadmaps" },
@@ -112,27 +116,11 @@ const Sidebar = () => {
       </div>
 
       {/* Main View */}
-      <div className="flex-1 p-8 md:ml-0 ml-0 w-full">
-        {selected === "sow" && (
-          <div className="text-2xl font-semibold text-gray-700">
-            SOW Editor View
-          </div>
-        )}
-        {selected === "roadmaps" && (
-          <div className="text-2xl font-semibold text-gray-700">
-            Roadmaps View
-          </div>
-        )}
-        {selected === "milestones" && (
-          <div className="text-2xl font-semibold text-gray-700">
-            Milestones View
-          </div>
-        )}
-        {selected === "deliverables" && (
-          <div className="text-2xl font-semibold text-gray-700">
-            Deliverables View
-          </div>
-        )}
+      <div className="flex-1 ml-2 md:ml-4 w-full">
+        {selected === "sow" && <ScopeOfWork />}
+        {selected === "roadmaps" && <Roadmaps />}
+        {selected === "milestones" && <Milestones />}
+        {selected === "deliverables" && <Deliverables />}
       </div>
     </div>
   );
