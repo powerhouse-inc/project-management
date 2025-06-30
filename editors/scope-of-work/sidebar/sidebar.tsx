@@ -12,10 +12,27 @@ const SIDEBAR_OPTIONS = [
 
 const Sidebar = (props: any) => {
   const { dispatch, document } = props;
-
+  const state = document.state.global;
+  const roadmaps = state.roadmaps;
 
   const [selected, setSelected] = useState("sow");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [roadmapsOpen, setRoadmapsOpen] = useState(false);
+  const [selectedRoadmapId, setSelectedRoadmapId] = useState<string | null>(null);
+
+  // Select latest roadmap by default when opening roadmaps
+  React.useEffect(() => {
+    if (selected === "roadmaps" && roadmaps.length > 0 && !selectedRoadmapId) {
+      setSelectedRoadmapId(roadmaps[roadmaps.length - 1].id);
+    }
+  }, [selected, roadmaps, selectedRoadmapId]);
+
+  // Handler for clicking a roadmap title in the sidebar
+  const handleSelectRoadmap = (id: string) => {
+    setSelected("roadmaps");
+    setSelectedRoadmapId(id);
+    setSidebarOpen(false);
+  };
 
   return (
     <div
@@ -99,29 +116,80 @@ const Sidebar = (props: any) => {
           </button>
         </div>
         <div className="flex flex-col gap-2 mt-2">
-          {SIDEBAR_OPTIONS.map((option) => (
+          {/* Roadmaps button with expandable subsection */}
+          <div>
             <button
-              key={option.key}
-              className={`text-left px-4 py-2 rounded border border-gray-300 transition-colors duration-150 ${
-                selected === option.key
+              className={`text-left px-4 py-2 rounded border border-gray-300 transition-colors duration-150 w-full ${
+                selected === "roadmaps"
                   ? "bg-white font-bold"
                   : "bg-gray-100 hover:bg-gray-300"
               }`}
               onClick={() => {
-                setSelected(option.key);
-                setSidebarOpen(false); // close sidebar on mobile after selection
+                setRoadmapsOpen((open) => !open);
+                setSelected("roadmaps");
+                if (roadmaps.length > 0 && !selectedRoadmapId) {
+                  setSelectedRoadmapId(roadmaps[roadmaps.length - 1].id);
+                }
+                setSidebarOpen(false);
               }}
             >
-              {option.label}
+              Roadmaps
             </button>
-          ))}
+            {/* Subsection for roadmap titles */}
+            {roadmapsOpen && roadmaps.length > 0 && (
+              <div className="ml-4 mt-1 flex flex-col gap-1">
+                {roadmaps.map((roadmap: any) => (
+                  <button
+                    key={roadmap.id}
+                    className={`text-left px-3 py-1 rounded transition-colors duration-150 border border-gray-200 focus:outline-none text-sm ${
+                      selectedRoadmapId === roadmap.id
+                        ? "bg-blue-100 font-bold border-blue-400"
+                        : "bg-gray-50 hover:bg-gray-200"
+                    }`}
+                    onClick={() => handleSelectRoadmap(roadmap.id)}
+                  >
+                    {roadmap.title}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          {/* Milestones and Deliverables buttons */}
+          <button
+            className={`text-left px-4 py-2 rounded border border-gray-300 transition-colors duration-150 ${
+              selected === "milestones"
+                ? "bg-white font-bold"
+                : "bg-gray-100 hover:bg-gray-300"
+            }`}
+            onClick={() => {
+              setSelected("milestones");
+              setSidebarOpen(false);
+            }}
+          >
+            Milestones
+          </button>
+          <button
+            className={`text-left px-4 py-2 rounded border border-gray-300 transition-colors duration-150 ${
+              selected === "deliverables"
+                ? "bg-white font-bold"
+                : "bg-gray-100 hover:bg-gray-300"
+            }`}
+            onClick={() => {
+              setSelected("deliverables");
+              setSidebarOpen(false);
+            }}
+          >
+            Deliverables
+          </button>
         </div>
       </div>
 
       {/* Main View */}
       <div className="flex-1 ml-2 md:ml-4 w-full">
         {selected === "sow" && <ScopeOfWork {...props} />}
-        {selected === "roadmaps" && <Roadmaps />}
+        {selected === "roadmaps" && selectedRoadmapId && (
+          <Roadmaps roadmaps={roadmaps.filter((r: any) => r.id === selectedRoadmapId)} />
+        )}
         {selected === "milestones" && <Milestones />}
         {selected === "deliverables" && <Deliverables />}
       </div>
