@@ -12,7 +12,7 @@ import {
 import { generateId } from "document-model";
 
 const ScopeOfWork = (props: any) => {
-  const { dispatch, document } = props;
+  const { setSelectedRoadmapId, setRoadmapsOpen, dispatch, document} = props;
   const state = document.state.global;
 
   const statusOptions = [
@@ -29,7 +29,7 @@ const ScopeOfWork = (props: any) => {
   useEffect(() => {
     setTableData(state.roadmaps);
   }, [state.roadmaps]);
-  
+
   const [editRowId, setEditRowId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -124,6 +124,7 @@ const ScopeOfWork = (props: any) => {
         />
       </div>
       <div className="mt-4">
+        <label className="text-sm font-medium text-gray-700 mb-2">Roadmaps</label>
         <table className="w-full mb-2 border border-gray-300 rounded">
           <thead>
             <tr className="bg-gray-100 border-b border-gray-300 rounded-t">
@@ -150,7 +151,8 @@ const ScopeOfWork = (props: any) => {
                     <span
                       className="cursor-pointer"
                       onClick={() => {
-                        console.log("move to roadmap");
+                        setSelectedRoadmapId(row.id);
+                        setRoadmapsOpen(true);
                       }}
                     >
                       <Icon

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import Roadmaps from "./roadmaps.js";
 import Milestones from "./milestones.js";
 import Deliverables from "./deliverables.js";
@@ -18,10 +18,12 @@ const Sidebar = (props: any) => {
   const [selected, setSelected] = useState("sow");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [roadmapsOpen, setRoadmapsOpen] = useState(false);
-  const [selectedRoadmapId, setSelectedRoadmapId] = useState<string | null>(null);
+  const [selectedRoadmapId, setSelectedRoadmapId] = useState<string | null>(
+    null
+  );
 
   // Select latest roadmap by default when opening roadmaps
-  React.useEffect(() => {
+  useEffect(() => {
     if (selected === "roadmaps" && roadmaps.length > 0 && !selectedRoadmapId) {
       setSelectedRoadmapId(roadmaps[roadmaps.length - 1].id);
     }
@@ -90,6 +92,7 @@ const Sidebar = (props: any) => {
             onClick={() => {
               setSelected("sow");
               setSidebarOpen(false);
+              setRoadmapsOpen(false);
             }}
             style={{ borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}
           >
@@ -164,6 +167,7 @@ const Sidebar = (props: any) => {
             onClick={() => {
               setSelected("milestones");
               setSidebarOpen(false);
+              setRoadmapsOpen(false);
             }}
           >
             Milestones
@@ -177,6 +181,7 @@ const Sidebar = (props: any) => {
             onClick={() => {
               setSelected("deliverables");
               setSidebarOpen(false);
+              setRoadmapsOpen(false);
             }}
           >
             Deliverables
@@ -186,9 +191,14 @@ const Sidebar = (props: any) => {
 
       {/* Main View */}
       <div className="flex-1 ml-2 md:ml-4 w-full">
-        {selected === "sow" && <ScopeOfWork {...props} />}
+        {selected === "sow" && (
+          <ScopeOfWork {...props} setRoadmapsOpen={setRoadmapsOpen} setSelectedRoadmapId={handleSelectRoadmap} />
+        )}
         {selected === "roadmaps" && selectedRoadmapId && (
-          <Roadmaps roadmaps={roadmaps.filter((r: any) => r.id === selectedRoadmapId)} />
+          <Roadmaps
+            dispatch={dispatch}
+            roadmaps={roadmaps.filter((r: any) => r.id === selectedRoadmapId)}
+          />
         )}
         {selected === "milestones" && <Milestones />}
         {selected === "deliverables" && <Deliverables />}
