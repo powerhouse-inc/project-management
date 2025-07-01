@@ -35,6 +35,16 @@ const Roadmaps: React.FC<RoadmapsProps> = ({ roadmaps, dispatch }) => {
   const columns = useMemo<Array<ColumnDef<any>>>(
     () => [
       {
+        field: "link",
+        width: 20,
+        align: "center" as ColumnAlignment,
+        renderCell: (value: any, context: any) => {
+          return <div className="text-center">
+            <Icon className="hover:cursor-pointer" name="Moved" size={18} />
+          </div>;
+        },
+      },
+      {
         field: "title",
         title: "Title",
         editable: true,
@@ -51,6 +61,9 @@ const Roadmaps: React.FC<RoadmapsProps> = ({ roadmaps, dispatch }) => {
             return true;
           }
           return false;
+        },
+        renderCell: (value: any, context: any) => {
+          return <div className="text-left">{value}</div>;
         },
       },
       {
@@ -107,11 +120,10 @@ const Roadmaps: React.FC<RoadmapsProps> = ({ roadmaps, dispatch }) => {
         renderCell: (value: any, context: any) => {
           return <div className="text-center">{value}</div>;
         },
-        renderCellEditor: (value: any, context: any) => {
-          return <DatePicker name="deliveryTarget" value={value} onChange={(e) => {
-            dispatch(actions.editMilestone({ id: context.row.id, roadmapId: roadmap.id, deliveryTarget: e.target.value }));
-          }} />;
-        },
+        // renderCellEditor: (value: any, context: any) => {
+        //   console.log({value, context});
+        //   return <DatePicker name="deliveryTarget" value={value}  />;
+        // },
       },
     ],
     []
