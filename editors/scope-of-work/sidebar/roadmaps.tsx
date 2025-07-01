@@ -15,9 +15,11 @@ interface Roadmap {
 interface RoadmapsProps {
   roadmaps: Roadmap[];
   dispatch: any;
+  setMilestonesOpen: (open: boolean) => void;
+  setSelectedMilestoneId: (id: string) => void;
 }
 
-const Roadmaps: React.FC<RoadmapsProps> = ({ roadmaps, dispatch }) => {
+const Roadmaps: React.FC<RoadmapsProps> = ({ roadmaps , dispatch, setMilestonesOpen, setSelectedMilestoneId }) => {
   const roadmap = roadmaps[0];
 
   // Controlled state for title and description
@@ -40,7 +42,12 @@ const Roadmaps: React.FC<RoadmapsProps> = ({ roadmaps, dispatch }) => {
         align: "center" as ColumnAlignment,
         renderCell: (value: any, context: any) => {
           return <div className="text-center">
-            <Icon className="hover:cursor-pointer" name="Moved" size={18} />
+            <Icon className="hover:cursor-pointer" name="Moved" size={18} 
+              onClick={() => {
+                setMilestonesOpen(true);
+                setSelectedMilestoneId(context.row.id);
+              }}
+            />
           </div>;
         },
       },
