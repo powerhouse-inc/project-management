@@ -55,7 +55,7 @@
     "@powerhousedao/builder-tools": "^3.1.2",
     "@powerhousedao/common": "^3.1.2",
     "@powerhousedao/design-system": "^3.1.2",
-    "@powerhousedao/document-engineering": "^1.15.0",
+    "@powerhousedao/document-engineering": "^1.16.0",
     "document-model": "^3.1.2",
     "error": "^10.4.0",
     "graphql": "^16.10.0",
