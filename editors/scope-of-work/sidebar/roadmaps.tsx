@@ -3,7 +3,7 @@ import { Textarea, TextInput } from "@powerhousedao/document-engineering";
 import React, { useState, useEffect, useMemo } from "react";
 import { Icon } from "@powerhousedao/design-system";
 import { generateId } from "document-model";
-import { ObjectSetTable, ColumnAlignment, DatePicker } from "@powerhousedao/document-engineering";
+import { ObjectSetTable, ColumnAlignment, DatePicker, ColumnDef } from "@powerhousedao/document-engineering";
 
 interface Roadmap {
   id: string;
@@ -32,7 +32,7 @@ const Roadmaps: React.FC<RoadmapsProps> = ({ roadmaps, dispatch }) => {
     setSlug(roadmap?.slug || "");
   }, [roadmap?.id]);
 
-  const columns = useMemo(
+  const columns = useMemo<Array<ColumnDef<any>>>(
     () => [
       {
         field: "title",
@@ -92,9 +92,25 @@ const Roadmaps: React.FC<RoadmapsProps> = ({ roadmaps, dispatch }) => {
         title: "Delivery Target",
         editable: true,
         align: "center" as ColumnAlignment,
-        onSave: (data: any, row: any) => {
-          console.log("save", row, data);
-          return true;
+        width: 200,
+        onSave: (newValue: any, context: any) => {
+          if(newValue === '') {
+            dispatch(actions.editMilestone({ id: context.row.id, roadmapId: roadmap.id, deliveryTarget: ' ' }));
+            return true;
+          }
+          if(newValue !== context.row.deliveryTarget || newValue === '') {
+            dispatch(actions.editMilestone({ id: context.row.id, roadmapId: roadmap.id, deliveryTarget: newValue as string }));
+            return true;
+          }
+          return false;
+        },
+        renderCell: (value: any, context: any) => {
+          return <div className="text-center">{value}</div>;
+        },
+        renderCellEditor: (value: any, context: any) => {
+          return <DatePicker name="deliveryTarget" value={value} onChange={(e) => {
+            dispatch(actions.editMilestone({ id: context.row.id, roadmapId: roadmap.id, deliveryTarget: e.target.value }));
+          }} />;
         },
       },
     ],
@@ -173,15 +189,6 @@ const Roadmaps: React.FC<RoadmapsProps> = ({ roadmaps, dispatch }) => {
                 })
               );
             }
-          }}
-        />
-      </div>
-      <div className="mt-4">
-        <DatePicker
-          name="startDate"
-          value={roadmap.startDate}
-          onBlur={(e) => {
-            // dispatch(actions.editRoadmap({ id: roadmap.id, startDate: e.target.value }));
           }}
         />
       </div>
