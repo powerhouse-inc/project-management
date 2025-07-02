@@ -53,6 +53,11 @@ const Sidebar = (props: any) => {
   };
 
   const handleSelectMilestone = (id: string) => {
+    // find roadmap id from milestone id
+    const roadmapId = roadmaps.find((r: any) => r.milestones.some((m: any) => m.id === id))?.id;
+    if (roadmapId) {
+      setSelectedRoadmapId(roadmapId);
+    }
     setSelected("milestones");
     setSelectedMilestoneId(id);
     setSidebarOpen(false);
@@ -244,6 +249,24 @@ const Sidebar = (props: any) => {
           >
             Deliverables
           </button>
+          {/* Subsection for deliverable titles */}
+          {deliverablesOpen && deliverables.length > 0 && (
+              <div className="ml-4 mt-1 flex flex-col gap-1">
+                {deliverables.map((deliverable: any) => (
+                  <button
+                    key={deliverable.id}
+                    className={`text-left px-3 py-1 rounded transition-colors duration-150 border border-gray-200 focus:outline-none text-sm ${
+                      selectedDeliverableId === deliverable.id
+                        ? "bg-blue-100 font-bold border-blue-400"
+                        : "bg-gray-50 hover:bg-gray-200"
+                    }`}
+                    onClick={() => handleSelectDeliverable(deliverable.id)}
+                  >
+                    {deliverable.title}
+                  </button>
+                ))}
+              </div>
+            )}
         </div>
       </div>
 
@@ -265,6 +288,9 @@ const Sidebar = (props: any) => {
             dispatch={dispatch}
             milestones={milestones.filter((m: any) => m.id === selectedMilestoneId)}
             roadmaps={roadmaps}
+            deliverables={deliverables}
+            setDeliverablesOpen={setDeliverablesOpen}
+            setSelectedDeliverableId={handleSelectDeliverable}
           />
         )}
         {selected === "deliverables" && selectedDeliverableId && (
