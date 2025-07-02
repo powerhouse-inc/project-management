@@ -64,6 +64,11 @@ const Sidebar = (props: any) => {
   };
 
   const handleSelectDeliverable = (id: string) => {
+    // find milestone id from deliverable id
+    const milestoneId = milestones.find((m: any) => m.scope?.deliverables.some((d: any) => d === id))?.id;
+    if (milestoneId) {
+      setSelectedMilestoneId(milestoneId);
+    }
     setSelected("deliverables");
     setSelectedDeliverableId(id);
     setSidebarOpen(false);

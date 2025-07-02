@@ -12,7 +12,7 @@ import {
   Deliverable,
 } from "../../../document-models/scope-of-work/index.js";
 import { actions } from "../../../document-models/scope-of-work/index.js";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { generateId } from "document-model";
 import { Icon } from "@powerhousedao/design-system";
 
@@ -41,6 +41,15 @@ const Milestones: React.FC<MilestonesProps> = ({
     milestone.scope?.deliverables.map((d: any) =>
       deliverables.find((d2: any) => d2.id === d)
     ) || [];
+
+  const [stateMilestone, setStateMilestone] = useState(milestone);
+
+  useEffect(() => {
+    setStateMilestone(milestone);
+  }, [milestone]);
+
+  console.log("stateMilestone deliveryTarget", stateMilestone.deliveryTarget);
+  console.log("milestone deliveryTarget", milestone.deliveryTarget);
 
   const columns = useMemo<Array<ColumnDef<any>>>(
     () => [
@@ -108,7 +117,8 @@ const Milestones: React.FC<MilestonesProps> = ({
           <TextInput
             className="w-full"
             label="Code"
-            defaultValue={milestone.sequenceCode}
+            value={stateMilestone.sequenceCode}
+            onChange={(e) => setStateMilestone(prevValue => ({ ...prevValue, sequenceCode: e.target.value }))}
             onBlur={(e) => {
               if (!roadmap) return;
               if (e.target.value === milestone.title) return;
@@ -126,8 +136,8 @@ const Milestones: React.FC<MilestonesProps> = ({
           <TextInput
             className="w-full"
             label="Title"
-            defaultValue={milestone.title}
-            // onChange={(e) => setTitle(e.target.value)}
+            value={stateMilestone.title}
+            onChange={(e) => setStateMilestone(prevValue => ({ ...prevValue, title: e.target.value }))}
             onBlur={(e) => {
               if (!roadmap) return;
               if (e.target.value === milestone.title) return;
@@ -148,7 +158,8 @@ const Milestones: React.FC<MilestonesProps> = ({
           <TextInput
             className="w-full"
             label="Coordinators"
-            defaultValue={milestone.coordinators.join(", ")}
+            value={stateMilestone.coordinators.join(", ")}
+            onChange={(e) => setStateMilestone(prevValue => ({ ...prevValue, coordinators: e.target.value.split(", ") }))}
             onBlur={(e) => {
               if (!roadmap) return;
               if (e.target.value === milestone.coordinators.join(", ")) return;
@@ -174,13 +185,14 @@ const Milestones: React.FC<MilestonesProps> = ({
         </div>
         <div className="col-span-3 flex justify-end">
           <DatePicker
+            key={stateMilestone.id}
             className="w-full"
             name="deliveryTarget"
             label="Delivery Target"
-            defaultValue={milestone.deliveryTarget}
+            value={stateMilestone.deliveryTarget}
             onChange={(e) => {
               if (!roadmap) return;
-              if (e.target.value === milestone.deliveryTarget) return;
+              if (e.target.value === stateMilestone.deliveryTarget) return;
               dispatch(
                 actions.editMilestone({
                   id: milestone.id,
@@ -197,7 +209,8 @@ const Milestones: React.FC<MilestonesProps> = ({
         <Textarea
           className="w-full"
           label="Description"
-          defaultValue={milestone.description}
+          value={stateMilestone.description}
+          onChange={(e) => setStateMilestone(prevValue => ({ ...prevValue, description: e.target.value }))}
           onBlur={(e) => {
             if (!roadmap) return;
             if (e.target.value === milestone.description) return;
@@ -215,7 +228,8 @@ const Milestones: React.FC<MilestonesProps> = ({
         <TextInput
           className="w-full"
           label="Estimated Budget Cap"
-          defaultValue={milestone.estimatedBudgetCap}
+          value={stateMilestone.estimatedBudgetCap}
+          onChange={(e) => setStateMilestone(prevValue => ({ ...prevValue, estimatedBudgetCap: e.target.value }))}
           onBlur={(e) => {
             if (!roadmap) return;
             if (e.target.value === milestone.estimatedBudgetCap) return;
