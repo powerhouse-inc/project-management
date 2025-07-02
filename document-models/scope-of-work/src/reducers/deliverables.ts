@@ -5,6 +5,7 @@
  */
 
 import type { ScopeOfWorkDeliverablesOperations } from "../../gen/deliverables/operations.js";
+import type { KeyResult } from "../../gen/types.js";
 
 export const reducer: ScopeOfWorkDeliverablesOperations = {
   addDeliverableOperation(state, action, dispatch) {
@@ -32,7 +33,7 @@ export const reducer: ScopeOfWorkDeliverablesOperations = {
       if (action.input.id === undefined) {
         throw new Error("Invalid deliverable id input");
       }
-      
+
       const deliverable = state.deliverables.find((deliverable) => String(deliverable.id) === String(action.input.id));
       if (!deliverable) {
         throw new Error("Deliverable not found");
@@ -122,23 +123,24 @@ export const reducer: ScopeOfWorkDeliverablesOperations = {
   },
   editKeyResultOperation(state, action, dispatch) {
     try {
+      if (action.input.id === undefined || action.input.deliverableId === undefined) {
+        throw new Error("Invalid key result id or deliverable id input");
+      }
+
       const updatedDeliverable = state.deliverables.find((deliverable) => String(deliverable.id) === String(action.input.deliverableId));
       if (!updatedDeliverable) {
         throw new Error("Deliverable not found");
       }
 
       const keyResult = updatedDeliverable.keyResults.find((keyResult) => String(keyResult.id) === String(action.input.id));
-      if (!keyResult) {
-        throw new Error("Key result not found");
-      }
 
       const updatedKeyResult = {
         ...keyResult,
-        title: action.input.title || keyResult.title,
-        link: action.input.link || keyResult.link,
+        title: action.input.title || keyResult?.title,
+        link: action.input.link || keyResult?.link,
       }
 
-      updatedDeliverable.keyResults = updatedDeliverable.keyResults.map((keyResult) => String(keyResult.id) === String(action.input.id) ? updatedKeyResult : keyResult);
+      updatedDeliverable.keyResults = updatedDeliverable.keyResults?.map((keyResult) => String(keyResult.id) === String(action.input.id) ? updatedKeyResult : keyResult) as KeyResult[];
       state.deliverables = state.deliverables.map((deliverable) => String(deliverable.id) === String(action.input.deliverableId) ? updatedDeliverable : deliverable);
 
     } catch (error) {

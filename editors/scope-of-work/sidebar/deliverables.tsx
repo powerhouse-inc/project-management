@@ -42,8 +42,8 @@ const Deliverables: React.FC<DeliverablesProps> = ({
     setStateDeliverable(deliverable);
   }, [deliverable?.id]);
 
-  const columns = useMemo<Array<ColumnDef<any>>>(
-    () => [
+  const columns = useMemo<Array<ColumnDef<any>>>(() => {
+    return [
       {
         field: "title",
         editable: true,
@@ -65,7 +65,7 @@ const Deliverables: React.FC<DeliverablesProps> = ({
         field: "link",
         editable: true,
         onSave: (newValue: any, context: any) => {
-          if (newValue !== context.row.title) {
+          if (newValue !== context.row.link) {
             dispatch(
               actions.editKeyResult({
                 id: context.row.id,
@@ -78,9 +78,8 @@ const Deliverables: React.FC<DeliverablesProps> = ({
           return false;
         },
       },
-    ],
-    []
-  );
+    ];
+  }, [deliverable, dispatch]);
 
   return (
     <div className="border border-gray-300 p-2">
@@ -210,39 +209,53 @@ const Deliverables: React.FC<DeliverablesProps> = ({
           }}
         />
       </div>
-      <div className="mt-2 w-[150px]">
-        <Select
-          label="Status"
-          options={statusOptions}
-          value={stateDeliverable.status}
-          onChange={(value) => {
-            dispatch(
-              actions.editDeliverable({
-                id: deliverable.id,
-                status: value as DeliverableStatusInput,
-              })
-            );
-          }}
-        />
+      <div className="mt-8 grid grid-cols-8 gap-2">
+        <div className="mt-2 w-[150px] col-span-2">
+          <Select
+            label="Status"
+            options={statusOptions}
+            value={stateDeliverable.status}
+            onChange={(value) => {
+              dispatch(
+                actions.editDeliverable({
+                  id: deliverable.id,
+                  status: value as DeliverableStatusInput,
+                })
+              );
+            }}
+          />
+        </div>
+        <div className="col-span-3 flex justify-center items-center">
+          <button className="bg-blue-500 text-white px-4 py-2 rounded-md">
+            Add Key Result
+          </button>
+        </div>
+        <div className="col-span-3 flex justify-end items-center">
+          <button className="bg-blue-500 text-white px-4 py-2 rounded-md">
+            Add Key Result
+          </button>
+        </div>
       </div>
       <div className="mt-8">
         <label className="text-sm font-medium">Add Key Results</label>
-        <ObjectSetTable
-          columns={columns}
-          data={deliverable.keyResults || []}
-          allowRowSelection={true}
-          onAdd={(data) => {
-            if (data.title) {
-              dispatch(
-                actions.addKeyResult({
-                  id: generateId(),
-                  deliverableId: deliverable.id,
-                  title: typeof data.title === "string" ? data.title : "",
-                })
-              );
-            }
-          }}
-        />
+        {deliverable && (
+          <ObjectSetTable
+            columns={columns}
+            data={deliverable.keyResults || []}
+            allowRowSelection={true}
+            onAdd={(data) => {
+              if (data.title) {
+                dispatch(
+                  actions.addKeyResult({
+                    id: generateId(),
+                    deliverableId: deliverable.id,
+                    title: typeof data.title === "string" ? data.title : "",
+                  })
+                );
+              }
+            }}
+          />
+        )}
       </div>
     </div>
   );
