@@ -48,8 +48,6 @@ const Milestones: React.FC<MilestonesProps> = ({
     setStateMilestone(milestone);
   }, [milestone]);
 
-  console.log("stateMilestone deliveryTarget", stateMilestone.deliveryTarget);
-  console.log("milestone deliveryTarget", milestone.deliveryTarget);
 
   const columns = useMemo<Array<ColumnDef<any>>>(
     () => [
