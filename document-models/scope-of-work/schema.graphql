@@ -221,6 +221,13 @@ input RemoveKeyResultInput {
   deliverableId:OID!
 }
 
+input EditKeyResultInput {
+  id: OID!
+  deliverableId: OID!
+  title: String
+  link: URL
+}
+
 # roadmaps
 
 input AddRoadmapInput {

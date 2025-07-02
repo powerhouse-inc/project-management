@@ -170,6 +170,11 @@ export const schema: DocumentNode = gql`
       docId: PHID
       input: ScopeOfWork_RemoveKeyResultInput
     ): Int
+    ScopeOfWork_editKeyResult(
+      driveId: String
+      docId: PHID
+      input: ScopeOfWork_EditKeyResultInput
+    ): Int
     ScopeOfWork_addRoadmap(
       driveId: String
       docId: PHID
@@ -334,6 +339,12 @@ export const schema: DocumentNode = gql`
   input ScopeOfWork_RemoveKeyResultInput {
     id: OID!
     deliverableId: OID!
+  }
+  input ScopeOfWork_EditKeyResultInput {
+    id: OID!
+    deliverableId: OID!
+    title: String
+    link: URL
   }
 
   """

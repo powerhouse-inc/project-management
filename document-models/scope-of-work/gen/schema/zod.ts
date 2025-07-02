@@ -23,6 +23,7 @@ import type {
   EditAgentInput,
   EditDeliverableInput,
   EditDeliverablesSetInput,
+  EditKeyResultInput,
   EditMilestoneInput,
   EditRoadmapInput,
   EditScopeOfWorkInput,
@@ -297,6 +298,17 @@ export function EditDeliverablesSetInputSchema(): z.ZodObject<
     ),
     milestoneId: z.string(),
     status: z.lazy(() => DeliverableSetStatusInputSchema.nullish()),
+  });
+}
+
+export function EditKeyResultInputSchema(): z.ZodObject<
+  Properties<EditKeyResultInput>
+> {
+  return z.object({
+    deliverableId: z.string(),
+    id: z.string(),
+    link: z.string().url().nullish(),
+    title: z.string().nullish(),
   });
 }
 

@@ -6,6 +6,7 @@ import {
   type SetDeliverableProgressInput,
   type AddKeyResultInput,
   type RemoveKeyResultInput,
+  type EditKeyResultInput,
   type ScopeOfWorkState,
   type ScopeOfWorkLocalState,
 } from "../types.js";
@@ -16,6 +17,7 @@ import {
   setDeliverableProgress,
   addKeyResult,
   removeKeyResult,
+  editKeyResult,
 } from "./creators.js";
 import { type ScopeOfWorkAction } from "../actions.js";
 
@@ -46,5 +48,9 @@ export default class ScopeOfWork_Deliverables extends BaseDocumentClass<
 
   public removeKeyResult(input: RemoveKeyResultInput) {
     return this.dispatch(removeKeyResult(input));
+  }
+
+  public editKeyResult(input: EditKeyResultInput) {
+    return this.dispatch(editKeyResult(input));
   }
 }

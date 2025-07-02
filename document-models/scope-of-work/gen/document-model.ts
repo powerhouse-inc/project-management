@@ -208,6 +208,18 @@ export const documentModel: DocumentModelState = {
               examples: [],
               scope: "global",
             },
+            {
+              id: "af639826-2a15-419f-a1ef-ebfd6cd048eb",
+              name: "EDIT_KEY_RESULT",
+              description: "",
+              schema:
+                "input EditKeyResultInput {\n  id: OID!\n  deliverableId: OID!\n  title: String\n  link: URL\n}",
+              template: "",
+              reducer: "",
+              errors: [],
+              examples: [],
+              scope: "global",
+            },
           ],
         },
         {

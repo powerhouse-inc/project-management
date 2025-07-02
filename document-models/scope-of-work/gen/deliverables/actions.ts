@@ -6,6 +6,7 @@ import type {
   SetDeliverableProgressInput,
   AddKeyResultInput,
   RemoveKeyResultInput,
+  EditKeyResultInput,
 } from "../types.js";
 
 export type AddDeliverableAction = BaseAction<
@@ -38,6 +39,11 @@ export type RemoveKeyResultAction = BaseAction<
   RemoveKeyResultInput,
   "global"
 >;
+export type EditKeyResultAction = BaseAction<
+  "EDIT_KEY_RESULT",
+  EditKeyResultInput,
+  "global"
+>;
 
 export type ScopeOfWorkDeliverablesAction =
   | AddDeliverableAction
@@ -45,4 +51,5 @@ export type ScopeOfWorkDeliverablesAction =
   | EditDeliverableAction
   | SetDeliverableProgressAction
   | AddKeyResultAction
-  | RemoveKeyResultAction;
+  | RemoveKeyResultAction
+  | EditKeyResultAction;

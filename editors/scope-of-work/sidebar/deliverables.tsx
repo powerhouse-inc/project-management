@@ -4,7 +4,6 @@ import {
   ColumnDef,
   Textarea,
   TextInput,
-  ColumnAlignment,
   Select,
 } from "@powerhousedao/document-engineering";
 import {
@@ -37,7 +36,6 @@ const Deliverables: React.FC<DeliverablesProps> = ({
 }) => {
   const deliverable = deliverables[0];
 
-
   const [stateDeliverable, setStateDeliverable] = useState(deliverable);
 
   useEffect(() => {
@@ -49,10 +47,36 @@ const Deliverables: React.FC<DeliverablesProps> = ({
       {
         field: "title",
         editable: true,
+        onSave: (newValue: any, context: any) => {
+          if (newValue !== context.row.title) {
+            dispatch(
+              actions.editKeyResult({
+                id: context.row.id,
+                deliverableId: deliverable.id,
+                title: newValue,
+              })
+            );
+            return true;
+          }
+          return false;
+        },
       },
       {
-        field: "Link",
+        field: "link",
         editable: true,
+        onSave: (newValue: any, context: any) => {
+          if (newValue !== context.row.title) {
+            dispatch(
+              actions.editKeyResult({
+                id: context.row.id,
+                deliverableId: deliverable.id,
+                link: newValue,
+              })
+            );
+            return true;
+          }
+          return false;
+        },
       },
     ],
     []
@@ -66,15 +90,20 @@ const Deliverables: React.FC<DeliverablesProps> = ({
             className="w-full"
             label="Code"
             value={stateDeliverable.code}
-            onChange={(e) => setStateDeliverable(prevValue => ({ ...prevValue, code: e.target.value }))}
+            onChange={(e) =>
+              setStateDeliverable((prevValue) => ({
+                ...prevValue,
+                code: e.target.value,
+              }))
+            }
             onBlur={(e) => {
-              if(e.target.value === '') {
+              if (e.target.value === "") {
                 dispatch(
                   actions.editDeliverable({
                     id: deliverable.id,
-                    code: ' ',
+                    code: " ",
                   })
-                )
+                );
               }
               if (e.target.value === deliverable.code) return;
               dispatch(
@@ -91,15 +120,20 @@ const Deliverables: React.FC<DeliverablesProps> = ({
             className="w-full"
             label="Title"
             value={stateDeliverable.title}
-            onChange={(e) => setStateDeliverable({ ...stateDeliverable, title: e.target.value })}
+            onChange={(e) =>
+              setStateDeliverable({
+                ...stateDeliverable,
+                title: e.target.value,
+              })
+            }
             onBlur={(e) => {
-              if(e.target.value === '') {
+              if (e.target.value === "") {
                 dispatch(
                   actions.editDeliverable({
                     id: deliverable.id,
-                    title: ' ',
+                    title: " ",
                   })
-                )
+                );
               }
               if (e.target.value === deliverable.title) return;
               dispatch(
@@ -119,15 +153,20 @@ const Deliverables: React.FC<DeliverablesProps> = ({
             className="w-full"
             label="Deliverable Owner"
             value={stateDeliverable.owner || ""}
-            onChange={(e) => setStateDeliverable({ ...stateDeliverable, owner: e.target.value })}
+            onChange={(e) =>
+              setStateDeliverable({
+                ...stateDeliverable,
+                owner: e.target.value,
+              })
+            }
             onBlur={(e) => {
-              if(e.target.value === '') {
+              if (e.target.value === "") {
                 dispatch(
                   actions.editDeliverable({
                     id: deliverable.id,
-                    owner: ' ',
+                    owner: " ",
                   })
-                )
+                );
               }
               if (e.target.value === deliverable.owner) return;
               dispatch(
@@ -146,15 +185,20 @@ const Deliverables: React.FC<DeliverablesProps> = ({
           className="w-full"
           label="Description"
           value={stateDeliverable.description}
-          onChange={(e) => setStateDeliverable({ ...stateDeliverable, description: e.target.value })}
+          onChange={(e) =>
+            setStateDeliverable({
+              ...stateDeliverable,
+              description: e.target.value,
+            })
+          }
           onBlur={(e) => {
-            if(e.target.value === '') {
+            if (e.target.value === "") {
               dispatch(
                 actions.editDeliverable({
                   id: deliverable.id,
-                  description: ' ',
+                  description: " ",
                 })
-              )
+              );
             }
             if (e.target.value === deliverable.description) return;
             dispatch(
@@ -182,6 +226,7 @@ const Deliverables: React.FC<DeliverablesProps> = ({
         />
       </div>
       <div className="mt-8">
+        <label className="text-sm font-medium">Add Key Results</label>
         <ObjectSetTable
           columns={columns}
           data={deliverable.keyResults || []}
@@ -192,13 +237,12 @@ const Deliverables: React.FC<DeliverablesProps> = ({
                 actions.addKeyResult({
                   id: generateId(),
                   deliverableId: deliverable.id,
-                  title: typeof data.title === 'string' ? data.title : '',
+                  title: typeof data.title === "string" ? data.title : "",
                 })
               );
             }
-           
           }}
-          />
+        />
       </div>
     </div>
   );

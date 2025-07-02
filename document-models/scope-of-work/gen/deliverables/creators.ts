@@ -7,6 +7,7 @@ import {
   type SetDeliverableProgressInput,
   type AddKeyResultInput,
   type RemoveKeyResultInput,
+  type EditKeyResultInput,
 } from "../types.js";
 import {
   type AddDeliverableAction,
@@ -15,6 +16,7 @@ import {
   type SetDeliverableProgressAction,
   type AddKeyResultAction,
   type RemoveKeyResultAction,
+  type EditKeyResultAction,
 } from "./actions.js";
 
 export const addDeliverable = (input: AddDeliverableInput) =>
@@ -68,5 +70,14 @@ export const removeKeyResult = (input: RemoveKeyResultInput) =>
     { ...input },
     undefined,
     z.RemoveKeyResultInputSchema,
+    "global",
+  );
+
+export const editKeyResult = (input: EditKeyResultInput) =>
+  createAction<EditKeyResultAction>(
+    "EDIT_KEY_RESULT",
+    { ...input },
+    undefined,
+    z.EditKeyResultInputSchema,
     "global",
   );

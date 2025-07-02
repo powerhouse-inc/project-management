@@ -177,6 +177,20 @@ export const getResolvers = (subgraph: Subgraph): Record<string, any> => {
         return doc.revision.global + 1;
       },
 
+      ScopeOfWork_editKeyResult: async (_: any, args: any) => {
+        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
+        const docId: string = args.docId || "";
+        const doc = await reactor.getDocument(driveId, docId);
+
+        await reactor.addAction(
+          driveId,
+          docId,
+          actions.editKeyResult({ ...args.input }),
+        );
+
+        return doc.revision.global + 1;
+      },
+
       ScopeOfWork_addRoadmap: async (_: any, args: any) => {
         const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
         const docId: string = args.docId || "";

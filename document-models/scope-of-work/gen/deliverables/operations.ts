@@ -6,6 +6,7 @@ import {
   type SetDeliverableProgressAction,
   type AddKeyResultAction,
   type RemoveKeyResultAction,
+  type EditKeyResultAction,
 } from "./actions.js";
 import { type ScopeOfWorkState } from "../types.js";
 
@@ -38,6 +39,11 @@ export interface ScopeOfWorkDeliverablesOperations {
   removeKeyResultOperation: (
     state: ScopeOfWorkState,
     action: RemoveKeyResultAction,
+    dispatch?: SignalDispatch,
+  ) => void;
+  editKeyResultOperation: (
+    state: ScopeOfWorkState,
+    action: EditKeyResultAction,
     dispatch?: SignalDispatch,
   ) => void;
 }

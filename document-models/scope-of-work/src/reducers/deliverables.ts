@@ -120,4 +120,29 @@ export const reducer: ScopeOfWorkDeliverablesOperations = {
       console.error(error);
     }
   },
+  editKeyResultOperation(state, action, dispatch) {
+    try {
+      const updatedDeliverable = state.deliverables.find((deliverable) => String(deliverable.id) === String(action.input.deliverableId));
+      if (!updatedDeliverable) {
+        throw new Error("Deliverable not found");
+      }
+
+      const keyResult = updatedDeliverable.keyResults.find((keyResult) => String(keyResult.id) === String(action.input.id));
+      if (!keyResult) {
+        throw new Error("Key result not found");
+      }
+
+      const updatedKeyResult = {
+        ...keyResult,
+        title: action.input.title || keyResult.title,
+        link: action.input.link || keyResult.link,
+      }
+
+      updatedDeliverable.keyResults = updatedDeliverable.keyResults.map((keyResult) => String(keyResult.id) === String(action.input.id) ? updatedKeyResult : keyResult);
+      state.deliverables = state.deliverables.map((deliverable) => String(deliverable.id) === String(action.input.deliverableId) ? updatedDeliverable : deliverable);
+
+    } catch (error) {
+      console.error(error);
+    }
+  }
 };

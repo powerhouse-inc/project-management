@@ -211,6 +211,13 @@ export type EditDeliverablesSetInput = {
   >;
 };
 
+export type EditKeyResultInput = {
+  deliverableId: Scalars["OID"]["input"];
+  id: Scalars["OID"]["input"];
+  link?: InputMaybe<Scalars["URL"]["input"]>;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+};
+
 export type EditMilestoneInput = {
   deliveryTarget?: InputMaybe<Scalars["String"]["input"]>;
   description?: InputMaybe<Scalars["String"]["input"]>;

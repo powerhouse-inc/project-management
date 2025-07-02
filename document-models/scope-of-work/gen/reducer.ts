@@ -85,6 +85,15 @@ const stateReducer: StateReducer<ScopeOfWorkDocument> = (
       );
       break;
 
+    case "EDIT_KEY_RESULT":
+      z.EditKeyResultInputSchema().parse(action.input);
+      DeliverablesReducer.editKeyResultOperation(
+        state[action.scope],
+        action,
+        dispatch,
+      );
+      break;
+
     case "ADD_ROADMAP":
       z.AddRoadmapInputSchema().parse(action.input);
       RoadmapsReducer.addRoadmapOperation(
