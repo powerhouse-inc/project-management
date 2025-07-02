@@ -186,7 +186,7 @@ const Roadmaps: React.FC<RoadmapsProps> = ({ roadmaps , dispatch, setMilestonesO
         </label>
         <ObjectSetTable
           columns={columns}
-          data={roadmap.milestones}
+          data={roadmap.milestones || []}
           allowRowSelection={true}
           onAdd={(data) => {
             if (data.title) {
