@@ -14,7 +14,8 @@ import {
   DeliverableStatusInput,
 } from "../../../document-models/scope-of-work/index.js";
 import { actions } from "../../../document-models/scope-of-work/index.js";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { generateId } from "document-model";
 interface DeliverablesProps {
   deliverables: Deliverable[];
   dispatch: any;
@@ -42,6 +43,20 @@ const Deliverables: React.FC<DeliverablesProps> = ({
   useEffect(() => {
     setStateDeliverable(deliverable);
   }, [deliverable?.id]);
+
+  const columns = useMemo<Array<ColumnDef<any>>>(
+    () => [
+      {
+        field: "title",
+        editable: true,
+      },
+      {
+        field: "Link",
+        editable: true,
+      },
+    ],
+    []
+  );
 
   return (
     <div className="border border-gray-300 p-2">
@@ -165,6 +180,25 @@ const Deliverables: React.FC<DeliverablesProps> = ({
             );
           }}
         />
+      </div>
+      <div className="mt-8">
+        <ObjectSetTable
+          columns={columns}
+          data={deliverable.keyResults || []}
+          allowRowSelection={true}
+          onAdd={(data) => {
+            if (data.title) {
+              dispatch(
+                actions.addKeyResult({
+                  id: generateId(),
+                  deliverableId: deliverable.id,
+                  title: typeof data.title === 'string' ? data.title : '',
+                })
+              );
+            }
+           
+          }}
+          />
       </div>
     </div>
   );
