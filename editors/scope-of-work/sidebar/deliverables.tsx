@@ -36,17 +36,39 @@ const Deliverables: React.FC<DeliverablesProps> = ({
   deliverables,
   dispatch,
 }) => {
-  const deliverable = deliverables[0];
-
-  const [stateDeliverable, setStateDeliverable] = useState(deliverable);
+  const currentDeliverable = deliverables[0];
+  const [stateDeliverable, setStateDeliverable] = useState(currentDeliverable);
   const [isBoolean, setIsBoolean] = useState(false);
   const [isPercentage, setIsPercentage] = useState(false);
   const [isSP, setIsSP] = useState(false);
-
+  const [workProgress, setWorkProgress] = useState(
+    deliverables[0]?.workProgress
+  );
 
   useEffect(() => {
-    setStateDeliverable(deliverable);
-  }, [deliverable?.id]);
+    const currentDeliverable = deliverables[0];
+    if (!currentDeliverable) return;
+
+    // Reset all flags first
+    setIsBoolean(false);
+    setIsPercentage(false);
+    setIsSP(false);
+
+    if (currentDeliverable.workProgress) {
+      if ("isBinary" in currentDeliverable.workProgress) {
+        setIsBoolean(true);
+      } else if ("value" in currentDeliverable.workProgress) {
+        setIsPercentage(true);
+      } else if (
+        "total" in currentDeliverable.workProgress &&
+        "completed" in currentDeliverable.workProgress
+      ) {
+        setIsSP(true);
+      }
+    }
+    setStateDeliverable(currentDeliverable);
+    setWorkProgress(currentDeliverable.workProgress);
+  }, [deliverables]);
 
   const columns = useMemo<Array<ColumnDef<any>>>(() => {
     return [
@@ -58,7 +80,7 @@ const Deliverables: React.FC<DeliverablesProps> = ({
             dispatch(
               actions.editKeyResult({
                 id: context.row.id,
-                deliverableId: deliverable.id,
+                deliverableId: currentDeliverable.id,
                 title: newValue,
               })
             );
@@ -75,7 +97,7 @@ const Deliverables: React.FC<DeliverablesProps> = ({
             dispatch(
               actions.editKeyResult({
                 id: context.row.id,
-                deliverableId: deliverable.id,
+                deliverableId: currentDeliverable.id,
                 link: newValue,
               })
             );
@@ -85,7 +107,7 @@ const Deliverables: React.FC<DeliverablesProps> = ({
         },
       },
     ];
-  }, [deliverable, dispatch]);
+  }, [currentDeliverable, dispatch]);
 
   return (
     <div className="border border-gray-300 p-2">
@@ -105,15 +127,15 @@ const Deliverables: React.FC<DeliverablesProps> = ({
               if (e.target.value === "") {
                 dispatch(
                   actions.editDeliverable({
-                    id: deliverable.id,
+                    id: currentDeliverable.id,
                     code: " ",
                   })
                 );
               }
-              if (e.target.value === deliverable.code) return;
+              if (e.target.value === currentDeliverable.code) return;
               dispatch(
                 actions.editDeliverable({
-                  id: deliverable.id,
+                  id: currentDeliverable.id,
                   code: e.target.value,
                 })
               );
@@ -135,15 +157,15 @@ const Deliverables: React.FC<DeliverablesProps> = ({
               if (e.target.value === "") {
                 dispatch(
                   actions.editDeliverable({
-                    id: deliverable.id,
+                    id: currentDeliverable.id,
                     title: " ",
                   })
                 );
               }
-              if (e.target.value === deliverable.title) return;
+              if (e.target.value === currentDeliverable.title) return;
               dispatch(
                 actions.editDeliverable({
-                  id: deliverable.id,
+                  id: currentDeliverable.id,
                   title: e.target.value,
                 })
               );
@@ -168,15 +190,15 @@ const Deliverables: React.FC<DeliverablesProps> = ({
               if (e.target.value === "") {
                 dispatch(
                   actions.editDeliverable({
-                    id: deliverable.id,
+                    id: currentDeliverable.id,
                     owner: " ",
                   })
                 );
               }
-              if (e.target.value === deliverable.owner) return;
+              if (e.target.value === currentDeliverable.owner) return;
               dispatch(
                 actions.editDeliverable({
-                  id: deliverable.id,
+                  id: currentDeliverable.id,
                   owner: e.target.value,
                 })
               );
@@ -200,15 +222,15 @@ const Deliverables: React.FC<DeliverablesProps> = ({
             if (e.target.value === "") {
               dispatch(
                 actions.editDeliverable({
-                  id: deliverable.id,
+                  id: currentDeliverable.id,
                   description: " ",
                 })
               );
             }
-            if (e.target.value === deliverable.description) return;
+            if (e.target.value === currentDeliverable.description) return;
             dispatch(
               actions.editDeliverable({
-                id: deliverable.id,
+                id: currentDeliverable.id,
                 description: e.target.value,
               })
             );
@@ -224,7 +246,7 @@ const Deliverables: React.FC<DeliverablesProps> = ({
             onChange={(value) => {
               dispatch(
                 actions.editDeliverable({
-                  id: deliverable.id,
+                  id: currentDeliverable.id,
                   status: value as DeliverableStatusInput,
                 })
               );
@@ -238,6 +260,14 @@ const Deliverables: React.FC<DeliverablesProps> = ({
               setIsBoolean(true);
               setIsPercentage(false);
               setIsSP(false);
+              dispatch(
+                actions.setDeliverableProgress({
+                  id: currentDeliverable.id,
+                  workProgress: {
+                    isBinary: true,
+                  },
+                })
+              );
             }}
           >
             -
@@ -248,6 +278,14 @@ const Deliverables: React.FC<DeliverablesProps> = ({
               setIsBoolean(false);
               setIsPercentage(true);
               setIsSP(false);
+              dispatch(
+                actions.setDeliverableProgress({
+                  id: currentDeliverable.id,
+                  workProgress: {
+                    value: 0,
+                  },
+                })
+              );
             }}
           >
             %
@@ -258,35 +296,153 @@ const Deliverables: React.FC<DeliverablesProps> = ({
               setIsBoolean(false);
               setIsPercentage(false);
               setIsSP(true);
+              dispatch(
+                actions.setDeliverableProgress({
+                  id: currentDeliverable.id,
+                  workProgress: {
+                    total: 0,
+                    completed: 0,
+                  },
+                })
+              );
             }}
           >
             SP
           </button>
         </div>
         <div className="col-span-3 flex justify-end items-end mr-4">
-          {isBoolean && <Checkbox label="Delivered" />}
-          {isPercentage && <TextInput label="Percentage" className="w-16" />}
+          {isBoolean && <Checkbox label="Delivered"
+            // defaultChecked={workProgress && "isBinary" in workProgress ? (workProgress.isBinary ?? false) : false}
+            defaultChecked={workProgress && "isBinary" in workProgress ? (workProgress.isBinary ?? false) : false}
+            onChange={(e: any) => {
+              dispatch(
+                actions.setDeliverableProgress({
+                  id: currentDeliverable.id,
+                  workProgress: {
+                    isBinary: e,
+                  },
+                })
+              );
+            }}
+          />}
+          {isPercentage && (
+            <NumberInput
+              key={`percentage-${currentDeliverable.id}`}
+              name="Percentage"
+              label="Percentage"
+              className="w-16"
+              value={
+                workProgress && "value" in workProgress ? workProgress.value : 0
+              }
+              onBlur={(e) => {
+                dispatch(
+                  actions.setDeliverableProgress({
+                    id: currentDeliverable.id,
+                    workProgress: {
+                      value: parseFloat(e.target.value),
+                    },
+                  })
+                );
+              }}
+            />
+          )}
           {isSP && (
             <div className="text-sm grid grid-cols-2 gap-2">
-              <NumberInput name="Completed" label="Completed" className="w-16 flex items-end" />
-              <NumberInput name="Total" label="Total" className="w-16 flex items-end" />
+              <div className="col-span-1">
+                <label>Completed</label>
+                <input
+                  type="number"
+                  className="w-16 h-8 flex items-end"
+                  value={
+                    workProgress && "completed" in workProgress
+                      ? workProgress.completed
+                      : 0
+                  }
+                  onChange={(e) => {
+                    setWorkProgress((prev) => {
+                      if (prev && "completed" in prev) {
+                        return {
+                          ...prev,
+                          completed: parseInt(e.target.value),
+                        };
+                      }
+                      return prev;
+                    });
+                  }}
+                  onBlur={(e) => {
+                    if (
+                      workProgress &&
+                      "completed" in workProgress
+                    ) {
+                      dispatch(
+                        actions.setDeliverableProgress({
+                          id: currentDeliverable.id,
+                          workProgress: {
+                            total: workProgress.total,
+                            completed: parseInt(e.target.value),
+                          },
+                        })
+                      );
+                    }
+                  }}
+                />
+              </div>
+              <div className="col-span-1">
+                <label>Total</label>
+                <input
+                  type="number"
+                  className="w-16 h-8 flex items-end"
+                  value={
+                    workProgress && "total" in workProgress
+                      ? workProgress.total
+                      : 0
+                  }
+                  onChange={(e) => {
+                    setWorkProgress((prev) => {
+                      if (prev && "total" in prev) {
+                        return {
+                          ...prev,
+                          total: parseInt(e.target.value),
+                        };
+                      }
+                      return prev;
+                    });
+                  }}
+                  onBlur={(e) => {
+                    if (
+                      workProgress &&
+                      "total" in workProgress
+                    ) {
+                      dispatch(
+                        actions.setDeliverableProgress({
+                          id: currentDeliverable.id,
+                          workProgress: {
+                            total: parseInt(e.target.value),
+                            completed: workProgress?.completed || 0,
+                          },
+                        })
+                      );
+                    }
+                  }}
+                />
+              </div>
             </div>
           )}
         </div>
       </div>
       <div className="mt-8">
         <label className="text-sm font-medium">Add Key Results</label>
-        {deliverable && (
+        {currentDeliverable && (
           <ObjectSetTable
             columns={columns}
-            data={deliverable.keyResults || []}
+            data={currentDeliverable.keyResults || []}
             allowRowSelection={true}
             onAdd={(data) => {
               if (data.title) {
                 dispatch(
                   actions.addKeyResult({
                     id: generateId(),
-                    deliverableId: deliverable.id,
+                    deliverableId: currentDeliverable.id,
                     title: typeof data.title === "string" ? data.title : "",
                   })
                 );
