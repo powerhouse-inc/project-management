@@ -5,6 +5,8 @@ import {
   Textarea,
   TextInput,
   Select,
+  Checkbox,
+  NumberInput,
 } from "@powerhousedao/document-engineering";
 import {
   Milestone,
@@ -37,6 +39,10 @@ const Deliverables: React.FC<DeliverablesProps> = ({
   const deliverable = deliverables[0];
 
   const [stateDeliverable, setStateDeliverable] = useState(deliverable);
+  const [isBoolean, setIsBoolean] = useState(false);
+  const [isPercentage, setIsPercentage] = useState(false);
+  const [isSP, setIsSP] = useState(false);
+
 
   useEffect(() => {
     setStateDeliverable(deliverable);
@@ -225,15 +231,47 @@ const Deliverables: React.FC<DeliverablesProps> = ({
             }}
           />
         </div>
-        <div className="col-span-3 flex justify-center items-center">
-          <button className="bg-blue-500 text-white px-4 py-2 rounded-md">
-            Add Key Result
+        <div className="col-span-3 flex justify-center items-end">
+          <button
+            className={`p-2 border border-gray-300 w-12 h-8 text-sm hover:bg-gray-100 ${isBoolean ? "bg-blue-100" : "bg-white"}`}
+            onClick={() => {
+              setIsBoolean(true);
+              setIsPercentage(false);
+              setIsSP(false);
+            }}
+          >
+            -
+          </button>
+          <button
+            className={`p-2 border border-gray-300 w-12 h-8 text-sm hover:bg-gray-100 ${isPercentage ? "bg-blue-100" : "bg-white"}`}
+            onClick={() => {
+              setIsBoolean(false);
+              setIsPercentage(true);
+              setIsSP(false);
+            }}
+          >
+            %
+          </button>
+          <button
+            className={`p-2 border border-gray-300 w-12 h-8 text-sm hover:bg-gray-100 ${isSP ? "bg-blue-100" : "bg-white"}`}
+            onClick={() => {
+              setIsBoolean(false);
+              setIsPercentage(false);
+              setIsSP(true);
+            }}
+          >
+            SP
           </button>
         </div>
-        <div className="col-span-3 flex justify-end items-center">
-          <button className="bg-blue-500 text-white px-4 py-2 rounded-md">
-            Add Key Result
-          </button>
+        <div className="col-span-3 flex justify-end items-end mr-4">
+          {isBoolean && <Checkbox label="Delivered" />}
+          {isPercentage && <TextInput label="Percentage" className="w-16" />}
+          {isSP && (
+            <div className="text-sm grid grid-cols-2 gap-2">
+              <NumberInput name="Completed" label="Completed" className="w-16 flex items-end" />
+              <NumberInput name="Total" label="Total" className="w-16 flex items-end" />
+            </div>
+          )}
         </div>
       </div>
       <div className="mt-8">
