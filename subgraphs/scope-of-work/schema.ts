@@ -426,21 +426,6 @@ export const schema: DocumentNode = gql`
     progress: ProgressInput!
   }
 
-  input PercentageInput {
-    value: Float!
-  }
-
-  input StoryPointInput {
-    total: Int!
-    completed: Int!
-  }
-
-  input BinaryInput {
-    isBinary: Boolean!
-  }
-
-  union ProgressInput = PercentageInput | StoryPointInput | BinaryInput
-
   """
   Module: Agents
   """
@@ -466,10 +451,5 @@ export const schema: DocumentNode = gql`
     agentType: AgentTypeInput
     code: String
     imageUrl: String
-  }
-  enum AgentTypeInput {
-    HUMAN
-    GROUP
-    AI
   }
 `;

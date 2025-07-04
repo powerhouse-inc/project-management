@@ -401,7 +401,7 @@ export const documentModel: DocumentModelState = {
               name: "SET_PROGRESS_IN_DELIVERABLES_SET",
               description: "",
               schema:
-                "input SetProgressInDeliverablesSetInput {\n  milestoneId: ID!\n  progress: ProgressInput!\n}\n\ninput PercentageInput {\n  value: Float!\n}\n\ninput StoryPointInput {\n  total: Int!\n  completed: Int!\n}\n\ninput BinaryInput {\n  isBinary: Boolean!\n}\n\nunion ProgressInput = PercentageInput | StoryPointInput | BinaryInput",
+                "input SetProgressInDeliverablesSetInput {\n  milestoneId: ID!\n  progress: ProgressInput!\n}",
               template: "",
               reducer: "",
               errors: [],
@@ -443,7 +443,7 @@ export const documentModel: DocumentModelState = {
               name: "EDIT_AGENT",
               description: "",
               schema:
-                "input EditAgentInput {\n  id: ID!\n  name: String\n  agentType: AgentTypeInput\n  code: String\n  imageUrl: String\n}\nenum AgentTypeInput {\n  HUMAN\n  GROUP\n  AI\n}",
+                "input EditAgentInput {\n  id: ID!\n  name: String\n  agentType: AgentTypeInput\n  code: String\n  imageUrl: String\n}",
               template: "",
               reducer: "",
               errors: [],
