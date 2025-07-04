@@ -47,19 +47,6 @@ export class OwnerIdNotRecognized extends Error implements ReducerError {
   }
 }
 
-export class DeliverableNotFound extends Error implements ReducerError {
-  errorCode = "DeliverableNotFound" as ErrorCode;
-  constructor(message = "DeliverableNotFound") {
-    super(message);
-  }
-}
-
-export class MissingRequiredFields extends Error implements ReducerError {
-  errorCode = "MissingRequiredFields" as ErrorCode;
-  constructor(message = "MissingRequiredFields") {
-    super(message);
-  }
-}
 
 export class InvalidLinkFormat extends Error implements ReducerError {
   errorCode = "InvalidLinkFormat" as ErrorCode;

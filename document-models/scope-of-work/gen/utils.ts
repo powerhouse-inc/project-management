@@ -20,6 +20,7 @@ export const initialGlobalState: ScopeOfWorkState = {
   deliverables: [],
   roadmaps: [],
   agents: [],
+  status: "DRAFT",
 };
 export const initialLocalState: ScopeOfWorkLocalState = {};
 
