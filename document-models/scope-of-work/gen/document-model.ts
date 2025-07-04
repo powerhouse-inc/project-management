@@ -106,7 +106,7 @@ export const documentModel: DocumentModelState = {
               description:
                 "This operation allows a user to edit the core attributes of a deliverable, a concrete piece of work within a project or a milestone. Deliverables are the building blocks of execution, typically assigned to contributors or teams.",
               schema:
-                "input EditDeliverableInput {\n  id: OID!\n  owner: ID\n  title: String\n  code: String\n  description: String\n  status: PMDeliverableStatusInput\n}\n\nenum PMDeliverableStatusInput {\n  WONT_DO\n  DRAFT\n  TODO\n  BLOCKED\n  IN_PROGRESS\n  DELIVERED\n  CANCELED\n}",
+                "input EditDeliverableInput {\n  id: OID!\n  owner: ID\n  title: String\n  code: String\n  description: String\n  status: PMDeliverableStatusInput\n}\n\n",
               template: "",
               reducer: "",
               errors: [

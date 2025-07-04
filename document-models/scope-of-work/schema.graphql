@@ -179,15 +179,7 @@ input EditDeliverableInput {
   status: PMDeliverableStatusInput
 }
 
-enum PMDeliverableStatusInput {
-  WONT_DO
-  DRAFT
-  TODO
-  BLOCKED
-  IN_PROGRESS
-  DELIVERED
-  CANCELED
-}
+
 
 input SetDeliverableProgressInput {
   id: OID! #deliverable id

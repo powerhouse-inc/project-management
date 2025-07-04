@@ -302,15 +302,6 @@ export const schema: DocumentNode = gql`
     status: PMDeliverableStatusInput
   }
 
-  enum PMDeliverableStatusInput {
-    WONT_DO
-    DRAFT
-    TODO
-    BLOCKED
-    IN_PROGRESS
-    DELIVERED
-    CANCELED
-  }
   input ScopeOfWork_SetDeliverableProgressInput {
     id: OID! #deliverable id
     workProgress: ProgressInput!
