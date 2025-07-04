@@ -16,7 +16,6 @@ import type {
   DeliverableSetStatus,
   DeliverableSetStatusInput,
   DeliverableStatus,
-  DeliverableStatusInput,
   DeliverablesCompleted,
   DeliverablesCompletedInput,
   DeliverablesSet,
@@ -29,6 +28,7 @@ import type {
   EditScopeOfWorkInput,
   KeyResult,
   Milestone,
+  PmDeliverableStatusInput,
   Percentage,
   PercentageInput,
   RemoveAgentInput,
@@ -91,7 +91,7 @@ export const DeliverableStatusSchema = z.enum([
   "WONT_DO",
 ]);
 
-export const DeliverableStatusInputSchema = z.enum([
+export const PmDeliverableStatusInputSchema = z.enum([
   "BLOCKED",
   "CANCELED",
   "DELIVERED",
@@ -153,7 +153,7 @@ export function AddDeliverableInputSchema(): z.ZodObject<
     description: z.string().nullish(),
     id: z.string(),
     owner: z.string().nullish(),
-    status: z.lazy(() => DeliverableStatusInputSchema.nullish()),
+    status: z.lazy(() => PmDeliverableStatusInputSchema.nullish()),
     title: z.string().nullish(),
   });
 }
@@ -284,7 +284,7 @@ export function EditDeliverableInputSchema(): z.ZodObject<
     description: z.string().nullish(),
     id: z.string(),
     owner: z.string().nullish(),
-    status: z.lazy(() => DeliverableStatusInputSchema.nullish()),
+    status: z.lazy(() => PmDeliverableStatusInputSchema.nullish()),
     title: z.string().nullish(),
   });
 }

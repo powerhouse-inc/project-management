@@ -78,7 +78,7 @@ export type AddDeliverableInput = {
   description?: InputMaybe<Scalars["String"]["input"]>;
   id: Scalars["OID"]["input"];
   owner?: InputMaybe<Scalars["ID"]["input"]>;
-  status?: InputMaybe<DeliverableStatusInput | `${DeliverableStatusInput}`>;
+  status?: InputMaybe<PmDeliverableStatusInput | `${PmDeliverableStatusInput}`>;
   title?: InputMaybe<Scalars["String"]["input"]>;
 };
 
@@ -160,15 +160,6 @@ export type DeliverableStatus =
   | "TODO"
   | "WONT_DO";
 
-export type DeliverableStatusInput =
-  | "BLOCKED"
-  | "CANCELED"
-  | "DELIVERED"
-  | "DRAFT"
-  | "IN_PROGRESS"
-  | "TODO"
-  | "WONT_DO";
-
 export type DeliverablesCompleted = {
   completed: Scalars["Int"]["output"];
   total: Scalars["Int"]["output"];
@@ -199,7 +190,7 @@ export type EditDeliverableInput = {
   description?: InputMaybe<Scalars["String"]["input"]>;
   id: Scalars["OID"]["input"];
   owner?: InputMaybe<Scalars["ID"]["input"]>;
-  status?: InputMaybe<DeliverableStatusInput | `${DeliverableStatusInput}`>;
+  status?: InputMaybe<PmDeliverableStatusInput | `${PmDeliverableStatusInput}`>;
   title?: InputMaybe<Scalars["String"]["input"]>;
 };
 
@@ -257,6 +248,15 @@ export type Milestone = {
   sequenceCode: Scalars["String"]["output"];
   title: Scalars["String"]["output"];
 };
+
+export type PmDeliverableStatusInput =
+  | "BLOCKED"
+  | "CANCELED"
+  | "DELIVERED"
+  | "DRAFT"
+  | "IN_PROGRESS"
+  | "TODO"
+  | "WONT_DO";
 
 export type Percentage = {
   value: Scalars["Float"]["output"];

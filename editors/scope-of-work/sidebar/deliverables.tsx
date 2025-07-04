@@ -12,7 +12,7 @@ import {
   Milestone,
   Roadmap,
   Deliverable,
-  DeliverableStatusInput,
+  PmDeliverableStatusInput,
 } from "../../../document-models/scope-of-work/index.js";
 import { actions } from "../../../document-models/scope-of-work/index.js";
 import { useEffect, useMemo, useState } from "react";
@@ -247,7 +247,7 @@ const Deliverables: React.FC<DeliverablesProps> = ({
               dispatch(
                 actions.editDeliverable({
                   id: currentDeliverable.id,
-                  status: value as DeliverableStatusInput,
+                  status: value as PmDeliverableStatusInput,
                 })
               );
             }}

@@ -278,10 +278,10 @@ export const schema: DocumentNode = gql`
     title: String
     code: String
     description: String
-    status: DeliverableStatusInput
+    status: PMDeliverableStatusInput
   }
 
-  enum DeliverableStatusInput {
+  enum PMDeliverableStatusInput {
     WONT_DO
     DRAFT
     TODO
@@ -299,10 +299,10 @@ export const schema: DocumentNode = gql`
     title: String
     code: String
     description: String
-    status: DeliverableStatusInput
+    status: PMDeliverableStatusInput
   }
 
-  enum DeliverableStatusInput {
+  enum PMDeliverableStatusInput {
     WONT_DO
     DRAFT
     TODO

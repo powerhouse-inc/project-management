@@ -153,10 +153,10 @@ input AddDeliverableInput {
   title: String
   code: String
   description: String
-  status: DeliverableStatusInput
+  status: PMDeliverableStatusInput
 }
 
-enum DeliverableStatusInput {
+enum PMDeliverableStatusInput {
   WONT_DO
   DRAFT
   TODO
@@ -176,10 +176,10 @@ input EditDeliverableInput {
   title: String
   code: String
   description: String
-  status: DeliverableStatusInput
+  status: PMDeliverableStatusInput
 }
 
-enum DeliverableStatusInput {
+enum PMDeliverableStatusInput {
   WONT_DO
   DRAFT
   TODO

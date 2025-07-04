@@ -73,7 +73,7 @@
                             "id": "9a986a3a-a546-494e-b008-d31cdf125383",
                             "name": "ADD_DELIVERABLE",
                             "description": "This operation is used to create a new deliverable. ",
-                            "schema": "input AddDeliverableInput {\n  id: OID!\n  owner: ID\n  title: String\n  code: String\n  description: String\n  status: DeliverableStatusInput\n}\n\nenum DeliverableStatusInput {\n  WONT_DO\n  DRAFT\n  TODO\n  BLOCKED\n  IN_PROGRESS\n  DELIVERED\n  CANCELED\n}",
+                            "schema": "input AddDeliverableInput {\n  id: OID!\n  owner: ID\n  title: String\n  code: String\n  description: String\n  status: PMDeliverableStatusInput\n}\n\nenum PMDeliverableStatusInput {\n  WONT_DO\n  DRAFT\n  TODO\n  BLOCKED\n  IN_PROGRESS\n  DELIVERED\n  CANCELED\n}",
                             "template": "",
                             "reducer": "",
                             "errors": [],
@@ -95,7 +95,7 @@
                             "id": "e031053f-f1c8-40b5-93fb-47d68161ecca",
                             "name": "EDIT_DELIVERABLE",
                             "description": "This operation allows a user to edit the core attributes of a deliverable, a concrete piece of work within a project or a milestone. Deliverables are the building blocks of execution, typically assigned to contributors or teams.",
-                            "schema": "input EditDeliverableInput {\n  id: OID!\n  owner: ID\n  title: String\n  code: String\n  description: String\n  status: DeliverableStatusInput\n}\n\nenum DeliverableStatusInput {\n  WONT_DO\n  DRAFT\n  TODO\n  BLOCKED\n  IN_PROGRESS\n  DELIVERED\n  CANCELED\n}",
+                            "schema": "input EditDeliverableInput {\n  id: OID!\n  owner: ID\n  title: String\n  code: String\n  description: String\n  status: PMDeliverableStatusInput\n}\n\nenum PMDeliverableStatusInput {\n  WONT_DO\n  DRAFT\n  TODO\n  BLOCKED\n  IN_PROGRESS\n  DELIVERED\n  CANCELED\n}",
                             "template": "",
                             "reducer": "",
                             "errors": [
