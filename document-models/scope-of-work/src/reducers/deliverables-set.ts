@@ -53,9 +53,7 @@ export const reducer: ScopeOfWorkDeliverablesSetOperations = {
         foundMilestone.scope = {
           deliverables: [],
           status: "DRAFT" as const,
-          progress: {
-            value: 0,
-          },
+          progress: { total: 0, completed: 0 },
           deliverablesCompleted: {
             total: 0,
             completed: 0,
@@ -115,7 +113,18 @@ export const reducer: ScopeOfWorkDeliverablesSetOperations = {
         throw new Error("Milestone or scope not found");
       }
 
-      foundMilestone.scope.progress = action.input.progress;
+      if (action.input.progress) {
+        if (action.input.progress.percentage !== undefined && action.input.progress.percentage !== null) {
+          foundMilestone.scope.progress = { value: action.input.progress.percentage };
+        } else if (action.input.progress.storyPoints) {
+          foundMilestone.scope.progress = {
+            total: action.input.progress.storyPoints.total,
+            completed: action.input.progress.storyPoints.completed,
+          };
+        } else if (action.input.progress.binary !== undefined && action.input.progress.binary !== null) {
+          foundMilestone.scope.progress = { isBinary: action.input.progress.binary };
+        }
+      }
 
       state.roadmaps = state.roadmaps.map((roadmap) => {
         return String(roadmap.id) === String(foundRoadmap.id) ? foundRoadmap : roadmap;

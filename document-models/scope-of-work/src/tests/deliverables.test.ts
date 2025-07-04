@@ -122,7 +122,7 @@ describe("Deliverables Operations", () => {
       const input: SetDeliverableProgressInput = {
         id: "1",
         workProgress: {
-          value: 50,
+          percentage: 50,
         },
       }
 

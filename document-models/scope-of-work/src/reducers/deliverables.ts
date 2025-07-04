@@ -76,7 +76,15 @@ export const reducer: ScopeOfWorkDeliverablesOperations = {
 
       const updatedDeliverable = {
         ...deliverable,
-        workProgress: action.input.workProgress || deliverable.workProgress,
+        workProgress: action.input.workProgress ? 
+          (action.input.workProgress.percentage !== undefined && action.input.workProgress.percentage !== null) ? 
+            { value: action.input.workProgress.percentage } :
+          action.input.workProgress.storyPoints ? 
+            { total: action.input.workProgress.storyPoints.total, completed: action.input.workProgress.storyPoints.completed } :
+          action.input.workProgress.binary !== undefined && action.input.workProgress.binary !== null ? 
+            { isBinary: action.input.workProgress.binary } :
+          deliverable.workProgress
+        : deliverable.workProgress,
       }
 
       state.deliverables = state.deliverables.map((deliverable) => String(deliverable.id) === String(action.input.id) ? updatedDeliverable : deliverable);

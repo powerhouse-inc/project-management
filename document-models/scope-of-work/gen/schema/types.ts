@@ -122,10 +122,6 @@ export type Binary = {
   isBinary: Maybe<Scalars["Boolean"]["output"]>;
 };
 
-export type BinaryInput = {
-  isBinary: Scalars["Boolean"]["input"];
-};
-
 export type Deliverable = {
   code: Scalars["String"]["output"];
   description: Scalars["String"]["output"];
@@ -166,8 +162,8 @@ export type DeliverablesCompleted = {
 };
 
 export type DeliverablesCompletedInput = {
-  completed: Scalars["Int"]["output"];
-  total: Scalars["Int"]["output"];
+  completed: Scalars["Int"]["input"];
+  total: Scalars["Int"]["input"];
 };
 
 export type DeliverablesSet = {
@@ -262,13 +258,13 @@ export type Percentage = {
   value: Scalars["Float"]["output"];
 };
 
-export type PercentageInput = {
-  value: Scalars["Float"]["input"];
-};
-
 export type Progress = Binary | Percentage | StoryPoint;
 
-export type ProgressInput = BinaryInput | PercentageInput | StoryPointInput;
+export type ProgressInput = {
+  binary?: InputMaybe<Scalars["Boolean"]["input"]>;
+  percentage?: InputMaybe<Scalars["Float"]["input"]>;
+  storyPoints?: InputMaybe<StoryPointInput>;
+};
 
 export type RemoveAgentInput = {
   id: Scalars["OID"]["input"];
@@ -335,12 +331,12 @@ export type ScopeOfWorkStatusInput =
 
 export type SetDeliverableProgressInput = {
   id: Scalars["OID"]["input"];
-  workProgress: ProgressInput;
+  workProgress?: InputMaybe<ProgressInput>;
 };
 
 export type SetProgressInDeliverablesSetInput = {
   milestoneId: Scalars["ID"]["input"];
-  progress: ProgressInput;
+  progress?: InputMaybe<ProgressInput>;
 };
 
 export type StoryPoint = {

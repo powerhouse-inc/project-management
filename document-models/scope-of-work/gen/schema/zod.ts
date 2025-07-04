@@ -11,7 +11,6 @@ import type {
   AgentType,
   AgentTypeInput,
   Binary,
-  BinaryInput,
   Deliverable,
   DeliverableSetStatus,
   DeliverableSetStatusInput,
@@ -30,7 +29,7 @@ import type {
   Milestone,
   PmDeliverableStatusInput,
   Percentage,
-  PercentageInput,
+  ProgressInput,
   RemoveAgentInput,
   RemoveCoordinatorInput,
   RemoveDeliverableInSetInput,
@@ -212,12 +211,6 @@ export function BinarySchema(): z.ZodObject<Properties<Binary>> {
   });
 }
 
-export function BinaryInputSchema(): z.ZodObject<Properties<BinaryInput>> {
-  return z.object({
-    isBinary: z.boolean(),
-  });
-}
-
 export function DeliverableSchema(): z.ZodObject<Properties<Deliverable>> {
   return z.object({
     __typename: z.literal("Deliverable").optional(),
@@ -246,7 +239,6 @@ export function DeliverablesCompletedInputSchema(): z.ZodObject<
   Properties<DeliverablesCompletedInput>
 > {
   return z.object({
-    __typename: z.literal("DeliverablesCompletedInput").optional(),
     completed: z.number(),
     total: z.number(),
   });
@@ -377,24 +369,16 @@ export function PercentageSchema(): z.ZodObject<Properties<Percentage>> {
   });
 }
 
-export function PercentageInputSchema(): z.ZodObject<
-  Properties<PercentageInput>
-> {
-  return z.object({
-    value: z.number(),
-  });
-}
-
 export function ProgressSchema() {
   return z.union([BinarySchema(), PercentageSchema(), StoryPointSchema()]);
 }
 
-export function ProgressInputSchema() {
-  return z.union([
-    BinaryInputSchema(),
-    PercentageInputSchema(),
-    StoryPointInputSchema(),
-  ]);
+export function ProgressInputSchema(): z.ZodObject<Properties<ProgressInput>> {
+  return z.object({
+    binary: z.boolean().nullish(),
+    percentage: z.number().nullish(),
+    storyPoints: z.lazy(() => StoryPointInputSchema().nullish()),
+  });
 }
 
 export function RemoveAgentInputSchema(): z.ZodObject<
@@ -487,7 +471,7 @@ export function SetDeliverableProgressInputSchema(): z.ZodObject<
 > {
   return z.object({
     id: z.string(),
-    workProgress: z.lazy(() => ProgressInputSchema()),
+    workProgress: z.lazy(() => ProgressInputSchema().nullish()),
   });
 }
 
@@ -496,7 +480,7 @@ export function SetProgressInDeliverablesSetInputSchema(): z.ZodObject<
 > {
   return z.object({
     milestoneId: z.string(),
-    progress: z.lazy(() => ProgressInputSchema()),
+    progress: z.lazy(() => ProgressInputSchema().nullish()),
   });
 }
 

@@ -264,7 +264,7 @@ const Deliverables: React.FC<DeliverablesProps> = ({
                 actions.setDeliverableProgress({
                   id: currentDeliverable.id,
                   workProgress: {
-                    isBinary: true,
+                    binary: true,
                   },
                 })
               );
@@ -282,7 +282,7 @@ const Deliverables: React.FC<DeliverablesProps> = ({
                 actions.setDeliverableProgress({
                   id: currentDeliverable.id,
                   workProgress: {
-                    value: 0,
+                    percentage: 0,
                   },
                 })
               );
@@ -300,8 +300,10 @@ const Deliverables: React.FC<DeliverablesProps> = ({
                 actions.setDeliverableProgress({
                   id: currentDeliverable.id,
                   workProgress: {
-                    total: 0,
-                    completed: 0,
+                    storyPoints: {
+                      total: 0,
+                      completed: 0,
+                    },
                   },
                 })
               );
@@ -319,7 +321,7 @@ const Deliverables: React.FC<DeliverablesProps> = ({
                 actions.setDeliverableProgress({
                   id: currentDeliverable.id,
                   workProgress: {
-                    isBinary: e,
+                    binary: e,
                   },
                 })
               );
@@ -327,19 +329,19 @@ const Deliverables: React.FC<DeliverablesProps> = ({
           />}
           {isPercentage && (
             <NumberInput
-              key={`percentage-${currentDeliverable.id}`}
+              key={`percentage-${currentDeliverable.id}${workProgress}`}
               name="Percentage"
               label="Percentage"
               className="w-16"
               value={
-                workProgress && "value" in workProgress ? workProgress.value : 0
+                workProgress && "value" in workProgress ? workProgress.value ?? 0 : 0
               }
               onBlur={(e) => {
                 dispatch(
                   actions.setDeliverableProgress({
                     id: currentDeliverable.id,
                     workProgress: {
-                      value: parseFloat(e.target.value),
+                      percentage: parseFloat(e.target.value),
                     },
                   })
                 );
@@ -378,8 +380,10 @@ const Deliverables: React.FC<DeliverablesProps> = ({
                         actions.setDeliverableProgress({
                           id: currentDeliverable.id,
                           workProgress: {
-                            total: workProgress.total,
-                            completed: parseInt(e.target.value),
+                            storyPoints: {
+                              total: workProgress.total ?? 0,
+                              completed: parseInt(e.target.value),
+                            },
                           },
                         })
                       );
@@ -417,8 +421,10 @@ const Deliverables: React.FC<DeliverablesProps> = ({
                         actions.setDeliverableProgress({
                           id: currentDeliverable.id,
                           workProgress: {
-                            total: parseInt(e.target.value),
-                            completed: workProgress?.completed || 0,
+                            storyPoints: {
+                              total: parseInt(e.target.value),
+                              completed: workProgress?.completed || 0,
+                            },
                           },
                         })
                       );

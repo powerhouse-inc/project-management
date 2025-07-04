@@ -186,7 +186,7 @@ describe("DeliverablesSet Operations", () => {
     const input: SetProgressInDeliverablesSetInput = {
       milestoneId,
       progress: {
-        value: 75,
+        percentage: 75,
       },
     };
 

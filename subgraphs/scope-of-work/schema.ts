@@ -304,11 +304,14 @@ export const schema: DocumentNode = gql`
 
   input ScopeOfWork_SetDeliverableProgressInput {
     id: OID! #deliverable id
-    workProgress: ProgressInput!
+    workProgress: ProgressInput
   }
 
-  input PercentageInput {
-    value: Float!
+  input ProgressInput {
+    # Only one of these fields should be provided
+    percentage: Float
+    storyPoints: StoryPointInput
+    binary: Boolean
   }
 
   input StoryPointInput {
@@ -316,11 +319,6 @@ export const schema: DocumentNode = gql`
     completed: Int!
   }
 
-  input BinaryInput {
-    isBinary: Boolean!
-  }
-
-  union ProgressInput = PercentageInput | StoryPointInput | BinaryInput
   input ScopeOfWork_AddKeyResultInput {
     id: OID!
     deliverableId: OID!
@@ -409,7 +407,7 @@ export const schema: DocumentNode = gql`
     CANCELED
   }
 
-  type ScopeOfWork_DeliverablesCompletedInput {
+  input DeliverablesCompletedInput {
     total: Int!
     completed: Int!
   }
@@ -423,7 +421,7 @@ export const schema: DocumentNode = gql`
   }
   input ScopeOfWork_SetProgressInDeliverablesSetInput {
     milestoneId: ID!
-    progress: ProgressInput!
+    progress: ProgressInput
   }
 
   """

@@ -183,11 +183,14 @@ input EditDeliverableInput {
 
 input SetDeliverableProgressInput {
   id: OID! #deliverable id
-  workProgress: ProgressInput!
+  workProgress: ProgressInput
 }
 
-input PercentageInput {
-  value: Float!
+input ProgressInput {
+  # Only one of these fields should be provided
+  percentage: Float
+  storyPoints: StoryPointInput
+  binary: Boolean
 }
 
 input StoryPointInput {
@@ -195,11 +198,6 @@ input StoryPointInput {
   completed: Int!
 }
 
-input BinaryInput {
-  isBinary: Boolean!
-}
-
-union ProgressInput = PercentageInput | StoryPointInput | BinaryInput
 
 input AddKeyResultInput {
   id: OID!
@@ -294,7 +292,7 @@ enum DeliverableSetStatusInput {
   CANCELED
 }
 
-type DeliverablesCompletedInput {
+input DeliverablesCompletedInput {
   total: Int!
   completed: Int!
 }
@@ -311,7 +309,7 @@ input RemoveDeliverableInSetInput {
 
 input SetProgressInDeliverablesSetInput {
   milestoneId: ID!
-  progress: ProgressInput!
+  progress: ProgressInput
 }
 
 # agents

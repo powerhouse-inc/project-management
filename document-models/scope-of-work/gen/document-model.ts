@@ -154,7 +154,7 @@ export const documentModel: DocumentModelState = {
               name: "SET_DELIVERABLE_PROGRESS",
               description: "",
               schema:
-                "input SetDeliverableProgressInput {\n  id: OID! #deliverable id\n  workProgress: ProgressInput!\n}\n\ninput PercentageInput {\n  value: Float!\n}\n\ninput StoryPointInput {\n  total: Int!\n  completed: Int!\n}\n\ninput BinaryInput {\n  isBinary: Boolean!\n}\n\nunion ProgressInput = PercentageInput | StoryPointInput | BinaryInput",
+                "input SetDeliverableProgressInput {\n  id: OID! #deliverable id\n  workProgress: ProgressInput\n}\n\ninput ProgressInput {\n  # Only one of these fields should be provided\n  percentage: Float\n  storyPoints: StoryPointInput\n  binary: Boolean\n}\n\ninput StoryPointInput {\n  total: Int!\n  completed: Int!\n}\n",
               template: "",
               reducer: "",
               errors: [],
@@ -365,7 +365,7 @@ export const documentModel: DocumentModelState = {
               name: "EDIT_DELIVERABLES_SET",
               description: "",
               schema:
-                "input EditDeliverablesSetInput {\n  milestoneId: ID!\n  status: DeliverableSetStatusInput\n  deliverablesCompleted: DeliverablesCompletedInput\n}\n\nenum DeliverableSetStatusInput {\n  DRAFT\n  TODO\n  IN_PROGRESS\n  FINISHED\n  CANCELED\n}\n\ntype DeliverablesCompletedInput {\n  total: Int!\n  completed: Int!\n}",
+                "input EditDeliverablesSetInput {\n  milestoneId: ID!\n  status: DeliverableSetStatusInput\n  deliverablesCompleted: DeliverablesCompletedInput\n}\n\nenum DeliverableSetStatusInput {\n  DRAFT\n  TODO\n  IN_PROGRESS\n  FINISHED\n  CANCELED\n}\n\ninput DeliverablesCompletedInput {\n  total: Int!\n  completed: Int!\n}",
               template: "",
               reducer: "",
               errors: [],
@@ -401,7 +401,7 @@ export const documentModel: DocumentModelState = {
               name: "SET_PROGRESS_IN_DELIVERABLES_SET",
               description: "",
               schema:
-                "input SetProgressInDeliverablesSetInput {\n  milestoneId: ID!\n  progress: ProgressInput!\n}",
+                "input SetProgressInDeliverablesSetInput {\n  milestoneId: ID!\n  progress: ProgressInput\n}",
               template: "",
               reducer: "",
               errors: [],
