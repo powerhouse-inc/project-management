@@ -57,7 +57,13 @@ const ScopeOfWork = (props: any) => {
           actions.editRoadmap({ id: editRowId.toString(), title: editValue })
         );
       } else {
-        dispatch(actions.addRoadmap({ id: editRowId, title: editValue }));
+        dispatch(actions.addRoadmap(
+          { 
+            id: editRowId, 
+            title: editValue, 
+            slug: editValue.toLowerCase().replace(/ /g, "-").concat(`-${editRowId.substring(editRowId.length - 8)}`)
+          })
+        );
       }
       setEditRowId(null);
       setEditValue("");
