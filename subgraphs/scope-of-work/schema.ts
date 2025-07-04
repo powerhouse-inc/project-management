@@ -17,8 +17,10 @@ export const schema: DocumentNode = gql`
   enum ScopeOfWorkStatus {
     DRAFT
     SUBMITTED
+    IN_PROGRESS
     REJECTED
     APPROVED
+    DELIVERED
     CANCELED
   }
 
@@ -264,8 +266,10 @@ export const schema: DocumentNode = gql`
   enum ScopeOfWorkStatusInput {
     DRAFT
     SUBMITTED
+    IN_PROGRESS
     REJECTED
     APPROVED
+    DELIVERED
     CANCELED
   }
 

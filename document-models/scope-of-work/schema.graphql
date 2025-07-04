@@ -26,8 +26,10 @@ type ScopeOfWorkState {
 enum ScopeOfWorkStatus {
   DRAFT
   SUBMITTED
+  IN_PROGRESS
   REJECTED
   APPROVED
+  DELIVERED
   CANCELED
 }
 
@@ -140,8 +142,10 @@ input EditScopeOfWorkInput {
 enum ScopeOfWorkStatusInput {
   DRAFT
   SUBMITTED
+  IN_PROGRESS
   REJECTED
   APPROVED
+  DELIVERED
   CANCELED
 }
 

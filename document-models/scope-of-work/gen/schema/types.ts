@@ -318,14 +318,18 @@ export type ScopeOfWorkState = {
 export type ScopeOfWorkStatus =
   | "APPROVED"
   | "CANCELED"
+  | "DELIVERED"
   | "DRAFT"
+  | "IN_PROGRESS"
   | "REJECTED"
   | "SUBMITTED";
 
 export type ScopeOfWorkStatusInput =
   | "APPROVED"
   | "CANCELED"
+  | "DELIVERED"
   | "DRAFT"
+  | "IN_PROGRESS"
   | "REJECTED"
   | "SUBMITTED";
 

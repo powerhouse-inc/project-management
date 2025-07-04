@@ -103,7 +103,9 @@ export const PmDeliverableStatusInputSchema = z.enum([
 export const ScopeOfWorkStatusSchema = z.enum([
   "APPROVED",
   "CANCELED",
+  "DELIVERED",
   "DRAFT",
+  "IN_PROGRESS",
   "REJECTED",
   "SUBMITTED",
 ]);
@@ -111,7 +113,9 @@ export const ScopeOfWorkStatusSchema = z.enum([
 export const ScopeOfWorkStatusInputSchema = z.enum([
   "APPROVED",
   "CANCELED",
+  "DELIVERED",
   "DRAFT",
+  "IN_PROGRESS",
   "REJECTED",
   "SUBMITTED",
 ]);

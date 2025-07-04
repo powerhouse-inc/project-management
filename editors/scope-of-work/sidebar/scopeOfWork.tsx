@@ -17,9 +17,11 @@ const ScopeOfWork = (props: any) => {
 
   const statusOptions = [
     { label: "Draft", value: "DRAFT" },
+    { label: "In Progress", value: "IN_PROGRESS" },
     { label: "Submitted", value: "SUBMITTED" },
     { label: "Rejected", value: "REJECTED" },
     { label: "Approved", value: "APPROVED" },
+    { label: "Delivered", value: "DELIVERED" },
     { label: "Cancelled", value: "CANCELED" },
   ];
 
