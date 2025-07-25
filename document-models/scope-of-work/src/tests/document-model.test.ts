@@ -13,7 +13,7 @@ describe("Scope Of Work Document Model", () => {
     const document = utils.createDocument();
 
     expect(document).toBeDefined();
-    expect(document.documentType).toBe("powerhouse/scopeofwork");
+    expect(document.header.documentType).toBe("powerhouse/scopeofwork");
   });
 
   it("should create a new Scope Of Work document with a valid initial state", () => {
