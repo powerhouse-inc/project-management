@@ -6,6 +6,7 @@ import {
   baseSaveToFileHandle,
   baseLoadFromFile,
   baseLoadFromInput,
+  generateId,
 } from "document-model";
 import {
   type ScopeOfWorkDocument,
@@ -33,16 +34,20 @@ const utils: DocumentModelUtils<ScopeOfWorkDocument> = {
     };
   },
   createExtendedState(extendedState) {
-    return baseCreateExtendedState(
-      { ...extendedState, documentType: "powerhouse/scopeofwork" },
-      utils.createState,
-    );
+    return baseCreateExtendedState({ ...extendedState }, utils.createState);
   },
   createDocument(state) {
-    return baseCreateDocument(
+    const document = baseCreateDocument(
       utils.createExtendedState(state),
       utils.createState,
     );
+
+    document.header.documentType = "powerhouse/scopeofwork";
+
+    // for backwards compatibility, but this is NOT a valid signed document id
+    document.header.id = generateId();
+
+    return document;
   },
   saveToFile(document, path, name) {
     return baseSaveToFile(document, path, ".phdm", name);

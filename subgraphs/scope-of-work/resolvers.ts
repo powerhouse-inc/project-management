@@ -22,9 +22,10 @@ export const getResolvers = (subgraph: Subgraph): Record<string, any> => {
             return {
               driveId: driveId,
               ...doc,
+              ...doc.header,
               state: doc.state.global,
               stateJSON: doc.state.global,
-              revision: doc.revision.global,
+              revision: doc.header.revision["global"] ?? 0,
             };
           },
           getDocuments: async (args: any) => {
@@ -36,15 +37,16 @@ export const getResolvers = (subgraph: Subgraph): Record<string, any> => {
                 return {
                   driveId: driveId,
                   ...doc,
+                  ...doc.header,
                   state: doc.state.global,
                   stateJSON: doc.state.global,
-                  revision: doc.revision.global,
+                  revision: doc.header.revision["global"] ?? 0,
                 };
               }),
             );
 
             return docs.filter(
-              (doc) => doc.documentType === "powerhouse/scopeofwork",
+              (doc) => doc.header.documentType === "powerhouse/scopeofwork",
             );
           },
         };
@@ -90,7 +92,7 @@ export const getResolvers = (subgraph: Subgraph): Record<string, any> => {
           actions.editScopeOfWork({ ...args.input }),
         );
 
-        return doc.revision.global + 1;
+        return (doc.header.revision["global"] ?? 0) + 1;
       },
 
       ScopeOfWork_addDeliverable: async (_: any, args: any) => {
@@ -104,7 +106,7 @@ export const getResolvers = (subgraph: Subgraph): Record<string, any> => {
           actions.addDeliverable({ ...args.input }),
         );
 
-        return doc.revision.global + 1;
+        return (doc.header.revision["global"] ?? 0) + 1;
       },
 
       ScopeOfWork_removeDeliverable: async (_: any, args: any) => {
@@ -118,7 +120,7 @@ export const getResolvers = (subgraph: Subgraph): Record<string, any> => {
           actions.removeDeliverable({ ...args.input }),
         );
 
-        return doc.revision.global + 1;
+        return (doc.header.revision["global"] ?? 0) + 1;
       },
 
       ScopeOfWork_editDeliverable: async (_: any, args: any) => {
@@ -132,7 +134,7 @@ export const getResolvers = (subgraph: Subgraph): Record<string, any> => {
           actions.editDeliverable({ ...args.input }),
         );
 
-        return doc.revision.global + 1;
+        return (doc.header.revision["global"] ?? 0) + 1;
       },
 
       ScopeOfWork_setDeliverableProgress: async (_: any, args: any) => {
@@ -146,7 +148,7 @@ export const getResolvers = (subgraph: Subgraph): Record<string, any> => {
           actions.setDeliverableProgress({ ...args.input }),
         );
 
-        return doc.revision.global + 1;
+        return (doc.header.revision["global"] ?? 0) + 1;
       },
 
       ScopeOfWork_addKeyResult: async (_: any, args: any) => {
@@ -160,7 +162,7 @@ export const getResolvers = (subgraph: Subgraph): Record<string, any> => {
           actions.addKeyResult({ ...args.input }),
         );
 
-        return doc.revision.global + 1;
+        return (doc.header.revision["global"] ?? 0) + 1;
       },
 
       ScopeOfWork_removeKeyResult: async (_: any, args: any) => {
@@ -174,7 +176,7 @@ export const getResolvers = (subgraph: Subgraph): Record<string, any> => {
           actions.removeKeyResult({ ...args.input }),
         );
 
-        return doc.revision.global + 1;
+        return (doc.header.revision["global"] ?? 0) + 1;
       },
 
       ScopeOfWork_editKeyResult: async (_: any, args: any) => {
@@ -188,7 +190,7 @@ export const getResolvers = (subgraph: Subgraph): Record<string, any> => {
           actions.editKeyResult({ ...args.input }),
         );
 
-        return doc.revision.global + 1;
+        return (doc.header.revision["global"] ?? 0) + 1;
       },
 
       ScopeOfWork_addRoadmap: async (_: any, args: any) => {
@@ -202,7 +204,7 @@ export const getResolvers = (subgraph: Subgraph): Record<string, any> => {
           actions.addRoadmap({ ...args.input }),
         );
 
-        return doc.revision.global + 1;
+        return (doc.header.revision["global"] ?? 0) + 1;
       },
 
       ScopeOfWork_removeRoadmap: async (_: any, args: any) => {
@@ -216,7 +218,7 @@ export const getResolvers = (subgraph: Subgraph): Record<string, any> => {
           actions.removeRoadmap({ ...args.input }),
         );
 
-        return doc.revision.global + 1;
+        return (doc.header.revision["global"] ?? 0) + 1;
       },
 
       ScopeOfWork_editRoadmap: async (_: any, args: any) => {
@@ -230,7 +232,7 @@ export const getResolvers = (subgraph: Subgraph): Record<string, any> => {
           actions.editRoadmap({ ...args.input }),
         );
 
-        return doc.revision.global + 1;
+        return (doc.header.revision["global"] ?? 0) + 1;
       },
 
       ScopeOfWork_addMilestone: async (_: any, args: any) => {
@@ -244,7 +246,7 @@ export const getResolvers = (subgraph: Subgraph): Record<string, any> => {
           actions.addMilestone({ ...args.input }),
         );
 
-        return doc.revision.global + 1;
+        return (doc.header.revision["global"] ?? 0) + 1;
       },
 
       ScopeOfWork_removeMilestone: async (_: any, args: any) => {
@@ -258,7 +260,7 @@ export const getResolvers = (subgraph: Subgraph): Record<string, any> => {
           actions.removeMilestone({ ...args.input }),
         );
 
-        return doc.revision.global + 1;
+        return (doc.header.revision["global"] ?? 0) + 1;
       },
 
       ScopeOfWork_editMilestone: async (_: any, args: any) => {
@@ -272,7 +274,7 @@ export const getResolvers = (subgraph: Subgraph): Record<string, any> => {
           actions.editMilestone({ ...args.input }),
         );
 
-        return doc.revision.global + 1;
+        return (doc.header.revision["global"] ?? 0) + 1;
       },
 
       ScopeOfWork_addCoordinator: async (_: any, args: any) => {
@@ -286,7 +288,7 @@ export const getResolvers = (subgraph: Subgraph): Record<string, any> => {
           actions.addCoordinator({ ...args.input }),
         );
 
-        return doc.revision.global + 1;
+        return (doc.header.revision["global"] ?? 0) + 1;
       },
 
       ScopeOfWork_removeCoordinator: async (_: any, args: any) => {
@@ -300,7 +302,7 @@ export const getResolvers = (subgraph: Subgraph): Record<string, any> => {
           actions.removeCoordinator({ ...args.input }),
         );
 
-        return doc.revision.global + 1;
+        return (doc.header.revision["global"] ?? 0) + 1;
       },
 
       ScopeOfWork_editDeliverablesSet: async (_: any, args: any) => {
@@ -314,7 +316,7 @@ export const getResolvers = (subgraph: Subgraph): Record<string, any> => {
           actions.editDeliverablesSet({ ...args.input }),
         );
 
-        return doc.revision.global + 1;
+        return (doc.header.revision["global"] ?? 0) + 1;
       },
 
       ScopeOfWork_addDeliverableInSet: async (_: any, args: any) => {
@@ -328,7 +330,7 @@ export const getResolvers = (subgraph: Subgraph): Record<string, any> => {
           actions.addDeliverableInSet({ ...args.input }),
         );
 
-        return doc.revision.global + 1;
+        return (doc.header.revision["global"] ?? 0) + 1;
       },
 
       ScopeOfWork_removeDeliverableInSet: async (_: any, args: any) => {
@@ -342,7 +344,7 @@ export const getResolvers = (subgraph: Subgraph): Record<string, any> => {
           actions.removeDeliverableInSet({ ...args.input }),
         );
 
-        return doc.revision.global + 1;
+        return (doc.header.revision["global"] ?? 0) + 1;
       },
 
       ScopeOfWork_setProgressInDeliverablesSet: async (_: any, args: any) => {
@@ -356,7 +358,7 @@ export const getResolvers = (subgraph: Subgraph): Record<string, any> => {
           actions.setProgressInDeliverablesSet({ ...args.input }),
         );
 
-        return doc.revision.global + 1;
+        return (doc.header.revision["global"] ?? 0) + 1;
       },
 
       ScopeOfWork_addAgent: async (_: any, args: any) => {
@@ -370,7 +372,7 @@ export const getResolvers = (subgraph: Subgraph): Record<string, any> => {
           actions.addAgent({ ...args.input }),
         );
 
-        return doc.revision.global + 1;
+        return (doc.header.revision["global"] ?? 0) + 1;
       },
 
       ScopeOfWork_removeAgent: async (_: any, args: any) => {
@@ -384,7 +386,7 @@ export const getResolvers = (subgraph: Subgraph): Record<string, any> => {
           actions.removeAgent({ ...args.input }),
         );
 
-        return doc.revision.global + 1;
+        return (doc.header.revision["global"] ?? 0) + 1;
       },
 
       ScopeOfWork_editAgent: async (_: any, args: any) => {
@@ -398,7 +400,7 @@ export const getResolvers = (subgraph: Subgraph): Record<string, any> => {
           actions.editAgent({ ...args.input }),
         );
 
-        return doc.revision.global + 1;
+        return (doc.header.revision["global"] ?? 0) + 1;
       },
     },
   };
