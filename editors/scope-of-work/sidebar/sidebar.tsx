@@ -7,6 +7,7 @@ import {
 } from "@powerhousedao/document-engineering";
 import { ReactElement, useState, useEffect, useMemo } from "react";
 import ScopeOfWork from "./scopeOfWork.js";
+import Roadmaps from "./roadmaps.js";
 
 type SidebarNode = {
   id: string;
@@ -74,7 +75,7 @@ const useSidebarWidth = () => {
 };
 
 export default function SidebarMenu(props: any) {
-  const { document, state = document.state.global } = props;
+  const { document, state = document.state.global, dispatch } = props;
   const { roadmaps, milestones, deliverables } = state;
 
   const [activeNodeId, setActiveNodeId] = useState<string | undefined>(
@@ -84,48 +85,69 @@ export default function SidebarMenu(props: any) {
   const { sidebarWidth, isSidebarOpen } = useSidebarWidth();
 
   console.log("activeNodeId", activeNodeId);
-  console.log("sidebarWidth", sidebarWidth, "isSidebarOpen", isSidebarOpen);
+  console.log("roadmaps", roadmaps);
 
   // Use useMemo to recalculate nodes whenever the state changes
-  const nodes: SidebarNode[] = useMemo(() => [
-    {
-      id: "roadmaps",
-      title: "Roadmaps",
-      children: roadmaps.map((roadmap: any) => ({
-        id: `roadmap-${roadmap.id}`,
-        title: roadmap.title,
-        children: roadmap.milestones.map((milestone: any) => ({
-          id: `milestone-${milestone.id}`,
-          title: milestone.title,
+  const nodes: SidebarNode[] = useMemo(
+    () => [
+      {
+        id: "roadmaps",
+        title: "Roadmaps",
+        children: roadmaps.map((roadmap: any) => ({
+          id: `roadmap.${roadmap.id}`,
+          title: roadmap.title,
+          children: roadmap.milestones.map((milestone: any) => ({
+            id: `milestone.${milestone.id}`,
+            title: milestone.title,
+            children: [],
+          })),
+        })),
+      },
+      {
+        id: "projects",
+        title: "Projects",
+        children: [],
+      },
+      {
+        id: "deliverables",
+        title: "Deliverables",
+        children: deliverables.map((deliverable: any) => ({
+          id: `deliverable.${deliverable.id}`,
+          title: deliverable.title,
           children: [],
         })),
-      })),
-    },
-    {
-      id: "projects",
-      title: "Projects",
-      children: [],
-    },
-    {
-      id: "deliverables",
-      title: "Deliverables",
-      children: deliverables.map((deliverable: any) => ({
-        id: `deliverable-${deliverable.id}`,
-        title: deliverable.title,
-        children: [],
-      })),
-    },
-  ], [roadmaps, deliverables, state]); // Dependencies that should trigger recalculation
+      },
+    ],
+    [roadmaps, deliverables, state]
+  ); // Dependencies that should trigger recalculation
 
   // Component that updates sidebar nodes when state changes
   const SidebarUpdater = ({ nodes }: { nodes: SidebarNode[] }) => {
     const { setNodes } = useSidebar();
-    
+
     useEffect(() => {
       setNodes(nodes);
     }, [nodes, setNodes]);
-    
+
     return null;
+  };
+
+  const displayActiveNode = (activeNodeId: string) => {
+    const id = activeNodeId.split(".")[1];
+    const name = activeNodeId.split(".")[0];
+
+    console.log("id", id);
+    console.log("name", name);
+
+    switch (name) {
+      case "roadmap":
+        return (
+          <Roadmaps
+            dispatch={dispatch}
+            roadmaps={roadmaps.filter((r: any) => r.id === id)}
+          />
+        );
+    }
   };
 
   return (
@@ -134,7 +156,7 @@ export default function SidebarMenu(props: any) {
         <SidebarUpdater nodes={nodes} />
         <Sidebar
           // nodes={nodes}
-          sidebarTitle={<span onClick={() => setActiveNodeId(undefined)}>Scope of Work</span>}
+          sidebarTitle="Scope of Work"
           sidebarIcon={<Icon name="BrickGlobe" />}
           enableMacros={3}
           allowPinning={true}
@@ -164,23 +186,7 @@ export default function SidebarMenu(props: any) {
           reset
         </button>
         {activeNodeId ? (
-          <div className="p-6">
-            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-              <h1 className="text-2xl font-semibold text-gray-800 mb-4">
-                Active Node: {activeNodeId}
-              </h1>
-              <div className="text-sm text-gray-600">
-                <p>Sidebar Width: {sidebarWidth}px</p>
-                <p>Sidebar Open: {isSidebarOpen ? "Yes" : "No"}</p>
-                <p>
-                  Content Width:{" "}
-                  {isSidebarOpen
-                    ? `calc(100vw - ${sidebarWidth}px)`
-                    : "calc(100vw - 8px)"}
-                </p>
-              </div>
-            </div>
-          </div>
+          displayActiveNode(activeNodeId)
         ) : (
           <ScopeOfWork {...props} />
         )}
