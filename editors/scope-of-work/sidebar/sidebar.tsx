@@ -8,6 +8,8 @@ import {
 import { ReactElement, useState, useEffect, useMemo } from "react";
 import ScopeOfWork from "./scopeOfWork.js";
 import Roadmaps from "./roadmaps.js";
+import Milestones from "./milestones.js";
+import Deliverables from "./deliverables.js";
 
 type SidebarNode = {
   id: string;
@@ -76,8 +78,8 @@ const useSidebarWidth = () => {
 
 export default function SidebarMenu(props: any) {
   const { document, state = document.state.global, dispatch } = props;
-  const { roadmaps, milestones, deliverables } = state;
-
+  const { roadmaps, deliverables } = state;
+  const milestones = state.roadmaps.flatMap((r: any) => r.milestones);
   const [activeNodeId, setActiveNodeId] = useState<string | undefined>(
     undefined
   );
@@ -86,6 +88,8 @@ export default function SidebarMenu(props: any) {
 
   console.log("activeNodeId", activeNodeId);
   console.log("roadmaps", roadmaps);
+  console.log("milestones", milestones);
+  console.log("deliverables", deliverables);
 
   // Use useMemo to recalculate nodes whenever the state changes
   const nodes: SidebarNode[] = useMemo(
@@ -147,6 +151,22 @@ export default function SidebarMenu(props: any) {
             roadmaps={roadmaps.filter((r: any) => r.id === id)}
           />
         );
+      case "milestone":
+        return (
+          <Milestones
+            dispatch={dispatch}
+            milestones={milestones.filter((m: any) => m.id === id)}
+            roadmaps={roadmaps}
+            deliverables={deliverables}
+          />
+        );
+      case "deliverable":
+        return (
+          <Deliverables
+            dispatch={dispatch}
+            deliverables={deliverables.filter((d: any) => d.id === id)}
+          />
+        );
     }
   };
 
@@ -170,7 +190,7 @@ export default function SidebarMenu(props: any) {
 
       {/* Main content area that adjusts based on sidebar width */}
       <div
-        className="flex-1 transition-all duration-75 ease-linear bg-white"
+        className="flex-1 transition-all duration-75 ease-linear"
         style={{
           marginLeft: isSidebarOpen ? `0` : "8px",
           width: isSidebarOpen
@@ -182,8 +202,9 @@ export default function SidebarMenu(props: any) {
           onClick={() => {
             setActiveNodeId(undefined);
           }}
+          className="block mx-auto bg-gray-200 rounded-md p-1 m-1 text-sm hover:bg-gray-300"
         >
-          reset
+          SoW Editor
         </button>
         {activeNodeId ? (
           displayActiveNode(activeNodeId)

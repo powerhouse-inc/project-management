@@ -21,8 +21,8 @@ interface MilestonesProps {
   milestones: Milestone[];
   dispatch: any;
   deliverables: Deliverable[];
-  setDeliverablesOpen: (open: boolean) => void;
-  setSelectedDeliverableId: (id: string) => void;
+  setDeliverablesOpen?: (open: boolean) => void;
+  setSelectedDeliverableId?: (id: string) => void;
 }
 
 const Milestones: React.FC<MilestonesProps> = ({
@@ -63,8 +63,8 @@ const Milestones: React.FC<MilestonesProps> = ({
                 name="Moved"
                 size={18}
                 onClick={() => {
-                  setDeliverablesOpen(true);
-                  setSelectedDeliverableId(context.row.id);
+                  // setDeliverablesOpen(true);
+                  // setSelectedDeliverableId(context.row.id);
                 }}
               />
             </div>
