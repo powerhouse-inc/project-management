@@ -110,7 +110,7 @@ const Deliverables: React.FC<DeliverablesProps> = ({
   }, [currentDeliverable, dispatch]);
 
   return (
-    <div className="border border-gray-300 p-2">
+    <div className="border border-gray-300 p-4 rounded-md">
       <div className="mt-2 grid grid-cols-8 gap-2">
         <div className="col-span-2">
           <TextInput

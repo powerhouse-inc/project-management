@@ -138,7 +138,7 @@ const Roadmaps: React.FC<RoadmapsProps> = ({ roadmaps , dispatch, setMilestonesO
   );
 
   return (
-    <div className="border border-gray-300 p-2 rounded-md">
+    <div className="border border-gray-300 p-4 rounded-md">
       <div className="mt-2">
         <TextInput
           className="w-full"
