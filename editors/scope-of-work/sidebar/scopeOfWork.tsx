@@ -1,8 +1,11 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 import {
   TextInput,
   Textarea,
   Select,
+  ObjectSetTable,
+  ColumnDef,
+  ColumnAlignment,
 } from "@powerhousedao/document-engineering";
 import { Icon } from "@powerhousedao/design-system";
 import {
@@ -12,8 +15,76 @@ import {
 import { generateId } from "document-model";
 
 const ScopeOfWork = (props: any) => {
-  const { setSelectedRoadmapId, setRoadmapsOpen, dispatch, document} = props;
+  const { setSelectedRoadmapId, setRoadmapsOpen, dispatch, document } = props;
   const state = document.state.global;
+
+  const columns = useMemo<Array<ColumnDef<any>>>(
+    () => [
+      {
+        field: "link",
+        width: 20,
+        align: "center" as ColumnAlignment,
+        renderCell: (value: any, context: any) => {
+          return (
+            <div className="text-center">
+              <Icon
+                className="hover:cursor-pointer"
+                name="Moved"
+                size={18}
+                onClick={() => {
+                  // setMilestonesOpen(true);
+                  // setSelectedMilestoneId(context.row.id);
+                }}
+              />
+            </div>
+          );
+        },
+      },
+      {
+        field: "title",
+        title: "Roadmap Title",
+        editable: true,
+        align: "center" as ColumnAlignment,
+        onSave: (newValue: any, context: any) => {
+          if (newValue !== context.row.title) {
+            dispatch(
+              actions.editRoadmap({
+                id: context.row.id,
+                title: newValue as string,
+              })
+            );
+            return true;
+          }
+          return false;
+        },
+        renderCell: (value: any, context: any) => {
+          return <div className="text-left">{value}</div>;
+        },
+      },
+      {
+        field: "actions",
+        title: "Actions",
+        editable: true,
+        align: "center" as ColumnAlignment,
+        width: 200,
+        renderCell: (value: any, context: any) => {
+          return (
+            <span className="cursor-pointer flex items-center justify-center">
+              <Icon
+                name="Trash"
+                size={18}
+                className="hover:text-red-500"
+                onClick={() => {
+                  dispatch(actions.removeRoadmap({ id: context.row.id }));
+                }}
+              />
+            </span>
+          );
+        },
+      },
+    ],
+    []
+  );
 
   const statusOptions = [
     { label: "Draft", value: "DRAFT" },
@@ -59,11 +130,14 @@ const ScopeOfWork = (props: any) => {
           actions.editRoadmap({ id: editRowId.toString(), title: editValue })
         );
       } else {
-        dispatch(actions.addRoadmap(
-          { 
-            id: editRowId, 
-            title: editValue, 
-            slug: editValue.toLowerCase().replace(/ /g, "-").concat(`-${editRowId.substring(editRowId.length - 8)}`)
+        dispatch(
+          actions.addRoadmap({
+            id: editRowId,
+            title: editValue,
+            slug: editValue
+              .toLowerCase()
+              .replace(/ /g, "-")
+              .concat(`-${editRowId.substring(editRowId.length - 8)}`),
           })
         );
       }
@@ -86,7 +160,7 @@ const ScopeOfWork = (props: any) => {
   };
 
   return (
-    <div className="border border-gray-300 p-2 rounded-md">
+    <div className="border border-gray-300 p-4 rounded-md ">
       <div className="mt-2">
         <TextInput
           className="w-full"
@@ -131,90 +205,23 @@ const ScopeOfWork = (props: any) => {
           }}
         />
       </div>
-      <div className="mt-4">
-        <label className="text-sm font-medium text-gray-700 mb-2">Roadmaps</label>
-        <table className="w-full mb-2 border border-gray-300 rounded">
-          <thead>
-            <tr className="bg-gray-100 border-b border-gray-300 rounded-t">
-              <th className="px-2 py-1 w-24 border-r border-gray-300 rounded-tl">
-                #
-              </th>
-              <th className="px-2 py-1 border-gray-300 rounded-tr">
-                Roadmap Title
-              </th>
-              <th className="w-24 px-2 py-1 border-gray-300 rounded-tr">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {tableData.map((row, idx) => (
-              <tr
-                key={row.id}
-                className="hover:bg-gray-50 border-b border-gray-300 last:rounded-b"
-              >
-                <td className="px-2 py-1 text-center border-r border-gray-300">
-                  <span className="flex items-center justify-center gap-1">
-                    {/* <span className="text-xs">{idx + 1} </span> */}
-                    <span
-                      className="cursor-pointer"
-                      onClick={() => {
-                        setSelectedRoadmapId(row.id);
-                        setRoadmapsOpen(true);
-                      }}
-                    >
-                      <Icon
-                        name="Moved"
-                        size={18}
-                        className="ml-2 hover:text-blue-500"
-                      />
-                    </span>
-                  </span>
-                </td>
-                <td
-                  className="px-2 py-1 cursor-pointer"
-                  onDoubleClick={() => handleDoubleClick(row)}
-                >
-                  {editRowId === row.id ? (
-                    <input
-                      ref={inputRef}
-                      className="w-full border border-gray-300 rounded px-1 py-0.5"
-                      defaultValue={row.title}
-                      onChange={handleInputChange}
-                      onBlur={handleInputBlur}
-                      onKeyDown={handleInputKeyDown}
-                    />
-                  ) : (
-                    row.title || (
-                      <span className="text-gray-400 italic">
-                        (Double click to edit)
-                      </span>
-                    )
-                  )}
-                </td>
-                <td className="px-2 py-1 border-r border-gray-300 flex items-center justify-center">
-                  <span className="cursor-pointer">
-                    <Icon
-                      name="Trash"
-                      size={18}
-                      className="hover:text-red-500"
-                      onClick={() => {
-                        dispatch(actions.removeRoadmap({ id: row.id }));
-                      }}
-                    />
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <button
-          className="w-full bg-white border rounded hover:bg-gray-100"
-          onClick={handleAddRow}
-        >
-          + Add Roadmap
-        </button>
-      </div>
+      <label className="text-sm font-medium text-gray-700 mb-2 mt-4">Roadmaps</label>
+      <ObjectSetTable
+        columns={columns}
+        data={state.roadmaps || []}
+        allowRowSelection={true}
+        onAdd={(data) => {
+          if (data.title) {
+            console.log("title", data.title);
+            dispatch(
+              actions.addRoadmap({
+                id: generateId(),
+                title: data.title as string,
+              })
+            );
+          }
+        }}
+      />
     </div>
   );
 };
