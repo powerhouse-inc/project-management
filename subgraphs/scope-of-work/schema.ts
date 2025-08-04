@@ -461,8 +461,8 @@ export const schema: DocumentNode = gql`
   Module: DeliverablesSet
   """
   input ScopeOfWork_EditDeliverablesSetInput {
-    milestoneId: ID!
-    projectId: ID!
+    milestoneId: ID
+    projectId: ID
     status: DeliverableSetStatusInput
     deliverablesCompleted: DeliverablesCompletedInput
   }
@@ -480,12 +480,13 @@ export const schema: DocumentNode = gql`
     completed: Int!
   }
   input ScopeOfWork_AddDeliverableInSetInput {
-    milestoneId: ID!
+    milestoneId: ID
+    projectId: ID
     deliverableId: OID!
   }
   input ScopeOfWork_RemoveDeliverableInSetInput {
-    milestoneId: ID!
-    projectId: ID!
+    milestoneId: ID
+    projectId: ID
     deliverableId: OID!
   }
   input ScopeOfWork_SetProgressInDeliverablesSetInput {
