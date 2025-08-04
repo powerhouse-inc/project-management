@@ -69,7 +69,8 @@ export type AddCoordinatorInput = {
 
 export type AddDeliverableInSetInput = {
   deliverableId: Scalars["OID"]["input"];
-  milestoneId: Scalars["ID"]["input"];
+  milestoneId?: InputMaybe<Scalars["ID"]["input"]>;
+  projectId?: InputMaybe<Scalars["ID"]["input"]>;
 };
 
 export type AddDeliverableInput = {
@@ -221,8 +222,8 @@ export type EditDeliverableInput = {
 
 export type EditDeliverablesSetInput = {
   deliverablesCompleted?: InputMaybe<DeliverablesCompletedInput>;
-  milestoneId: Scalars["ID"]["input"];
-  projectId: Scalars["ID"]["input"];
+  milestoneId?: InputMaybe<Scalars["ID"]["input"]>;
+  projectId?: InputMaybe<Scalars["ID"]["input"]>;
   status?: InputMaybe<
     DeliverableSetStatusInput | `${DeliverableSetStatusInput}`
   >;
@@ -325,8 +326,8 @@ export type RemoveCoordinatorInput = {
 
 export type RemoveDeliverableInSetInput = {
   deliverableId: Scalars["OID"]["input"];
-  milestoneId: Scalars["ID"]["input"];
-  projectId: Scalars["ID"]["input"];
+  milestoneId?: InputMaybe<Scalars["ID"]["input"]>;
+  projectId?: InputMaybe<Scalars["ID"]["input"]>;
 };
 
 export type RemoveDeliverableInput = {

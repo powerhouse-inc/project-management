@@ -175,7 +175,8 @@ export function AddDeliverableInSetInputSchema(): z.ZodObject<
 > {
   return z.object({
     deliverableId: z.string(),
-    milestoneId: z.string(),
+    milestoneId: z.string().nullish(),
+    projectId: z.string().nullish(),
   });
 }
 
@@ -363,8 +364,8 @@ export function EditDeliverablesSetInputSchema(): z.ZodObject<
     deliverablesCompleted: z.lazy(() =>
       DeliverablesCompletedInputSchema().nullish(),
     ),
-    milestoneId: z.string(),
-    projectId: z.string(),
+    milestoneId: z.string().nullish(),
+    projectId: z.string().nullish(),
     status: z.lazy(() => DeliverableSetStatusInputSchema.nullish()),
   });
 }
@@ -496,8 +497,8 @@ export function RemoveDeliverableInSetInputSchema(): z.ZodObject<
 > {
   return z.object({
     deliverableId: z.string(),
-    milestoneId: z.string(),
-    projectId: z.string(),
+    milestoneId: z.string().nullish(),
+    projectId: z.string().nullish(),
   });
 }
 

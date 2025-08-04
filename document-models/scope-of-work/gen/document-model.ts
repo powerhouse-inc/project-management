@@ -365,7 +365,7 @@ export const documentModel: DocumentModelState = {
               name: "EDIT_DELIVERABLES_SET",
               description: "",
               schema:
-                "input EditDeliverablesSetInput {\n  milestoneId: ID!\n  projectId: ID!\n  status: DeliverableSetStatusInput\n  deliverablesCompleted: DeliverablesCompletedInput\n}\n\nenum DeliverableSetStatusInput {\n  DRAFT\n  TODO\n  IN_PROGRESS\n  FINISHED\n  CANCELED\n}\n\ninput DeliverablesCompletedInput {\n  total: Int!\n  completed: Int!\n}",
+                "input EditDeliverablesSetInput {\n  milestoneId: ID\n  projectId: ID\n  status: DeliverableSetStatusInput\n  deliverablesCompleted: DeliverablesCompletedInput\n}\n\nenum DeliverableSetStatusInput {\n  DRAFT\n  TODO\n  IN_PROGRESS\n  FINISHED\n  CANCELED\n}\n\ninput DeliverablesCompletedInput {\n  total: Int!\n  completed: Int!\n}",
               template: "",
               reducer: "",
               errors: [],
@@ -377,7 +377,7 @@ export const documentModel: DocumentModelState = {
               name: "ADD_DELIVERABLE_IN_SET",
               description: "",
               schema:
-                "input AddDeliverableInSetInput {\n  milestoneId: ID!\n  deliverableId: OID!\n}",
+                "input AddDeliverableInSetInput {\n  milestoneId: ID\n  projectId: ID\n  deliverableId: OID!\n}",
               template: "",
               reducer: "",
               errors: [],
@@ -389,7 +389,7 @@ export const documentModel: DocumentModelState = {
               name: "REMOVE_DELIVERABLE_IN_SET",
               description: "",
               schema:
-                "input RemoveDeliverableInSetInput {\n  milestoneId: ID!\n  projectId: ID!\n  deliverableId: OID!\n}",
+                "input RemoveDeliverableInSetInput {\n  milestoneId: ID\n  projectId: ID\n  deliverableId: OID!\n}",
               template: "",
               reducer: "",
               errors: [],

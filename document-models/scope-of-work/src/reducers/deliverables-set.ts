@@ -31,10 +31,10 @@ export const reducer: ScopeOfWorkDeliverablesSetOperations = {
       state.roadmaps = state.roadmaps.map((roadmap) => {
         return String(roadmap.id) === String(foundRoadmap.id) ? foundRoadmap : roadmap;
       });
-      
+
       // update project set
       const project = state.projects.find((p) => p.id === action.input.projectId);
-      if(!project) {
+      if (!project) {
         throw new Error(`Project with id ${action.input.projectId} not found`);
       }
       const updatedProject = {
@@ -50,44 +50,66 @@ export const reducer: ScopeOfWorkDeliverablesSetOperations = {
       state.projects = state.projects.map((project) => {
         return String(project.id) === String(action.input.projectId) ? updatedProject : project;
       });
-      
+
     } catch (error) {
       console.error(error);
     }
   },
   addDeliverableInSetOperation(state, action, dispatch) {
     try {
-      const foundRoadmap = state.roadmaps.find((roadmap) => {
-        return roadmap.milestones.some((milestone) => String(milestone.id) === String(action.input.milestoneId));
-      });
-      if (!foundRoadmap) {
-        throw new Error(`Roadmap with milestone ${action.input.milestoneId} not found`);
+      // check if action.input either milestoneId or projectId is provided
+      if (!action.input.milestoneId && !action.input.projectId) {
+        throw new Error("Either milestoneId or projectId must be provided");
       }
 
-      const foundMilestone = foundRoadmap.milestones.find((milestone) => String(milestone.id) === String(action.input.milestoneId));
-      if (!foundMilestone) {
-        throw new Error("Milestone not found");
-      }
+      // if milestoneId is provided, check if roadmap exists
+      if (action.input.milestoneId && !action.input.projectId) {
+        const foundRoadmap = state.roadmaps.find((roadmap) => {
+          return roadmap.milestones.some((milestone) => String(milestone.id) === String(action.input.milestoneId));
+        });
+        if (!foundRoadmap) {
+          throw new Error(`Roadmap with milestone ${action.input.milestoneId} not found`);
+        }
 
-      if (!foundMilestone.scope) {
-        foundMilestone.scope = {
-          deliverables: [],
-          status: "DRAFT" as const,
-          progress: { total: 0, completed: 0 },
-          deliverablesCompleted: {
-            total: 0,
-            completed: 0,
-          },
-        };
-      }
+        const foundMilestone = foundRoadmap.milestones.find((milestone) => String(milestone.id) === String(action.input.milestoneId));
+        if (!foundMilestone) {
+          throw new Error("Milestone not found");
+        }
 
-      if (!foundMilestone.scope.deliverables.includes(action.input.deliverableId)) {
-        foundMilestone.scope.deliverables.push(action.input.deliverableId);
-      }
+        if (!foundMilestone.scope) {
+          foundMilestone.scope = {
+            deliverables: [],
+            status: "DRAFT" as const,
+            progress: { total: 0, completed: 0 },
+            deliverablesCompleted: {
+              total: 0,
+              completed: 0,
+            },
+          };
+        }
 
-      state.roadmaps = state.roadmaps.map((roadmap) => {
-        return String(roadmap.id) === String(foundRoadmap.id) ? foundRoadmap : roadmap;
-      });
+        if (!foundMilestone.scope.deliverables.includes(action.input.deliverableId)) {
+          foundMilestone.scope.deliverables.push(action.input.deliverableId);
+        }
+
+        state.roadmaps = state.roadmaps.map((roadmap) => {
+          return String(roadmap.id) === String(foundRoadmap.id) ? foundRoadmap : roadmap;
+        });
+      } else if (action.input.projectId && !action.input.milestoneId) {
+        // check if project exists
+        const foundProject = state.projects.find((project) => String(project.id) === String(action.input.projectId));
+        if (!foundProject) {
+          throw new Error(`Project with id ${action.input.projectId} not found`);
+        }
+
+        if (!foundProject.scope?.deliverables.includes(action.input.deliverableId)) {
+          foundProject!.scope!.deliverables.push(action.input.deliverableId);
+        }
+
+        state.projects = state.projects.map((project) => {
+          return String(project.id) === String(action.input.projectId) ? foundProject : project;
+        });
+      }
     } catch (error) {
       console.error(error);
     }
@@ -152,7 +174,7 @@ export const reducer: ScopeOfWorkDeliverablesSetOperations = {
 
       // update project set
       const project = state.projects.find((p) => p.id === action.input.projectId);
-      if(!project) {
+      if (!project) {
         throw new Error(`Project with id ${action.input.projectId} not found`);
       }
       const updatedProject = {
@@ -167,7 +189,7 @@ export const reducer: ScopeOfWorkDeliverablesSetOperations = {
       state.projects = state.projects.map((project) => {
         return String(project.id) === String(action.input.projectId) ? updatedProject : project;
       });
-      
+
     } catch (error) {
       console.error(error);
     }

@@ -330,8 +330,8 @@ input RemoveCoordinatorInput {
 # deliverables_set
 
 input EditDeliverablesSetInput {
-  milestoneId: ID!
-  projectId: ID!
+  milestoneId: ID
+  projectId: ID
   status: DeliverableSetStatusInput
   deliverablesCompleted: DeliverablesCompletedInput
 }
@@ -350,13 +350,14 @@ input DeliverablesCompletedInput {
 }
 
 input AddDeliverableInSetInput {
-  milestoneId: ID!
+  milestoneId: ID
+  projectId: ID
   deliverableId: OID!
 }
 
 input RemoveDeliverableInSetInput {
-  milestoneId: ID!
-  projectId: ID!
+  milestoneId: ID
+  projectId: ID
   deliverableId: OID!
 }
 
