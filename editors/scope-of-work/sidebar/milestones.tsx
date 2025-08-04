@@ -21,8 +21,7 @@ interface MilestonesProps {
   milestones: Milestone[];
   dispatch: any;
   deliverables: Deliverable[];
-  setDeliverablesOpen?: (open: boolean) => void;
-  setSelectedDeliverableId?: (id: string) => void;
+  setActiveNodeId: (id: string) => void;
 }
 
 const Milestones: React.FC<MilestonesProps> = ({
@@ -30,8 +29,7 @@ const Milestones: React.FC<MilestonesProps> = ({
   roadmaps,
   dispatch,
   deliverables,
-  setDeliverablesOpen,
-  setSelectedDeliverableId,
+  setActiveNodeId,
 }) => {
   const milestone = milestones[0];
   const roadmap = roadmaps.find((r: any) => {
@@ -63,8 +61,7 @@ const Milestones: React.FC<MilestonesProps> = ({
                 name="Moved"
                 size={18}
                 onClick={() => {
-                  // setDeliverablesOpen(true);
-                  // setSelectedDeliverableId(context.row.id);
+                  setActiveNodeId(`deliverable.${context.row.id}`);
                 }}
               />
             </div>

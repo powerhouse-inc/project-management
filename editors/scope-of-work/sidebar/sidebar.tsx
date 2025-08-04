@@ -7,9 +7,13 @@ import {
 } from "@powerhousedao/document-engineering";
 import { ReactElement, useState, useEffect, useMemo } from "react";
 import ScopeOfWork from "./scopeOfWork.js";
-import Roadmaps from "./roadmaps.js";
+import Roadmap from "./roadmap.js";
 import Milestones from "./milestones.js";
+import Deliverable from "./deliverable.js";
+import Projects from "./projects.js";
+import Project from "./project.js";
 import Deliverables from "./deliverables.js";
+import Roadmaps from "./roadmaps.js";
 
 type SidebarNode = {
   id: string;
@@ -78,7 +82,7 @@ const useSidebarWidth = () => {
 
 export default function SidebarMenu(props: any) {
   const { document, state = document.state.global, dispatch } = props;
-  const { roadmaps, deliverables } = state;
+  const { roadmaps, deliverables, projects } = state;
   const milestones = state.roadmaps.flatMap((r: any) => r.milestones);
   const [activeNodeId, setActiveNodeId] = useState<string | undefined>(
     undefined
@@ -86,10 +90,6 @@ export default function SidebarMenu(props: any) {
 
   const { sidebarWidth, isSidebarOpen } = useSidebarWidth();
 
-  console.log("activeNodeId", activeNodeId);
-  console.log("roadmaps", roadmaps);
-  console.log("milestones", milestones);
-  console.log("deliverables", deliverables);
 
   // Use useMemo to recalculate nodes whenever the state changes
   const nodes: SidebarNode[] = useMemo(
@@ -110,7 +110,11 @@ export default function SidebarMenu(props: any) {
       {
         id: "projects",
         title: "Projects",
-        children: [],
+        children: projects.map((project: any) => ({
+          id: `project.${project.id}`,
+          title: project.title,
+          children: [],
+        })),
       },
       {
         id: "deliverables",
@@ -140,15 +144,21 @@ export default function SidebarMenu(props: any) {
     const id = activeNodeId.split(".")[1];
     const name = activeNodeId.split(".")[0];
 
-    console.log("id", id);
-    console.log("name", name);
-
     switch (name) {
-      case "roadmap":
+      case "roadmaps":
         return (
           <Roadmaps
             dispatch={dispatch}
+            roadmaps={roadmaps}
+            setActiveNodeId={setActiveNodeId}
+          />
+        );
+      case "roadmap":
+        return (
+          <Roadmap
+            dispatch={dispatch}
             roadmaps={roadmaps.filter((r: any) => r.id === id)}
+            setActiveNodeId={setActiveNodeId}
           />
         );
       case "milestone":
@@ -158,13 +168,36 @@ export default function SidebarMenu(props: any) {
             milestones={milestones.filter((m: any) => m.id === id)}
             roadmaps={roadmaps}
             deliverables={deliverables}
+            setActiveNodeId={setActiveNodeId}
+          />
+        );
+      case "deliverables":
+        return (
+          <Deliverables
+            dispatch={dispatch}
+            deliverables={deliverables}
+            milestones={milestones}
+            projects={projects}
+            setActiveNodeId={setActiveNodeId}
+            document={document}
           />
         );
       case "deliverable":
         return (
-          <Deliverables
+          <Deliverable
             dispatch={dispatch}
             deliverables={deliverables.filter((d: any) => d.id === id)}
+          />
+        );
+      case "projects":
+        return <Projects dispatch={dispatch} projects={projects} setActiveNodeId={setActiveNodeId} />;
+      case "project":
+        return (
+          <Project
+            dispatch={dispatch}
+            project={projects.find((p: any) => p.id === id)}
+            deliverables={deliverables}
+            setActiveNodeId={setActiveNodeId}
           />
         );
     }

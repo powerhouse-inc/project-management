@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import Roadmaps from "./roadmaps.js";
+import Roadmaps from "./roadmap.js";
 import Milestones from "./milestones.js";
-import Deliverables from "./deliverables.js";
+import Deliverables from "./deliverable.js";
 import ScopeOfWork from "./scopeOfWork.js";
 
 const SIDEBAR_OPTIONS = [

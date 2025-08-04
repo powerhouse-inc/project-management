@@ -1,6 +1,7 @@
 import { useMemo } from "react";
-import { Roadmap } from "../../../document-models/scope-of-work/gen/types.js";
+import { Project } from "../../../document-models/scope-of-work/gen/types.js";
 import {
+  TextInput,
   ObjectSetTable,
   ColumnDef,
   ColumnAlignment,
@@ -10,12 +11,12 @@ import { actions } from "../../../document-models/scope-of-work/index.js";
 import { generateId } from "document-model";
 
 interface ProjectsProps {
-  roadmaps: Roadmap[] | undefined;
+  projects: Project[] | undefined;
   dispatch: any;
   setActiveNodeId: (id: string) => void;
 }
 
-const Roadmaps: React.FC<ProjectsProps> = ({ roadmaps, dispatch, setActiveNodeId }) => {
+const Projects: React.FC<ProjectsProps> = ({ projects, dispatch, setActiveNodeId }) => {
   const columns = useMemo<Array<ColumnDef<any>>>(
     () => [
       {
@@ -30,7 +31,7 @@ const Roadmaps: React.FC<ProjectsProps> = ({ roadmaps, dispatch, setActiveNodeId
                 name="Moved"
                 size={18}
                 onClick={() => {
-                  setActiveNodeId(`roadmap.${context.row.id}`);
+                  setActiveNodeId(`project.${context.row.id}`);
                 }}
               />
             </div>
@@ -67,23 +68,20 @@ const Roadmaps: React.FC<ProjectsProps> = ({ roadmaps, dispatch, setActiveNodeId
     <div className="border border-gray-300 p-4 rounded-md">
       <div className="mt-4">
         <h3 className="flex justify-center items-center font-bold text-gray-700 mb-2">
-          Roadmaps
+          Projects
         </h3>
         <ObjectSetTable
           columns={columns}
-          data={roadmaps || []}
+          data={projects || []}
           allowRowSelection={true}
           onAdd={(data) => {
             if (data.title) {
-              const newId = generateId();
+              console.log("title", data.title);
               dispatch(
-                actions.addRoadmap({
+                actions.addProject({
                   id: generateId(),
+                  code: '',
                   title: data.title as string,
-                  slug: (data.title as string)
-                  .toLowerCase()
-                  .replace(/ /g, "-")
-                  .concat(`-${newId.substring(newId.length - 8)}`),
                 })
               );
             }
@@ -94,4 +92,4 @@ const Roadmaps: React.FC<ProjectsProps> = ({ roadmaps, dispatch, setActiveNodeId
   );
 };
 
-export default Roadmaps;
+export default Projects;
