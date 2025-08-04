@@ -10,6 +10,7 @@ export const schema: DocumentNode = gql`
     description: String!
     status: ScopeOfWorkStatus!
     deliverables: [Deliverable!]!
+    projects: [Project!]!
     roadmaps: [Roadmap!]!
     agents: [Agent!]!
   }
@@ -47,6 +48,19 @@ export const schema: DocumentNode = gql`
     status: DeliverableStatus!
     workProgress: Progress
     keyResults: [KeyResult!]!
+    budgetAnchor: BudgetAnchorProject
+  }
+
+  type BudgetAnchorProject {
+    project: OID!
+    unit: Unit
+    unitCost: Float!
+    quantity: Float!
+  }
+
+  enum Unit {
+    StoryPoints
+    Hours
   }
 
   enum DeliverableStatus {
@@ -66,7 +80,7 @@ export const schema: DocumentNode = gql`
   }
 
   type Binary {
-    isBinary: Boolean
+    completed: Boolean
   }
 
   type StoryPoint {
@@ -78,6 +92,40 @@ export const schema: DocumentNode = gql`
     id: OID!
     title: String!
     link: String!
+  }
+
+  type Project {
+    id: OID!
+    code: String!
+    title: String!
+    projectOwner: ID
+    abstract: String
+    imageUrl: URL
+    scope: DeliverablesSet
+    budgetType: BudgetType
+    currency: Currency
+    budget: Float
+    expenditure: BudgetExpenditure
+  }
+
+  enum Currency {
+    DAI
+    USDS
+    EUR
+    USD
+  }
+
+  enum BudgetType {
+    CONTINGENCY
+    OPEX
+    CAPEX
+    OVERHEAD
+  }
+
+  type BudgetExpenditure {
+    percentage: Float!
+    actuals: Float!
+    cap: Float!
   }
 
   type Roadmap {
@@ -252,6 +300,21 @@ export const schema: DocumentNode = gql`
       docId: PHID
       input: ScopeOfWork_EditAgentInput
     ): Int
+    ScopeOfWork_addProject(
+      driveId: String
+      docId: PHID
+      input: ScopeOfWork_AddProjectInput
+    ): Int
+    ScopeOfWork_updateProject(
+      driveId: String
+      docId: PHID
+      input: ScopeOfWork_UpdateProjectInput
+    ): Int
+    ScopeOfWork_updateProjectOwner(
+      driveId: String
+      docId: PHID
+      input: ScopeOfWork_UpdateProjectOwnerInput
+    ): Int
   }
 
   """
@@ -315,7 +378,7 @@ export const schema: DocumentNode = gql`
     # Only one of these fields should be provided
     percentage: Float
     storyPoints: StoryPointInput
-    binary: Boolean
+    completed: Boolean
   }
 
   input StoryPointInput {
@@ -399,6 +462,7 @@ export const schema: DocumentNode = gql`
   """
   input ScopeOfWork_EditDeliverablesSetInput {
     milestoneId: ID!
+    projectId: ID!
     status: DeliverableSetStatusInput
     deliverablesCompleted: DeliverablesCompletedInput
   }
@@ -421,10 +485,12 @@ export const schema: DocumentNode = gql`
   }
   input ScopeOfWork_RemoveDeliverableInSetInput {
     milestoneId: ID!
+    projectId: ID!
     deliverableId: OID!
   }
   input ScopeOfWork_SetProgressInDeliverablesSetInput {
     milestoneId: ID!
+    projectId: ID
     progress: ProgressInput
   }
 
@@ -453,5 +519,55 @@ export const schema: DocumentNode = gql`
     agentType: AgentTypeInput
     code: String
     imageUrl: String
+  }
+
+  enum AgentTypeInput {
+    HUMAN
+    GROUP
+    AI
+  }
+
+  """
+  Module: Projects
+  """
+  input ScopeOfWork_AddProjectInput {
+    id: OID!
+    code: String!
+    title: String!
+    projectOwner: ID # Initial project owner
+    abstract: String
+    imageUrl: URL
+    budgetType: PMBudgetTypeInput
+    currency: PMCurrencyInput
+    budget: Float
+  }
+
+  enum PMBudgetTypeInput {
+    CONTINGENCY
+    OPEX
+    CAPEX
+    OVERHEAD
+  }
+
+  enum PMCurrencyInput {
+    DAI
+    USDS
+    EUR
+    USD
+  }
+
+  input ScopeOfWork_UpdateProjectInput {
+    id: OID!
+    code: String
+    title: String
+    abstract: String
+    imageUrl: URL
+    budgetType: PMBudgetTypeInput
+    currency: PMCurrencyInput
+    budget: Float
+  }
+  input ScopeOfWork_UpdateProjectOwnerInput {
+    id: OID! # The ID of the project
+    projectOwner: ID! # The ID of the new owner (Agent)
   }
 `;

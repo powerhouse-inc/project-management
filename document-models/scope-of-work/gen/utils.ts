@@ -19,9 +19,9 @@ export const initialGlobalState: ScopeOfWorkState = {
   title: "",
   description: "",
   deliverables: [],
+  projects: [],
   roadmaps: [],
   agents: [],
-  status: "DRAFT",
 };
 export const initialLocalState: ScopeOfWorkLocalState = {};
 

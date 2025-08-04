@@ -31,6 +31,26 @@ export const reducer: ScopeOfWorkDeliverablesSetOperations = {
       state.roadmaps = state.roadmaps.map((roadmap) => {
         return String(roadmap.id) === String(foundRoadmap.id) ? foundRoadmap : roadmap;
       });
+      
+      // update project set
+      const project = state.projects.find((p) => p.id === action.input.projectId);
+      if(!project) {
+        throw new Error(`Project with id ${action.input.projectId} not found`);
+      }
+      const updatedProject = {
+        ...project,
+        scope: {
+          deliverables: project.scope?.deliverables || [],
+          status: action.input.status || project.scope?.status || "DRAFT" as const,
+          progress: project.scope?.progress || { value: 0 },
+          deliverablesCompleted: action.input.deliverablesCompleted || project.scope?.deliverablesCompleted || { total: 0, completed: 0 },
+        }
+      }
+
+      state.projects = state.projects.map((project) => {
+        return String(project.id) === String(action.input.projectId) ? updatedProject : project;
+      });
+      
     } catch (error) {
       console.error(error);
     }
@@ -121,14 +141,33 @@ export const reducer: ScopeOfWorkDeliverablesSetOperations = {
             total: action.input.progress.storyPoints.total,
             completed: action.input.progress.storyPoints.completed,
           };
-        } else if (action.input.progress.binary !== undefined && action.input.progress.binary !== null) {
-          foundMilestone.scope.progress = { isBinary: action.input.progress.binary };
+        } else if (action.input.progress.completed !== undefined && action.input.progress.completed !== null) {
+          foundMilestone.scope.progress = { completed: action.input.progress.completed };
         }
       }
 
       state.roadmaps = state.roadmaps.map((roadmap) => {
         return String(roadmap.id) === String(foundRoadmap.id) ? foundRoadmap : roadmap;
       });
+
+      // update project set
+      const project = state.projects.find((p) => p.id === action.input.projectId);
+      if(!project) {
+        throw new Error(`Project with id ${action.input.projectId} not found`);
+      }
+      const updatedProject = {
+        ...project,
+        scope: {
+          deliverables: project.scope?.deliverables || [],
+          status: project.scope?.status || "DRAFT" as const,
+          progress: project.scope?.progress || { value: 0 },
+          deliverablesCompleted: project.scope?.deliverablesCompleted || { total: 0, completed: 0 },
+        }
+      }
+      state.projects = state.projects.map((project) => {
+        return String(project.id) === String(action.input.projectId) ? updatedProject : project;
+      });
+      
     } catch (error) {
       console.error(error);
     }

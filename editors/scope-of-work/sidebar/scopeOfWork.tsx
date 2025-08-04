@@ -213,10 +213,15 @@ const ScopeOfWork = (props: any) => {
         onAdd={(data) => {
           if (data.title) {
             console.log("title", data.title);
+            const newId = generateId();
             dispatch(
               actions.addRoadmap({
-                id: generateId(),
+                id: newId,
                 title: data.title as string,
+                slug: (data.title as string)
+                  .toLowerCase()
+                  .replace(/ /g, "-")
+                  .concat(`-${newId.substring(newId.length - 8)}`),
               })
             );
           }

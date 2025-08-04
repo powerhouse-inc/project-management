@@ -47,6 +47,7 @@ describe("DeliverablesSet Operations", () => {
 
     const input: EditDeliverablesSetInput = {
       milestoneId,
+      projectId: "project-1",
       status: "IN_PROGRESS",
       deliverablesCompleted: {
         total: 5,
@@ -143,6 +144,7 @@ describe("DeliverablesSet Operations", () => {
 
     const input: RemoveDeliverableInSetInput = {
       milestoneId,
+      projectId: "project-1",
       deliverableId,
     };
 
@@ -202,6 +204,6 @@ describe("DeliverablesSet Operations", () => {
     const milestone = roadmap!.milestones.find(m => m.id === milestoneId);
     expect(milestone).toBeDefined();
     expect(milestone!.scope).toBeDefined();
-    expect(milestone!.scope!.progress).toStrictEqual(input.progress);
+    expect(milestone!.scope!.progress).toStrictEqual({ value: input.progress!.percentage });
   });
 });

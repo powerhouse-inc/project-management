@@ -132,7 +132,7 @@ describe("Deliverables Operations", () => {
       expect(updatedDocument.operations.global[1].type).toBe("SET_DELIVERABLE_PROGRESS");
       expect(updatedDocument.operations.global[1].input).toStrictEqual(input);
       expect(updatedDocument.operations.global[1].index).toEqual(1);
-      expect(updatedDocument.state.global.deliverables[0].workProgress).toStrictEqual(input.workProgress);
+      expect(updatedDocument.state.global.deliverables[0].workProgress).toStrictEqual({ value: input.workProgress!.percentage });
     });
 
     it("should handle addKeyResult operation", () => {

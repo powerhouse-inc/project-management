@@ -6,11 +6,16 @@ import type {
   AddDeliverableInput,
   AddKeyResultInput,
   AddMilestoneInput,
+  AddProjectInput,
   AddRoadmapInput,
   Agent,
   AgentType,
   AgentTypeInput,
   Binary,
+  BudgetAnchorProject,
+  BudgetExpenditure,
+  BudgetType,
+  Currency,
   Deliverable,
   DeliverableSetStatus,
   DeliverableSetStatusInput,
@@ -27,9 +32,12 @@ import type {
   EditScopeOfWorkInput,
   KeyResult,
   Milestone,
+  PmBudgetTypeInput,
+  PmCurrencyInput,
   PmDeliverableStatusInput,
   Percentage,
   ProgressInput,
+  Project,
   RemoveAgentInput,
   RemoveCoordinatorInput,
   RemoveDeliverableInSetInput,
@@ -45,6 +53,9 @@ import type {
   SetProgressInDeliverablesSetInput,
   StoryPoint,
   StoryPointInput,
+  Unit,
+  UpdateProjectInput,
+  UpdateProjectOwnerInput,
 } from "./types.js";
 
 type Properties<T> = Required<{
@@ -63,6 +74,15 @@ export const definedNonNullAnySchema = z
 export const AgentTypeSchema = z.enum(["AI", "GROUP", "HUMAN"]);
 
 export const AgentTypeInputSchema = z.enum(["AI", "GROUP", "HUMAN"]);
+
+export const BudgetTypeSchema = z.enum([
+  "CAPEX",
+  "CONTINGENCY",
+  "OPEX",
+  "OVERHEAD",
+]);
+
+export const CurrencySchema = z.enum(["DAI", "EUR", "USD", "USDS"]);
 
 export const DeliverableSetStatusSchema = z.enum([
   "CANCELED",
@@ -89,6 +109,15 @@ export const DeliverableStatusSchema = z.enum([
   "TODO",
   "WONT_DO",
 ]);
+
+export const PmBudgetTypeInputSchema = z.enum([
+  "CAPEX",
+  "CONTINGENCY",
+  "OPEX",
+  "OVERHEAD",
+]);
+
+export const PmCurrencyInputSchema = z.enum(["DAI", "EUR", "USD", "USDS"]);
 
 export const PmDeliverableStatusInputSchema = z.enum([
   "BLOCKED",
@@ -119,6 +148,8 @@ export const ScopeOfWorkStatusInputSchema = z.enum([
   "REJECTED",
   "SUBMITTED",
 ]);
+
+export const UnitSchema = z.enum(["Hours", "StoryPoints"]);
 
 export function AddAgentInputSchema(): z.ZodObject<Properties<AddAgentInput>> {
   return z.object({
@@ -186,6 +217,22 @@ export function AddMilestoneInputSchema(): z.ZodObject<
   });
 }
 
+export function AddProjectInputSchema(): z.ZodObject<
+  Properties<AddProjectInput>
+> {
+  return z.object({
+    abstract: z.string().nullish(),
+    budget: z.number().nullish(),
+    budgetType: z.lazy(() => PmBudgetTypeInputSchema.nullish()),
+    code: z.string(),
+    currency: z.lazy(() => PmCurrencyInputSchema.nullish()),
+    id: z.string(),
+    imageUrl: z.string().url().nullish(),
+    projectOwner: z.string().nullish(),
+    title: z.string(),
+  });
+}
+
 export function AddRoadmapInputSchema(): z.ZodObject<
   Properties<AddRoadmapInput>
 > {
@@ -211,13 +258,37 @@ export function AgentSchema(): z.ZodObject<Properties<Agent>> {
 export function BinarySchema(): z.ZodObject<Properties<Binary>> {
   return z.object({
     __typename: z.literal("Binary").optional(),
-    isBinary: z.boolean().nullable(),
+    completed: z.boolean().nullable(),
+  });
+}
+
+export function BudgetAnchorProjectSchema(): z.ZodObject<
+  Properties<BudgetAnchorProject>
+> {
+  return z.object({
+    __typename: z.literal("BudgetAnchorProject").optional(),
+    project: z.string(),
+    quantity: z.number(),
+    unit: UnitSchema.nullable(),
+    unitCost: z.number(),
+  });
+}
+
+export function BudgetExpenditureSchema(): z.ZodObject<
+  Properties<BudgetExpenditure>
+> {
+  return z.object({
+    __typename: z.literal("BudgetExpenditure").optional(),
+    actuals: z.number(),
+    cap: z.number(),
+    percentage: z.number(),
   });
 }
 
 export function DeliverableSchema(): z.ZodObject<Properties<Deliverable>> {
   return z.object({
     __typename: z.literal("Deliverable").optional(),
+    budgetAnchor: BudgetAnchorProjectSchema().nullable(),
     code: z.string(),
     description: z.string(),
     id: z.string(),
@@ -293,6 +364,7 @@ export function EditDeliverablesSetInputSchema(): z.ZodObject<
       DeliverablesCompletedInputSchema().nullish(),
     ),
     milestoneId: z.string(),
+    projectId: z.string(),
     status: z.lazy(() => DeliverableSetStatusInputSchema.nullish()),
   });
 }
@@ -379,9 +451,26 @@ export function ProgressSchema() {
 
 export function ProgressInputSchema(): z.ZodObject<Properties<ProgressInput>> {
   return z.object({
-    binary: z.boolean().nullish(),
+    completed: z.boolean().nullish(),
     percentage: z.number().nullish(),
     storyPoints: z.lazy(() => StoryPointInputSchema().nullish()),
+  });
+}
+
+export function ProjectSchema(): z.ZodObject<Properties<Project>> {
+  return z.object({
+    __typename: z.literal("Project").optional(),
+    abstract: z.string().nullable(),
+    budget: z.number().nullable(),
+    budgetType: BudgetTypeSchema.nullable(),
+    code: z.string(),
+    currency: CurrencySchema.nullable(),
+    expenditure: BudgetExpenditureSchema().nullable(),
+    id: z.string(),
+    imageUrl: z.string().url().nullable(),
+    projectOwner: z.string().nullable(),
+    scope: DeliverablesSetSchema().nullable(),
+    title: z.string(),
   });
 }
 
@@ -408,6 +497,7 @@ export function RemoveDeliverableInSetInputSchema(): z.ZodObject<
   return z.object({
     deliverableId: z.string(),
     milestoneId: z.string(),
+    projectId: z.string(),
   });
 }
 
@@ -464,6 +554,7 @@ export function ScopeOfWorkStateSchema(): z.ZodObject<
     agents: z.array(AgentSchema()),
     deliverables: z.array(DeliverableSchema()),
     description: z.string(),
+    projects: z.array(ProjectSchema()),
     roadmaps: z.array(RoadmapSchema()),
     status: ScopeOfWorkStatusSchema,
     title: z.string(),
@@ -485,6 +576,7 @@ export function SetProgressInDeliverablesSetInputSchema(): z.ZodObject<
   return z.object({
     milestoneId: z.string(),
     progress: z.lazy(() => ProgressInputSchema().nullish()),
+    projectId: z.string().nullish(),
   });
 }
 
@@ -502,5 +594,29 @@ export function StoryPointInputSchema(): z.ZodObject<
   return z.object({
     completed: z.number(),
     total: z.number(),
+  });
+}
+
+export function UpdateProjectInputSchema(): z.ZodObject<
+  Properties<UpdateProjectInput>
+> {
+  return z.object({
+    abstract: z.string().nullish(),
+    budget: z.number().nullish(),
+    budgetType: z.lazy(() => PmBudgetTypeInputSchema.nullish()),
+    code: z.string().nullish(),
+    currency: z.lazy(() => PmCurrencyInputSchema.nullish()),
+    id: z.string(),
+    imageUrl: z.string().url().nullish(),
+    title: z.string().nullish(),
+  });
+}
+
+export function UpdateProjectOwnerInputSchema(): z.ZodObject<
+  Properties<UpdateProjectOwnerInput>
+> {
+  return z.object({
+    id: z.string(),
+    projectOwner: z.string(),
   });
 }

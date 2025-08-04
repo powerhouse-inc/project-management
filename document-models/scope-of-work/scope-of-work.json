@@ -2,7 +2,7 @@
     "id": "powerhouse/scopeofwork",
     "name": "ScopeOfWork",
     "extension": ".phdm",
-    "description": "The Scope of Work model defines a structured plan for executing contributor work; it includes deliverables and roadmaps with milestones with each being linked to ownership, progress tracking.",
+    "description": "The Scope of Work v2 model defines a structured plan for executing contributor work; on top of deliverables and roadmaps with milestones it now also includes projects as budget anchors for project based budgeting. ",
     "author": {
         "name": "Powerhouse",
         "website": "https://powerhouse.inc"
@@ -13,8 +13,8 @@
             "changeLog": [],
             "state": {
                 "global": {
-                    "schema": "type ScopeOfWorkState {\n  title: String!\n  description: String!\n  status: ScopeOfWorkStatus!\n  deliverables: [Deliverable!]!\n  roadmaps: [Roadmap!]!\n  agents: [Agent!]!\n}\n\nenum ScopeOfWorkStatus {\n  DRAFT\n  SUBMITTED\n  IN_PROGRESS\n  REJECTED\n  APPROVED\n  DELIVERED\n  CANCELED\n}\n\ntype Agent {\n  id: ID!\n  agentType: AgentType!\n  name: String!\n  code: String!\n  imageUrl: String\n}\n\nenum AgentType {\n  HUMAN\n  GROUP\n  AI\n}\n\ntype Deliverable {\n  id: OID!\n  owner: ID\n  title: String!\n  code: String!\n  description: String!\n  status: DeliverableStatus!\n  workProgress: Progress\n  keyResults: [KeyResult!]!\n}\n\nenum DeliverableStatus {\n  WONT_DO\n  DRAFT\n  TODO\n  BLOCKED\n  IN_PROGRESS\n  DELIVERED\n  CANCELED\n}\n\nunion Progress = StoryPoint | Percentage | Binary\n\ntype Percentage {\n  value: Float!\n}\n\ntype Binary {\n  isBinary: Boolean\n  \n}\n\ntype StoryPoint {\n   total: Int!\n   completed: Int!\n}\n\ntype KeyResult {\n  id: OID!\n  title: String!\n  link: String!\n}\n\ntype Roadmap {\n  id: OID!\n  slug: String!\n  title: String!\n  description: String!\n  milestones: [Milestone!]!\n}\n\ntype Milestone {\n  id: OID!\n  sequenceCode: String!\n  title: String!\n  description: String!\n  deliveryTarget: String!\n  scope: DeliverablesSet\n  estimatedBudgetCap: String!\n  coordinators: [ID!]!\n}\n\ntype DeliverablesSet {\n  deliverables: [OID!]!\n  status: DeliverableSetStatus!\n  progress: Progress!\n  deliverablesCompleted: DeliverablesCompleted!\n}\n\ntype DeliverablesCompleted {\n  total: Int!\n  completed: Int!\n}\n\nenum DeliverableSetStatus {\n  DRAFT\n  TODO\n  IN_PROGRESS\n  FINISHED\n  CANCELED\n}",
-                    "initialValue": "{\n  \"title\": \"\",\n  \"description\": \"\",\n  \"deliverables\": [],\n  \"roadmaps\": [],\n  \"agents\": []\n}",
+                    "schema": "type ScopeOfWorkState {\n  title: String!\n  description: String!\n  status: ScopeOfWorkStatus!\n  deliverables: [Deliverable!]!\n  projects: [Project!]!\n  roadmaps: [Roadmap!]!\n  agents: [Agent!]!\n}\n\nenum ScopeOfWorkStatus {\n  DRAFT\n  SUBMITTED\n  IN_PROGRESS\n  REJECTED\n  APPROVED\n  DELIVERED\n  CANCELED\n}\n\ntype Agent {\n  id: ID!\n  agentType: AgentType!\n  name: String!\n  code: String!\n  imageUrl: String\n}\n\nenum AgentType {\n  HUMAN\n  GROUP\n  AI\n}\n\ntype Deliverable {\n  id: OID!\n  owner: ID\n  title: String!\n  code: String!\n  description: String!\n  status: DeliverableStatus!\n  workProgress: Progress\n  keyResults: [KeyResult!]!\n  budgetAnchor: BudgetAnchorProject\n}\n\ntype BudgetAnchorProject {\n  project: OID!\n  unit: Unit\n  unitCost: Float!\n  quantity: Float!\n}\n\nenum Unit {\n  StoryPoints\n  Hours\n}\n\nenum DeliverableStatus {\n  WONT_DO\n  DRAFT\n  TODO\n  BLOCKED\n  IN_PROGRESS\n  DELIVERED\n  CANCELED\n}\n\nunion Progress = StoryPoint | Percentage | Binary\n\ntype Percentage {\n  value: Float!\n}\n\ntype Binary {\n  completed: Boolean\n}\n\ntype StoryPoint {\n  total: Int!\n  completed: Int!\n}\n\ntype KeyResult {\n  id: OID!\n  title: String!\n  link: String!\n}\n\ntype Project {\n  id: OID!\n  code: String!\n  title: String!\n  projectOwner: ID\n  abstract: String\n  imageUrl: URL\n  scope: DeliverablesSet\n  budgetType: BudgetType\n  currency: Currency\n  budget: Float\n  expenditure: BudgetExpenditure\n}\n\nenum Currency {\n  DAI\n  USDS\n  EUR\n  USD\n}\n\nenum BudgetType {\n  CONTINGENCY\n  OPEX\n  CAPEX\n  OVERHEAD\n}\n\ntype BudgetExpenditure {\n  percentage: Float!\n  actuals: Float!\n  cap: Float!\n}\n\ntype Roadmap {\n  id: OID!\n  slug: String!\n  title: String!\n  description: String!\n  milestones: [Milestone!]!\n}\n\ntype Milestone {\n  id: OID!\n  sequenceCode: String!\n  title: String!\n  description: String!\n  deliveryTarget: String!\n  scope: DeliverablesSet\n  estimatedBudgetCap: String!\n  coordinators: [ID!]!\n}\n\ntype DeliverablesSet {\n  deliverables: [OID!]!\n  status: DeliverableSetStatus!\n  progress: Progress!\n  deliverablesCompleted: DeliverablesCompleted!\n}\n\ntype DeliverablesCompleted {\n  total: Int!\n  completed: Int!\n}\n\nenum DeliverableSetStatus {\n  DRAFT\n  TODO\n  IN_PROGRESS\n  FINISHED\n  CANCELED\n}",
+                    "initialValue": "{\n  \"title\": \"\",\n  \"description\": \"\",\n  \"deliverables\": [],\n  \"projects\": [], \n  \"roadmaps\": [],\n  \"agents\": []\n}",
                     "examples": []
                 },
                 "local": {
@@ -142,7 +142,7 @@
                             "id": "505fb5d9-1698-428c-935c-a0e64cf48a01",
                             "name": "SET_DELIVERABLE_PROGRESS",
                             "description": "",
-                            "schema": "input SetDeliverableProgressInput {\n  id: OID! #deliverable id\n  workProgress: ProgressInput\n}\n\ninput ProgressInput {\n  # Only one of these fields should be provided\n  percentage: Float\n  storyPoints: StoryPointInput\n  binary: Boolean\n}\n\ninput StoryPointInput {\n  total: Int!\n  completed: Int!\n}\n",
+                            "schema": "input SetDeliverableProgressInput {\n  id: OID! #deliverable id\n  workProgress: ProgressInput\n}\n\ninput ProgressInput {\n  # Only one of these fields should be provided\n  percentage: Float\n  storyPoints: StoryPointInput\n  completed: Boolean\n}\n\ninput StoryPointInput {\n  total: Int!\n  completed: Int!\n}\n",
                             "template": "",
                             "reducer": "",
                             "errors": [],
@@ -339,7 +339,7 @@
                             "id": "68ba1e27-8979-4762-a779-f1f2ef86500e",
                             "name": "EDIT_DELIVERABLES_SET",
                             "description": "",
-                            "schema": "input EditDeliverablesSetInput {\n  milestoneId: ID!\n  status: DeliverableSetStatusInput\n  deliverablesCompleted: DeliverablesCompletedInput\n}\n\nenum DeliverableSetStatusInput {\n  DRAFT\n  TODO\n  IN_PROGRESS\n  FINISHED\n  CANCELED\n}\n\ninput DeliverablesCompletedInput {\n  total: Int!\n  completed: Int!\n}",
+                            "schema": "input EditDeliverablesSetInput {\n  milestoneId: ID!\n  projectId: ID!\n  status: DeliverableSetStatusInput\n  deliverablesCompleted: DeliverablesCompletedInput\n}\n\nenum DeliverableSetStatusInput {\n  DRAFT\n  TODO\n  IN_PROGRESS\n  FINISHED\n  CANCELED\n}\n\ninput DeliverablesCompletedInput {\n  total: Int!\n  completed: Int!\n}",
                             "template": "",
                             "reducer": "",
                             "errors": [],
@@ -361,7 +361,7 @@
                             "id": "94e5b395-9798-48ae-921e-70983f17155d",
                             "name": "REMOVE_DELIVERABLE_IN_SET",
                             "description": "",
-                            "schema": "input RemoveDeliverableInSetInput {\n  milestoneId: ID!\n  deliverableId: OID!\n}",
+                            "schema": "input RemoveDeliverableInSetInput {\n  milestoneId: ID!\n  projectId: ID!\n  deliverableId: OID!\n}",
                             "template": "",
                             "reducer": "",
                             "errors": [],
@@ -372,7 +372,7 @@
                             "id": "a3fba990-3d5a-481b-a375-e828d2b7723f",
                             "name": "SET_PROGRESS_IN_DELIVERABLES_SET",
                             "description": "",
-                            "schema": "input SetProgressInDeliverablesSetInput {\n  milestoneId: ID!\n  progress: ProgressInput\n}",
+                            "schema": "input SetProgressInDeliverablesSetInput {\n  milestoneId: ID!\n  projectId: ID\n  progress: ProgressInput\n}\n",
                             "template": "",
                             "reducer": "",
                             "errors": [],
@@ -412,10 +412,123 @@
                             "id": "33534820-0c51-4f04-8ad2-bb378fb9c60e",
                             "name": "EDIT_AGENT",
                             "description": "",
-                            "schema": "input EditAgentInput {\n  id: ID!\n  name: String\n  agentType: AgentTypeInput\n  code: String\n  imageUrl: String\n}",
+                            "schema": "input EditAgentInput {\n  id: ID!\n  name: String\n  agentType: AgentTypeInput\n  code: String\n  imageUrl: String\n}\n\nenum AgentTypeInput {\n  HUMAN\n  GROUP\n  AI\n}",
                             "template": "",
                             "reducer": "",
                             "errors": [],
+                            "examples": [],
+                            "scope": "global"
+                        }
+                    ]
+                },
+                {
+                    "id": "0578e71b-6205-4c19-86ab-5c581cc71b93",
+                    "name": "projects",
+                    "description": "",
+                    "operations": [
+                        {
+                            "id": "773aebd7-98af-46f3-8f6a-161be1d2e176",
+                            "name": "ADD_PROJECT",
+                            "description": "Creates a new project in a DRAFT status, initializing its core fields. The status of the new project defaults to DRAFT. The Deliverables list (scope) is initialized as empty.",
+                            "schema": "input AddProjectInput {\n  id: OID!\n  code: String!\n  title: String!\n  projectOwner: ID # Initial project owner\n  abstract: String\n  imageUrl: URL\n  budgetType: PMBudgetTypeInput\n  currency: PMCurrencyInput\n  budget: Float\n}\n\nenum PMBudgetTypeInput {\n  CONTINGENCY\n  OPEX\n  CAPEX\n  OVERHEAD\n}\n\nenum PMCurrencyInput {\n  DAI\n  USDS\n  EUR\n  USD\n}\n\n",
+                            "template": "",
+                            "reducer": "",
+                            "errors": [
+                                {
+                                    "id": "1c80ca1c-2fcf-4a29-abe4-5544528eb9cf",
+                                    "name": "ProjectIdAlreadyExists",
+                                    "code": "",
+                                    "description": "",
+                                    "template": ""
+                                },
+                                {
+                                    "id": "36dcb235-02d4-4b85-ae23-0e4d95c4dfba",
+                                    "name": "ProjectCodeAlreadyExists",
+                                    "code": "",
+                                    "description": "",
+                                    "template": ""
+                                },
+                                {
+                                    "id": "eedf8345-a78e-43ef-b098-714d1c1c670f",
+                                    "name": "InvalidOwnerId",
+                                    "code": "",
+                                    "description": "",
+                                    "template": ""
+                                }
+                            ],
+                            "examples": [],
+                            "scope": "global"
+                        },
+                        {
+                            "id": "e978628b-ed5f-4867-83f4-45d5ed284f16",
+                            "name": "UPDATE_PROJECT",
+                            "description": "Updates general, non-status-related fields of an existing project. This operation is for minor content adjustments. Project must exist; only allowed if the project status is DRAFT or REJECTED. For projects in other statuses, specific operations for status transitions or scope management should be used.\n\nIf code is updated, it must remain unique.",
+                            "schema": "input UpdateProjectInput {\n  id: OID! \n  code: String \n  title: String \n  abstract: String \n  imageUrl: URL \n  budgetType:  PMBudgetTypeInput\n  currency:  PMCurrencyInput\n  budget: Float \n}",
+                            "template": "",
+                            "reducer": "",
+                            "errors": [
+                                {
+                                    "id": "0c266ada-f61b-4818-b22a-ea4740523aa8",
+                                    "name": "ProjectNotFound",
+                                    "code": "",
+                                    "description": "",
+                                    "template": ""
+                                },
+                                {
+                                    "id": "49204d9d-4519-4862-ae2e-03220a49a146",
+                                    "name": "InvalidProjectStatusForUpdate",
+                                    "code": "",
+                                    "description": "",
+                                    "template": ""
+                                },
+                                {
+                                    "id": "da278562-2601-4efb-bf7c-500b55bf793d",
+                                    "name": "ProjectCodeAlreadyExists",
+                                    "code": "",
+                                    "description": "",
+                                    "template": ""
+                                }
+                            ],
+                            "examples": [],
+                            "scope": "global"
+                        },
+                        {
+                            "id": "a6c4ce6a-fe2d-4242-bc8d-783ec3c7db9a",
+                            "name": "UPDATE_PROJECT_OWNER",
+                            "description": "Changes the primary owner of a project. This is a specific update due to its potential impact on permissions and responsibilities. Project must exist. The projectOwner must correspond to a valid existing Agent.\nOnly allowed if the project status is DRAFT, REJECTED, APPROVED, or IN_PROGRESS. Requires appropriate permissions (e.g., current owner, admin, or coordinator).",
+                            "schema": "input UpdateProjectOwnerInput {\n  id: OID! # The ID of the project\n  projectOwner: ID! # The ID of the new owner (Agent)\n}",
+                            "template": "",
+                            "reducer": "",
+                            "errors": [
+                                {
+                                    "id": "9ec0382b-42cb-4a61-a62c-35a74e956204",
+                                    "name": "ProjectNotFound",
+                                    "code": "",
+                                    "description": "",
+                                    "template": ""
+                                },
+                                {
+                                    "id": "e9938099-4ea1-4176-841a-fa8f33926346",
+                                    "name": "InvalidAgentId",
+                                    "code": "",
+                                    "description": "",
+                                    "template": ""
+                                },
+                                {
+                                    "id": "6bb0fcfa-bc25-459a-82a6-3f5e696fba2a",
+                                    "name": "InvalidProjectStatusForOwnerUpdate",
+                                    "code": "",
+                                    "description": "",
+                                    "template": ""
+                                },
+                                {
+                                    "id": "e3a9968b-c871-43e2-855b-4aa21a2d04e2",
+                                    "name": "InsufficientPermissions",
+                                    "code": "",
+                                    "description": "",
+                                    "template": ""
+                                }
+                            ],
                             "examples": [],
                             "scope": "global"
                         }

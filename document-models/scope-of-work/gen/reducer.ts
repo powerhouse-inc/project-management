@@ -11,6 +11,7 @@ import { reducer as RoadmapsReducer } from "../src/reducers/roadmaps.js";
 import { reducer as MilestonesReducer } from "../src/reducers/milestones.js";
 import { reducer as DeliverablesSetReducer } from "../src/reducers/deliverables-set.js";
 import { reducer as AgentsReducer } from "../src/reducers/agents.js";
+import { reducer as ProjectsReducer } from "../src/reducers/projects.js";
 
 const stateReducer: StateReducer<ScopeOfWorkDocument> = (
   state,
@@ -215,6 +216,33 @@ const stateReducer: StateReducer<ScopeOfWorkDocument> = (
     case "EDIT_AGENT":
       z.EditAgentInputSchema().parse(action.input);
       AgentsReducer.editAgentOperation(state[action.scope], action, dispatch);
+      break;
+
+    case "ADD_PROJECT":
+      z.AddProjectInputSchema().parse(action.input);
+      ProjectsReducer.addProjectOperation(
+        state[action.scope],
+        action,
+        dispatch,
+      );
+      break;
+
+    case "UPDATE_PROJECT":
+      z.UpdateProjectInputSchema().parse(action.input);
+      ProjectsReducer.updateProjectOperation(
+        state[action.scope],
+        action,
+        dispatch,
+      );
+      break;
+
+    case "UPDATE_PROJECT_OWNER":
+      z.UpdateProjectOwnerInputSchema().parse(action.input);
+      ProjectsReducer.updateProjectOwnerOperation(
+        state[action.scope],
+        action,
+        dispatch,
+      );
       break;
 
     default:

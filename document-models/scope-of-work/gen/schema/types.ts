@@ -44,7 +44,6 @@ export type Scalars = {
   Amount_Money: { input: number; output: number };
   Amount_Percentage: { input: number; output: number };
   Amount_Tokens: { input: number; output: number };
-  Currency: { input: string; output: string };
   Date: { input: string; output: string };
   DateTime: { input: string; output: string };
   EmailAddress: { input: string; output: string };
@@ -99,6 +98,18 @@ export type AddMilestoneInput = {
   title?: InputMaybe<Scalars["String"]["input"]>;
 };
 
+export type AddProjectInput = {
+  abstract?: InputMaybe<Scalars["String"]["input"]>;
+  budget?: InputMaybe<Scalars["Float"]["input"]>;
+  budgetType?: InputMaybe<PmBudgetTypeInput | `${PmBudgetTypeInput}`>;
+  code: Scalars["String"]["input"];
+  currency?: InputMaybe<PmCurrencyInput | `${PmCurrencyInput}`>;
+  id: Scalars["OID"]["input"];
+  imageUrl?: InputMaybe<Scalars["URL"]["input"]>;
+  projectOwner?: InputMaybe<Scalars["ID"]["input"]>;
+  title: Scalars["String"]["input"];
+};
+
 export type AddRoadmapInput = {
   description?: InputMaybe<Scalars["String"]["input"]>;
   id: Scalars["OID"]["input"];
@@ -119,10 +130,28 @@ export type AgentType = "AI" | "GROUP" | "HUMAN";
 export type AgentTypeInput = "AI" | "GROUP" | "HUMAN";
 
 export type Binary = {
-  isBinary: Maybe<Scalars["Boolean"]["output"]>;
+  completed: Maybe<Scalars["Boolean"]["output"]>;
 };
 
+export type BudgetAnchorProject = {
+  project: Scalars["OID"]["output"];
+  quantity: Scalars["Float"]["output"];
+  unit: Maybe<Unit | `${Unit}`>;
+  unitCost: Scalars["Float"]["output"];
+};
+
+export type BudgetExpenditure = {
+  actuals: Scalars["Float"]["output"];
+  cap: Scalars["Float"]["output"];
+  percentage: Scalars["Float"]["output"];
+};
+
+export type BudgetType = "CAPEX" | "CONTINGENCY" | "OPEX" | "OVERHEAD";
+
+export type Currency = "DAI" | "EUR" | "USD" | "USDS";
+
 export type Deliverable = {
+  budgetAnchor: Maybe<BudgetAnchorProject>;
   code: Scalars["String"]["output"];
   description: Scalars["String"]["output"];
   id: Scalars["OID"]["output"];
@@ -193,6 +222,7 @@ export type EditDeliverableInput = {
 export type EditDeliverablesSetInput = {
   deliverablesCompleted?: InputMaybe<DeliverablesCompletedInput>;
   milestoneId: Scalars["ID"]["input"];
+  projectId: Scalars["ID"]["input"];
   status?: InputMaybe<
     DeliverableSetStatusInput | `${DeliverableSetStatusInput}`
   >;
@@ -245,6 +275,10 @@ export type Milestone = {
   title: Scalars["String"]["output"];
 };
 
+export type PmBudgetTypeInput = "CAPEX" | "CONTINGENCY" | "OPEX" | "OVERHEAD";
+
+export type PmCurrencyInput = "DAI" | "EUR" | "USD" | "USDS";
+
 export type PmDeliverableStatusInput =
   | "BLOCKED"
   | "CANCELED"
@@ -261,9 +295,23 @@ export type Percentage = {
 export type Progress = Binary | Percentage | StoryPoint;
 
 export type ProgressInput = {
-  binary?: InputMaybe<Scalars["Boolean"]["input"]>;
+  completed?: InputMaybe<Scalars["Boolean"]["input"]>;
   percentage?: InputMaybe<Scalars["Float"]["input"]>;
   storyPoints?: InputMaybe<StoryPointInput>;
+};
+
+export type Project = {
+  abstract: Maybe<Scalars["String"]["output"]>;
+  budget: Maybe<Scalars["Float"]["output"]>;
+  budgetType: Maybe<BudgetType | `${BudgetType}`>;
+  code: Scalars["String"]["output"];
+  currency: Maybe<Currency | `${Currency}`>;
+  expenditure: Maybe<BudgetExpenditure>;
+  id: Scalars["OID"]["output"];
+  imageUrl: Maybe<Scalars["URL"]["output"]>;
+  projectOwner: Maybe<Scalars["ID"]["output"]>;
+  scope: Maybe<DeliverablesSet>;
+  title: Scalars["String"]["output"];
 };
 
 export type RemoveAgentInput = {
@@ -278,6 +326,7 @@ export type RemoveCoordinatorInput = {
 export type RemoveDeliverableInSetInput = {
   deliverableId: Scalars["OID"]["input"];
   milestoneId: Scalars["ID"]["input"];
+  projectId: Scalars["ID"]["input"];
 };
 
 export type RemoveDeliverableInput = {
@@ -310,6 +359,7 @@ export type ScopeOfWorkState = {
   agents: Array<Agent>;
   deliverables: Array<Deliverable>;
   description: Scalars["String"]["output"];
+  projects: Array<Project>;
   roadmaps: Array<Roadmap>;
   status: ScopeOfWorkStatus | `${ScopeOfWorkStatus}`;
   title: Scalars["String"]["output"];
@@ -341,6 +391,7 @@ export type SetDeliverableProgressInput = {
 export type SetProgressInDeliverablesSetInput = {
   milestoneId: Scalars["ID"]["input"];
   progress?: InputMaybe<ProgressInput>;
+  projectId?: InputMaybe<Scalars["ID"]["input"]>;
 };
 
 export type StoryPoint = {
@@ -351,4 +402,22 @@ export type StoryPoint = {
 export type StoryPointInput = {
   completed: Scalars["Int"]["input"];
   total: Scalars["Int"]["input"];
+};
+
+export type Unit = "Hours" | "StoryPoints";
+
+export type UpdateProjectInput = {
+  abstract?: InputMaybe<Scalars["String"]["input"]>;
+  budget?: InputMaybe<Scalars["Float"]["input"]>;
+  budgetType?: InputMaybe<PmBudgetTypeInput | `${PmBudgetTypeInput}`>;
+  code?: InputMaybe<Scalars["String"]["input"]>;
+  currency?: InputMaybe<PmCurrencyInput | `${PmCurrencyInput}`>;
+  id: Scalars["OID"]["input"];
+  imageUrl?: InputMaybe<Scalars["URL"]["input"]>;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type UpdateProjectOwnerInput = {
+  id: Scalars["OID"]["input"];
+  projectOwner: Scalars["ID"]["input"];
 };

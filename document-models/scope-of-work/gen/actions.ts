@@ -4,6 +4,7 @@ import type { ScopeOfWorkRoadmapsAction } from "./roadmaps/actions.js";
 import type { ScopeOfWorkMilestonesAction } from "./milestones/actions.js";
 import type { ScopeOfWorkDeliverablesSetAction } from "./deliverables-set/actions.js";
 import type { ScopeOfWorkAgentsAction } from "./agents/actions.js";
+import type { ScopeOfWorkProjectsAction } from "./projects/actions.js";
 
 export * from "./scope-of-work/actions.js";
 export * from "./deliverables/actions.js";
@@ -11,6 +12,7 @@ export * from "./roadmaps/actions.js";
 export * from "./milestones/actions.js";
 export * from "./deliverables-set/actions.js";
 export * from "./agents/actions.js";
+export * from "./projects/actions.js";
 
 export type ScopeOfWorkAction =
   | ScopeOfWorkScopeOfWorkAction
@@ -18,4 +20,5 @@ export type ScopeOfWorkAction =
   | ScopeOfWorkRoadmapsAction
   | ScopeOfWorkMilestonesAction
   | ScopeOfWorkDeliverablesSetAction
-  | ScopeOfWorkAgentsAction;
+  | ScopeOfWorkAgentsAction
+  | ScopeOfWorkProjectsAction;
