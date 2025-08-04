@@ -185,6 +185,9 @@ export default function SidebarMenu(props: any) {
           onActiveNodeChange={(node) => {
             setActiveNodeId(node.id);
           }}
+          handleOnTitleClick={() => {
+            setActiveNodeId(undefined);
+          }}
         />
       </SidebarProvider>
 
@@ -198,14 +201,6 @@ export default function SidebarMenu(props: any) {
             : "calc(100vw - 8px)",
         }}
       >
-        <button
-          onClick={() => {
-            setActiveNodeId(undefined);
-          }}
-          className="block mx-auto bg-gray-200 rounded-md p-1 m-1 text-sm hover:bg-gray-300"
-        >
-          SoW Editor
-        </button>
         {activeNodeId ? (
           displayActiveNode(activeNodeId)
         ) : (
