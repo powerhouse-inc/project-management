@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";   
 import { Deliverable, Milestone, Project } from "../../../document-models/scope-of-work/gen/types.js";
 import {
   TextInput,
@@ -20,10 +20,18 @@ interface ProjectsProps {
 }
 
 const Deliverables: React.FC<ProjectsProps> = ({ deliverables, dispatch, milestones, projects, setActiveNodeId, document }) => {
-  console.log('document', document.operations);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Update current time every second for live timestamps
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
 
   const latestActivity = document.operations.global.filter((operation: any) => operation.type === 'EDIT_DELIVERABLE' || operation.type === 'ADD_DELIVERABLE');
-  console.log('latestActivity', latestActivity);
 
     // Create a map of deliverable IDs to their latest activity
   const latestActivityMap = new Map();
@@ -64,9 +72,14 @@ const Deliverables: React.FC<ProjectsProps> = ({ deliverables, dispatch, milesto
         };
       }) || []
     ) || []),
-  ].filter(Boolean);
+  ].filter(Boolean).map((deliverable) => {
+    if (!deliverable) return null;
+    return {
+      ...deliverable,
+      latestActivity: parseLatestActivity(deliverable.latestActivity, currentTime),
+    };
+  });
 
-  console.log('richDeliverables', richDeliverables);
 
   const columns = useMemo<Array<ColumnDef<any>>>(
     () => [
@@ -166,3 +179,36 @@ const Deliverables: React.FC<ProjectsProps> = ({ deliverables, dispatch, milesto
 };
 
 export default Deliverables;
+
+
+const parseLatestActivity = (latestActivity: any, currentTime: Date) => {
+    
+    if (!latestActivity) {
+        return "";
+    }
+
+    let activity;
+
+    if (latestActivity.type === 'ADD_DELIVERABLE') {
+        activity = "Added Deliverable";
+    } else if (latestActivity.type === 'EDIT_DELIVERABLE') {
+        activity = `Edited ${Object.keys(latestActivity.input)[1]}`;
+    }
+
+    const timeSince = currentTime.getTime() - new Date(latestActivity.timestamp).getTime();
+    const timeSinceInSeconds = Math.abs(timeSince / 1000);
+    const timeSinceInMinutes = timeSinceInSeconds / 60;
+    const timeSinceInHours = timeSinceInMinutes / 60;
+    const timeSinceInDays = timeSinceInHours / 24;
+
+    if (timeSinceInDays >= 1) {
+        return `${activity} ${Math.round(timeSinceInDays)} days ago`;
+    } else if (timeSinceInHours >= 1) {
+        return `${activity} ${Math.round(timeSinceInHours)} hours ago`;
+    } else if (timeSinceInMinutes >= 1) {
+        return `${activity} ${Math.round(timeSinceInMinutes)} minutes ago`;
+    } else {
+        return `${activity} ${Math.round(timeSinceInSeconds)} seconds ago`;
+    }       
+
+}
