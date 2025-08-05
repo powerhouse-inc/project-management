@@ -450,3 +450,7 @@ input UpdateProjectOwnerInput {
   id: OID! # The ID of the project
   projectOwner: ID! # The ID of the new owner (Agent)
 }
+
+input RemoveProjectInput {
+  projectId: ID!
+}

@@ -63,4 +63,11 @@ export const reducer: ScopeOfWorkProjectsOperations = {
       console.error(error);
     }
   },
+  removeProjectOperation(state, action, dispatch) {
+    try {
+      state.projects = state.projects.filter((p) => p.id !== action.input.projectId);
+    } catch (error) {
+      console.error(error);
+    }
+  },
 };

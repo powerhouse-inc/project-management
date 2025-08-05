@@ -3,6 +3,7 @@ import {
   type AddProjectAction,
   type UpdateProjectAction,
   type UpdateProjectOwnerAction,
+  type RemoveProjectAction,
 } from "./actions.js";
 import { type ScopeOfWorkState } from "../types.js";
 
@@ -20,6 +21,11 @@ export interface ScopeOfWorkProjectsOperations {
   updateProjectOwnerOperation: (
     state: ScopeOfWorkState,
     action: UpdateProjectOwnerAction,
+    dispatch?: SignalDispatch,
+  ) => void;
+  removeProjectOperation: (
+    state: ScopeOfWorkState,
+    action: RemoveProjectAction,
     dispatch?: SignalDispatch,
   ) => void;
 }

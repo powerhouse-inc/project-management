@@ -4,11 +4,13 @@ import {
   type AddProjectInput,
   type UpdateProjectInput,
   type UpdateProjectOwnerInput,
+  type RemoveProjectInput,
 } from "../types.js";
 import {
   type AddProjectAction,
   type UpdateProjectAction,
   type UpdateProjectOwnerAction,
+  type RemoveProjectAction,
 } from "./actions.js";
 
 export const addProject = (input: AddProjectInput) =>
@@ -35,5 +37,14 @@ export const updateProjectOwner = (input: UpdateProjectOwnerInput) =>
     { ...input },
     undefined,
     z.UpdateProjectOwnerInputSchema,
+    "global",
+  );
+
+export const removeProject = (input: RemoveProjectInput) =>
+  createAction<RemoveProjectAction>(
+    "REMOVE_PROJECT",
+    { ...input },
+    undefined,
+    z.RemoveProjectInputSchema,
     "global",
   );

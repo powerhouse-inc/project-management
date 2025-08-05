@@ -320,6 +320,11 @@ export const schema: DocumentNode = gql`
       docId: PHID
       input: ScopeOfWork_UpdateProjectOwnerInput
     ): Int
+    ScopeOfWork_removeProject(
+      driveId: String
+      docId: PHID
+      input: ScopeOfWork_RemoveProjectInput
+    ): Int
   }
 
   """
@@ -577,5 +582,8 @@ export const schema: DocumentNode = gql`
   input ScopeOfWork_UpdateProjectOwnerInput {
     id: OID! # The ID of the project
     projectOwner: ID! # The ID of the new owner (Agent)
+  }
+  input ScopeOfWork_RemoveProjectInput {
+    projectId: ID!
   }
 `;

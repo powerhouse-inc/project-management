@@ -44,6 +44,7 @@ import type {
   RemoveDeliverableInput,
   RemoveKeyResultInput,
   RemoveMilestoneInput,
+  RemoveProjectInput,
   RemoveRoadmapInput,
   Roadmap,
   ScopeOfWorkState,
@@ -526,6 +527,14 @@ export function RemoveMilestoneInputSchema(): z.ZodObject<
   return z.object({
     id: z.string(),
     roadmapId: z.string(),
+  });
+}
+
+export function RemoveProjectInputSchema(): z.ZodObject<
+  Properties<RemoveProjectInput>
+> {
+  return z.object({
+    projectId: z.string(),
   });
 }
 

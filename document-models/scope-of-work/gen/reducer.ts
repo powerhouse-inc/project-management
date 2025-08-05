@@ -254,6 +254,15 @@ const stateReducer: StateReducer<ScopeOfWorkDocument> = (
       );
       break;
 
+    case "REMOVE_PROJECT":
+      z.RemoveProjectInputSchema().parse(action.input);
+      ProjectsReducer.removeProjectOperation(
+        state[action.scope],
+        action,
+        dispatch,
+      );
+      break;
+
     default:
       return state;
   }

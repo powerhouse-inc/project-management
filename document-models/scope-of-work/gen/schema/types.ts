@@ -345,6 +345,10 @@ export type RemoveMilestoneInput = {
   roadmapId: Scalars["OID"]["input"];
 };
 
+export type RemoveProjectInput = {
+  projectId: Scalars["ID"]["input"];
+};
+
 export type RemoveRoadmapInput = {
   id: Scalars["OID"]["input"];
 };

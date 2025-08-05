@@ -3,6 +3,7 @@ import type {
   AddProjectInput,
   UpdateProjectInput,
   UpdateProjectOwnerInput,
+  RemoveProjectInput,
 } from "../types.js";
 
 export type AddProjectAction = BaseAction<
@@ -20,8 +21,14 @@ export type UpdateProjectOwnerAction = BaseAction<
   UpdateProjectOwnerInput,
   "global"
 >;
+export type RemoveProjectAction = BaseAction<
+  "REMOVE_PROJECT",
+  RemoveProjectInput,
+  "global"
+>;
 
 export type ScopeOfWorkProjectsAction =
   | AddProjectAction
   | UpdateProjectAction
-  | UpdateProjectOwnerAction;
+  | UpdateProjectOwnerAction
+  | RemoveProjectAction;

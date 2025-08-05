@@ -104,4 +104,22 @@ describe("Projects Operations", () => {
       projectOwner: input.projectOwner,
     });
   });
+  it("should handle removeProject operation", () => {
+    const addProjectInput: AddProjectInput = {
+      id: "1",
+      code: "1",
+      title: "Project 1",
+      projectOwner: "Project Owner 1",
+      abstract: "Abstract 1",
+    }
+    let updatedDocument = reducer(document, creators.addProject(addProjectInput));
+
+    updatedDocument = reducer(updatedDocument, creators.removeProject({ projectId: "1" }));
+
+    expect(updatedDocument.operations.global).toHaveLength(2);
+    expect(updatedDocument.operations.global[1].type).toBe("REMOVE_PROJECT");
+    expect(updatedDocument.operations.global[1].input).toStrictEqual({ projectId: "1" });
+    expect(updatedDocument.operations.global[1].index).toEqual(1);
+    expect(updatedDocument.state.global.projects).toHaveLength(0);
+  });
 });
