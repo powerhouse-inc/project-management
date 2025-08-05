@@ -17,7 +17,7 @@ export const documentModel: DocumentModelState = {
       state: {
         global: {
           schema:
-            "type ScopeOfWorkState {\n  title: String!\n  description: String!\n  status: ScopeOfWorkStatus!\n  deliverables: [Deliverable!]!\n  projects: [Project!]!\n  roadmaps: [Roadmap!]!\n  agents: [Agent!]!\n}\n\nenum ScopeOfWorkStatus {\n  DRAFT\n  SUBMITTED\n  IN_PROGRESS\n  REJECTED\n  APPROVED\n  DELIVERED\n  CANCELED\n}\n\ntype Agent {\n  id: ID!\n  agentType: AgentType!\n  name: String!\n  code: String!\n  imageUrl: String\n}\n\nenum AgentType {\n  HUMAN\n  GROUP\n  AI\n}\n\ntype Deliverable {\n  id: OID!\n  owner: ID\n  title: String!\n  code: String!\n  description: String!\n  status: DeliverableStatus!\n  workProgress: Progress\n  keyResults: [KeyResult!]!\n  budgetAnchor: BudgetAnchorProject\n}\n\ntype BudgetAnchorProject {\n  project: OID!\n  unit: Unit\n  unitCost: Float!\n  quantity: Float!\n}\n\nenum Unit {\n  StoryPoints\n  Hours\n}\n\nenum DeliverableStatus {\n  WONT_DO\n  DRAFT\n  TODO\n  BLOCKED\n  IN_PROGRESS\n  DELIVERED\n  CANCELED\n}\n\nunion Progress = StoryPoint | Percentage | Binary\n\ntype Percentage {\n  value: Float!\n}\n\ntype Binary {\n  completed: Boolean\n}\n\ntype StoryPoint {\n  total: Int!\n  completed: Int!\n}\n\ntype KeyResult {\n  id: OID!\n  title: String!\n  link: String!\n}\n\ntype Project {\n  id: OID!\n  code: String!\n  title: String!\n  projectOwner: ID\n  abstract: String\n  imageUrl: URL\n  scope: DeliverablesSet\n  budgetType: BudgetType\n  currency: Currency\n  budget: Float\n  expenditure: BudgetExpenditure\n}\n\nenum Currency {\n  DAI\n  USDS\n  EUR\n  USD\n}\n\nenum BudgetType {\n  CONTINGENCY\n  OPEX\n  CAPEX\n  OVERHEAD\n}\n\ntype BudgetExpenditure {\n  percentage: Float!\n  actuals: Float!\n  cap: Float!\n}\n\ntype Roadmap {\n  id: OID!\n  slug: String!\n  title: String!\n  description: String!\n  milestones: [Milestone!]!\n}\n\ntype Milestone {\n  id: OID!\n  sequenceCode: String!\n  title: String!\n  description: String!\n  deliveryTarget: String!\n  scope: DeliverablesSet\n  estimatedBudgetCap: String!\n  coordinators: [ID!]!\n}\n\ntype DeliverablesSet {\n  deliverables: [OID!]!\n  status: DeliverableSetStatus!\n  progress: Progress!\n  deliverablesCompleted: DeliverablesCompleted!\n}\n\ntype DeliverablesCompleted {\n  total: Int!\n  completed: Int!\n}\n\nenum DeliverableSetStatus {\n  DRAFT\n  TODO\n  IN_PROGRESS\n  FINISHED\n  CANCELED\n}",
+            "type ScopeOfWorkState {\n  title: String!\n  description: String!\n  status: ScopeOfWorkStatus!\n  deliverables: [Deliverable!]!\n  projects: [Project!]!\n  roadmaps: [Roadmap!]!\n  agents: [Agent!]!\n}\n\nenum ScopeOfWorkStatus {\n  DRAFT\n  SUBMITTED\n  IN_PROGRESS\n  REJECTED\n  APPROVED\n  DELIVERED\n  CANCELED\n}\n\ntype Agent {\n  id: ID!\n  agentType: AgentType!\n  name: String!\n  code: String!\n  imageUrl: String\n}\n\nenum AgentType {\n  HUMAN\n  GROUP\n  AI\n}\n\ntype Deliverable {\n  id: OID!\n  owner: ID\n  title: String!\n  code: String!\n  description: String!\n  status: DeliverableStatus!\n  workProgress: Progress\n  keyResults: [KeyResult!]!\n  budgetAnchor: BudgetAnchorProject\n}\n\ntype BudgetAnchorProject {\n  project: OID!\n  unit: Unit\n  unitCost: Float!\n  quantity: Float!\n  margin: Float!\n}\n\nenum Unit {\n  StoryPoints\n  Hours\n}\n\nenum DeliverableStatus {\n  WONT_DO\n  DRAFT\n  TODO\n  BLOCKED\n  IN_PROGRESS\n  DELIVERED\n  CANCELED\n}\n\nunion Progress = StoryPoint | Percentage | Binary\n\ntype Percentage {\n  value: Float!\n}\n\ntype Binary {\n  completed: Boolean\n}\n\ntype StoryPoint {\n  total: Int!\n  completed: Int!\n}\n\ntype KeyResult {\n  id: OID!\n  title: String!\n  link: String!\n}\n\ntype Project {\n  id: OID!\n  code: String!\n  title: String!\n  projectOwner: ID\n  abstract: String\n  imageUrl: URL\n  scope: DeliverablesSet\n  budgetType: BudgetType\n  currency: PMCurrency\n  budget: Float\n  expenditure: BudgetExpenditure\n}\n\nenum PMCurrency {\n  DAI\n  USDS\n  EUR\n  USD\n}\n\nenum BudgetType {\n  CONTINGENCY\n  OPEX\n  CAPEX\n  OVERHEAD\n}\n\ntype BudgetExpenditure {\n  percentage: Float!\n  actuals: Float!\n  cap: Float!\n}\n\ntype Roadmap {\n  id: OID!\n  slug: String!\n  title: String!\n  description: String!\n  milestones: [Milestone!]!\n}\n\ntype Milestone {\n  id: OID!\n  sequenceCode: String!\n  title: String!\n  description: String!\n  deliveryTarget: String!\n  scope: DeliverablesSet\n  coordinators: [ID!]!\n}\n\ntype DeliverablesSet {\n  deliverables: [OID!]!\n  status: DeliverableSetStatus!\n  progress: Progress!\n  deliverablesCompleted: DeliverablesCompleted!\n}\n\ntype DeliverablesCompleted {\n  total: Int!\n  completed: Int!\n}\n\nenum DeliverableSetStatus {\n  DRAFT\n  TODO\n  IN_PROGRESS\n  FINISHED\n  CANCELED\n}",
           initialValue:
             '"{\\n  \\"title\\": \\"\\",\\n  \\"description\\": \\"\\",\\n  \\"deliverables\\": [],\\n  \\"projects\\": [], \\n  \\"roadmaps\\": [],\\n  \\"agents\\": []\\n}"',
           examples: [],
@@ -214,6 +214,18 @@ export const documentModel: DocumentModelState = {
               description: "",
               schema:
                 "input EditKeyResultInput {\n  id: OID!\n  deliverableId: OID!\n  title: String\n  link: URL\n}",
+              template: "",
+              reducer: "",
+              errors: [],
+              examples: [],
+              scope: "global",
+            },
+            {
+              id: "306568c6-39d1-415b-b096-670ed99eaa04",
+              name: "SET_DELIVERABLE_BUDGET_ANCHOR_PROJECT",
+              description: "",
+              schema:
+                "input SetDeliverableBudgetAnchorProjectInput {\n  deliverableId: ID!\n  project: OID!\n  unit: Unit\n  unitCost: Float!\n  quantity: Float!\n  margin: Float!\n}",
               template: "",
               reducer: "",
               errors: [],
@@ -443,7 +455,7 @@ export const documentModel: DocumentModelState = {
               name: "EDIT_AGENT",
               description: "",
               schema:
-                "input EditAgentInput {\n  id: ID!\n  name: String\n  agentType: AgentTypeInput\n  code: String\n  imageUrl: String\n}\n\nenum AgentTypeInput {\n  HUMAN\n  GROUP\n  AI\n}",
+                "input EditAgentInput {\n  id: ID!\n  name: String\n  agentType: AgentTypeInput\n  code: String\n  imageUrl: String\n}",
               template: "",
               reducer: "",
               errors: [],

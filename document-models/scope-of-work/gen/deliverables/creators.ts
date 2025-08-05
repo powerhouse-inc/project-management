@@ -8,6 +8,7 @@ import {
   type AddKeyResultInput,
   type RemoveKeyResultInput,
   type EditKeyResultInput,
+  type SetDeliverableBudgetAnchorProjectInput,
 } from "../types.js";
 import {
   type AddDeliverableAction,
@@ -17,6 +18,7 @@ import {
   type AddKeyResultAction,
   type RemoveKeyResultAction,
   type EditKeyResultAction,
+  type SetDeliverableBudgetAnchorProjectAction,
 } from "./actions.js";
 
 export const addDeliverable = (input: AddDeliverableInput) =>
@@ -79,5 +81,16 @@ export const editKeyResult = (input: EditKeyResultInput) =>
     { ...input },
     undefined,
     z.EditKeyResultInputSchema,
+    "global",
+  );
+
+export const setDeliverableBudgetAnchorProject = (
+  input: SetDeliverableBudgetAnchorProjectInput,
+) =>
+  createAction<SetDeliverableBudgetAnchorProjectAction>(
+    "SET_DELIVERABLE_BUDGET_ANCHOR_PROJECT",
+    { ...input },
+    undefined,
+    z.SetDeliverableBudgetAnchorProjectInputSchema,
     "global",
   );

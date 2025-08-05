@@ -7,6 +7,7 @@ import {
   type AddKeyResultInput,
   type RemoveKeyResultInput,
   type EditKeyResultInput,
+  type SetDeliverableBudgetAnchorProjectInput,
   type ScopeOfWorkState,
   type ScopeOfWorkLocalState,
 } from "../types.js";
@@ -18,6 +19,7 @@ import {
   addKeyResult,
   removeKeyResult,
   editKeyResult,
+  setDeliverableBudgetAnchorProject,
 } from "./creators.js";
 import { type ScopeOfWorkAction } from "../actions.js";
 
@@ -52,5 +54,11 @@ export default class ScopeOfWork_Deliverables extends BaseDocumentClass<
 
   public editKeyResult(input: EditKeyResultInput) {
     return this.dispatch(editKeyResult(input));
+  }
+
+  public setDeliverableBudgetAnchorProject(
+    input: SetDeliverableBudgetAnchorProjectInput,
+  ) {
+    return this.dispatch(setDeliverableBudgetAnchorProject(input));
   }
 }

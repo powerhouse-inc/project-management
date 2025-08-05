@@ -15,7 +15,6 @@ import type {
   BudgetAnchorProject,
   BudgetExpenditure,
   BudgetType,
-  Currency,
   Deliverable,
   DeliverableSetStatus,
   DeliverableSetStatusInput,
@@ -33,6 +32,7 @@ import type {
   KeyResult,
   Milestone,
   PmBudgetTypeInput,
+  PmCurrency,
   PmCurrencyInput,
   PmDeliverableStatusInput,
   Percentage,
@@ -49,6 +49,7 @@ import type {
   ScopeOfWorkState,
   ScopeOfWorkStatus,
   ScopeOfWorkStatusInput,
+  SetDeliverableBudgetAnchorProjectInput,
   SetDeliverableProgressInput,
   SetProgressInDeliverablesSetInput,
   StoryPoint,
@@ -82,8 +83,6 @@ export const BudgetTypeSchema = z.enum([
   "OVERHEAD",
 ]);
 
-export const CurrencySchema = z.enum(["DAI", "EUR", "USD", "USDS"]);
-
 export const DeliverableSetStatusSchema = z.enum([
   "CANCELED",
   "DRAFT",
@@ -116,6 +115,8 @@ export const PmBudgetTypeInputSchema = z.enum([
   "OPEX",
   "OVERHEAD",
 ]);
+
+export const PmCurrencySchema = z.enum(["DAI", "EUR", "USD", "USDS"]);
 
 export const PmCurrencyInputSchema = z.enum(["DAI", "EUR", "USD", "USDS"]);
 
@@ -268,6 +269,7 @@ export function BudgetAnchorProjectSchema(): z.ZodObject<
 > {
   return z.object({
     __typename: z.literal("BudgetAnchorProject").optional(),
+    margin: z.number(),
     project: z.string(),
     quantity: z.number(),
     unit: UnitSchema.nullable(),
@@ -431,7 +433,6 @@ export function MilestoneSchema(): z.ZodObject<Properties<Milestone>> {
     coordinators: z.array(z.string()),
     deliveryTarget: z.string(),
     description: z.string(),
-    estimatedBudgetCap: z.string(),
     id: z.string(),
     scope: DeliverablesSetSchema().nullable(),
     sequenceCode: z.string(),
@@ -465,7 +466,7 @@ export function ProjectSchema(): z.ZodObject<Properties<Project>> {
     budget: z.number().nullable(),
     budgetType: BudgetTypeSchema.nullable(),
     code: z.string(),
-    currency: CurrencySchema.nullable(),
+    currency: PmCurrencySchema.nullable(),
     expenditure: BudgetExpenditureSchema().nullable(),
     id: z.string(),
     imageUrl: z.string().url().nullable(),
@@ -559,6 +560,19 @@ export function ScopeOfWorkStateSchema(): z.ZodObject<
     roadmaps: z.array(RoadmapSchema()),
     status: ScopeOfWorkStatusSchema,
     title: z.string(),
+  });
+}
+
+export function SetDeliverableBudgetAnchorProjectInputSchema(): z.ZodObject<
+  Properties<SetDeliverableBudgetAnchorProjectInput>
+> {
+  return z.object({
+    deliverableId: z.string(),
+    margin: z.number(),
+    project: z.string(),
+    quantity: z.number(),
+    unit: UnitSchema.nullish(),
+    unitCost: z.number(),
   });
 }
 

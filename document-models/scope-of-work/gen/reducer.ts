@@ -95,6 +95,15 @@ const stateReducer: StateReducer<ScopeOfWorkDocument> = (
       );
       break;
 
+    case "SET_DELIVERABLE_BUDGET_ANCHOR_PROJECT":
+      z.SetDeliverableBudgetAnchorProjectInputSchema().parse(action.input);
+      DeliverablesReducer.setDeliverableBudgetAnchorProjectOperation(
+        state[action.scope],
+        action,
+        dispatch,
+      );
+      break;
+
     case "ADD_ROADMAP":
       z.AddRoadmapInputSchema().parse(action.input);
       RoadmapsReducer.addRoadmapOperation(

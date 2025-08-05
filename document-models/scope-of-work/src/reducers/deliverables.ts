@@ -20,6 +20,7 @@ export const reducer: ScopeOfWorkDeliverablesOperations = {
         status: action.input.status || "DRAFT",
         workProgress: null,
         keyResults: [],
+        budgetAnchor: null,
       };
 
       state.deliverables.push(deliverable);
@@ -81,8 +82,8 @@ export const reducer: ScopeOfWorkDeliverablesOperations = {
             { value: action.input.workProgress.percentage } :
           action.input.workProgress.storyPoints ? 
             { total: action.input.workProgress.storyPoints.total, completed: action.input.workProgress.storyPoints.completed } :
-          action.input.workProgress.binary !== undefined && action.input.workProgress.binary !== null ? 
-            { isBinary: action.input.workProgress.binary } :
+          action.input.workProgress.completed !== undefined && action.input.workProgress.completed !== null ? 
+            { completed: action.input.workProgress.completed } :
           deliverable.workProgress
         : deliverable.workProgress,
       }
@@ -154,5 +155,26 @@ export const reducer: ScopeOfWorkDeliverablesOperations = {
     } catch (error) {
       console.error(error);
     }
-  }
+  },
+  setDeliverableBudgetAnchorProjectOperation(state, action, dispatch) {
+    try {
+      const foundDeliverable = state.deliverables.find((deliverable) => String(deliverable.id) === String(action.input.deliverableId));
+      if (!foundDeliverable) {
+        throw new Error("Deliverable not found");
+      }
+
+      const budgetAnchor = {
+        project: action.input.project,
+        unit: action.input.unit || "Hours",
+        unitCost: action.input.unitCost,
+        quantity: action.input.quantity,
+        margin: action.input.margin,
+      }
+
+      foundDeliverable.budgetAnchor = budgetAnchor;
+      state.deliverables = state.deliverables.map((deliverable) => String(deliverable.id) === String(action.input.deliverableId) ? foundDeliverable : deliverable);
+    } catch (error) {
+      console.error(error);
+    }
+  },
 };

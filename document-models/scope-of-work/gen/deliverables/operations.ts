@@ -7,6 +7,7 @@ import {
   type AddKeyResultAction,
   type RemoveKeyResultAction,
   type EditKeyResultAction,
+  type SetDeliverableBudgetAnchorProjectAction,
 } from "./actions.js";
 import { type ScopeOfWorkState } from "../types.js";
 
@@ -44,6 +45,11 @@ export interface ScopeOfWorkDeliverablesOperations {
   editKeyResultOperation: (
     state: ScopeOfWorkState,
     action: EditKeyResultAction,
+    dispatch?: SignalDispatch,
+  ) => void;
+  setDeliverableBudgetAnchorProjectOperation: (
+    state: ScopeOfWorkState,
+    action: SetDeliverableBudgetAnchorProjectAction,
     dispatch?: SignalDispatch,
   ) => void;
 }

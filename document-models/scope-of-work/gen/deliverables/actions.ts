@@ -7,6 +7,7 @@ import type {
   AddKeyResultInput,
   RemoveKeyResultInput,
   EditKeyResultInput,
+  SetDeliverableBudgetAnchorProjectInput,
 } from "../types.js";
 
 export type AddDeliverableAction = BaseAction<
@@ -44,6 +45,11 @@ export type EditKeyResultAction = BaseAction<
   EditKeyResultInput,
   "global"
 >;
+export type SetDeliverableBudgetAnchorProjectAction = BaseAction<
+  "SET_DELIVERABLE_BUDGET_ANCHOR_PROJECT",
+  SetDeliverableBudgetAnchorProjectInput,
+  "global"
+>;
 
 export type ScopeOfWorkDeliverablesAction =
   | AddDeliverableAction
@@ -52,4 +58,5 @@ export type ScopeOfWorkDeliverablesAction =
   | SetDeliverableProgressAction
   | AddKeyResultAction
   | RemoveKeyResultAction
-  | EditKeyResultAction;
+  | EditKeyResultAction
+  | SetDeliverableBudgetAnchorProjectAction;

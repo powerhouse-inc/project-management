@@ -56,6 +56,7 @@ export const schema: DocumentNode = gql`
     unit: Unit
     unitCost: Float!
     quantity: Float!
+    margin: Float!
   }
 
   enum Unit {
@@ -103,12 +104,12 @@ export const schema: DocumentNode = gql`
     imageUrl: URL
     scope: DeliverablesSet
     budgetType: BudgetType
-    currency: Currency
+    currency: PMCurrency
     budget: Float
     expenditure: BudgetExpenditure
   }
 
-  enum Currency {
+  enum PMCurrency {
     DAI
     USDS
     EUR
@@ -143,7 +144,6 @@ export const schema: DocumentNode = gql`
     description: String!
     deliveryTarget: String!
     scope: DeliverablesSet
-    estimatedBudgetCap: String!
     coordinators: [ID!]!
   }
 
@@ -224,6 +224,11 @@ export const schema: DocumentNode = gql`
       driveId: String
       docId: PHID
       input: ScopeOfWork_EditKeyResultInput
+    ): Int
+    ScopeOfWork_setDeliverableBudgetAnchorProject(
+      driveId: String
+      docId: PHID
+      input: ScopeOfWork_SetDeliverableBudgetAnchorProjectInput
     ): Int
     ScopeOfWork_addRoadmap(
       driveId: String
@@ -402,6 +407,14 @@ export const schema: DocumentNode = gql`
     title: String
     link: URL
   }
+  input ScopeOfWork_SetDeliverableBudgetAnchorProjectInput {
+    deliverableId: ID!
+    project: OID!
+    unit: Unit
+    unitCost: Float!
+    quantity: Float!
+    margin: Float!
+  }
 
   """
   Module: Roadmaps
@@ -520,12 +533,6 @@ export const schema: DocumentNode = gql`
     agentType: AgentTypeInput
     code: String
     imageUrl: String
-  }
-
-  enum AgentTypeInput {
-    HUMAN
-    GROUP
-    AI
   }
 
   """

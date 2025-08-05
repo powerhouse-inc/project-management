@@ -12,7 +12,7 @@ import {
 } from "../../gen/schema/index.js";
 import { reducer } from "../../gen/reducer.js";
 import * as creators from "../../gen/deliverables/creators.js";
-import type { AddDeliverableInput, DeliverableStatus, RemoveDeliverableInput, ScopeOfWorkDocument, SetDeliverableProgressInput } from "../../gen/types.js";
+import type { AddDeliverableInput, DeliverableStatus, RemoveDeliverableInput, ScopeOfWorkDocument, SetDeliverableBudgetAnchorProjectInput, SetDeliverableProgressInput } from "../../gen/types.js";
 
 describe("Deliverables Operations", () => {
   let document: ScopeOfWorkDocument;
@@ -202,5 +202,44 @@ describe("Deliverables Operations", () => {
       expect(updatedDocument.operations.global[2].index).toEqual(2);
       expect(updatedDocument.state.global.deliverables[0].keyResults).toHaveLength(0);
     });
+
+    it("should handle setDeliverableBudgetAnchorProject operation", () => {
+      const deliverable = {
+        id: "1",
+        owner: "1",
+        title: "Test Deliverable",
+        code: "TEST",
+        description: "Test Description",
+        status: "DRAFT" as DeliverableStatus,
+        keyResults: [],
+        workProgress: null,
+      }
+
+      let updatedDocument = reducer(document, creators.addDeliverable(deliverable));
+
+      const input: SetDeliverableBudgetAnchorProjectInput = {
+        deliverableId: "1",
+        project: "1",
+        unit: "Hours",
+        unitCost: 100,
+        quantity: 1,
+        margin: 10,
+      }
+
+      updatedDocument = reducer(updatedDocument, creators.setDeliverableBudgetAnchorProject(input));
+
+      expect(updatedDocument.operations.global).toHaveLength(2);
+      expect(updatedDocument.operations.global[1].type).toBe("SET_DELIVERABLE_BUDGET_ANCHOR_PROJECT");
+      expect(updatedDocument.operations.global[1].input).toStrictEqual(input);
+      expect(updatedDocument.operations.global[1].index).toEqual(1);
+      expect(updatedDocument.state.global.deliverables[0].budgetAnchor).toStrictEqual({
+        project: input.project,
+        unit: input.unit,
+        unitCost: input.unitCost,
+        quantity: input.quantity,
+        margin: input.margin,
+      });
+    });
+
 
 });

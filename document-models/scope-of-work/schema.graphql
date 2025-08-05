@@ -65,6 +65,7 @@ type BudgetAnchorProject {
   unit: Unit
   unitCost: Float!
   quantity: Float!
+  margin: Float!
 }
 
 enum Unit {
@@ -112,12 +113,12 @@ type Project {
   imageUrl: URL
   scope: DeliverablesSet
   budgetType: BudgetType
-  currency: Currency
+  currency: PMCurrency
   budget: Float
   expenditure: BudgetExpenditure
 }
 
-enum Currency {
+enum PMCurrency {
   DAI
   USDS
   EUR
@@ -152,7 +153,6 @@ type Milestone {
   description: String!
   deliveryTarget: String!
   scope: DeliverablesSet
-  estimatedBudgetCap: String!
   coordinators: [ID!]!
 }
 
@@ -267,6 +267,15 @@ input EditKeyResultInput {
   deliverableId: OID!
   title: String
   link: URL
+}
+
+input SetDeliverableBudgetAnchorProjectInput {
+  deliverableId: ID!
+  project: OID!
+  unit: Unit
+  unitCost: Float!
+  quantity: Float!
+  margin: Float!
 }
 
 # roadmaps
@@ -394,12 +403,6 @@ input EditAgentInput {
   agentType: AgentTypeInput
   code: String
   imageUrl: String
-}
-
-enum AgentTypeInput {
-  HUMAN
-  GROUP
-  AI
 }
 
 # projects

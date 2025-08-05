@@ -44,6 +44,7 @@ export type Scalars = {
   Amount_Money: { input: number; output: number };
   Amount_Percentage: { input: number; output: number };
   Amount_Tokens: { input: number; output: number };
+  Currency: { input: string; output: string };
   Date: { input: string; output: string };
   DateTime: { input: string; output: string };
   EmailAddress: { input: string; output: string };
@@ -135,6 +136,7 @@ export type Binary = {
 };
 
 export type BudgetAnchorProject = {
+  margin: Scalars["Float"]["output"];
   project: Scalars["OID"]["output"];
   quantity: Scalars["Float"]["output"];
   unit: Maybe<Unit | `${Unit}`>;
@@ -148,8 +150,6 @@ export type BudgetExpenditure = {
 };
 
 export type BudgetType = "CAPEX" | "CONTINGENCY" | "OPEX" | "OVERHEAD";
-
-export type Currency = "DAI" | "EUR" | "USD" | "USDS";
 
 export type Deliverable = {
   budgetAnchor: Maybe<BudgetAnchorProject>;
@@ -269,7 +269,6 @@ export type Milestone = {
   coordinators: Array<Scalars["ID"]["output"]>;
   deliveryTarget: Scalars["String"]["output"];
   description: Scalars["String"]["output"];
-  estimatedBudgetCap: Scalars["String"]["output"];
   id: Scalars["OID"]["output"];
   scope: Maybe<DeliverablesSet>;
   sequenceCode: Scalars["String"]["output"];
@@ -277,6 +276,8 @@ export type Milestone = {
 };
 
 export type PmBudgetTypeInput = "CAPEX" | "CONTINGENCY" | "OPEX" | "OVERHEAD";
+
+export type PmCurrency = "DAI" | "EUR" | "USD" | "USDS";
 
 export type PmCurrencyInput = "DAI" | "EUR" | "USD" | "USDS";
 
@@ -306,7 +307,7 @@ export type Project = {
   budget: Maybe<Scalars["Float"]["output"]>;
   budgetType: Maybe<BudgetType | `${BudgetType}`>;
   code: Scalars["String"]["output"];
-  currency: Maybe<Currency | `${Currency}`>;
+  currency: Maybe<PmCurrency | `${PmCurrency}`>;
   expenditure: Maybe<BudgetExpenditure>;
   id: Scalars["OID"]["output"];
   imageUrl: Maybe<Scalars["URL"]["output"]>;
@@ -383,6 +384,15 @@ export type ScopeOfWorkStatusInput =
   | "IN_PROGRESS"
   | "REJECTED"
   | "SUBMITTED";
+
+export type SetDeliverableBudgetAnchorProjectInput = {
+  deliverableId: Scalars["ID"]["input"];
+  margin: Scalars["Float"]["input"];
+  project: Scalars["OID"]["input"];
+  quantity: Scalars["Float"]["input"];
+  unit?: InputMaybe<Unit | `${Unit}`>;
+  unitCost: Scalars["Float"]["input"];
+};
 
 export type SetDeliverableProgressInput = {
   id: Scalars["OID"]["input"];
