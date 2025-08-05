@@ -14,8 +14,16 @@ import {
 } from "../../../document-models/scope-of-work/index.js";
 import { generateId } from "document-model";
 
-const ScopeOfWork = (props: any) => {
-  const { setSelectedRoadmapId, setRoadmapsOpen, dispatch, document } = props;
+interface ScopeOfWorkProps {
+  setSelectedRoadmapId: (id: string) => void;
+  setRoadmapsOpen: (open: boolean) => void;
+  dispatch: any;
+  document: any;
+  setActiveNodeId: (id: string) => void;
+}
+
+const ScopeOfWork = (props: ScopeOfWorkProps) => {
+  const { setSelectedRoadmapId, setRoadmapsOpen, dispatch, document, setActiveNodeId } = props;
   const state = document.state.global;
 
   const columns = useMemo<Array<ColumnDef<any>>>(
@@ -25,6 +33,7 @@ const ScopeOfWork = (props: any) => {
         width: 20,
         align: "center" as ColumnAlignment,
         renderCell: (value: any, context: any) => {
+          console.log("context", context);
           return (
             <div className="text-center">
               <Icon
@@ -32,8 +41,7 @@ const ScopeOfWork = (props: any) => {
                 name="Moved"
                 size={18}
                 onClick={() => {
-                  // setMilestonesOpen(true);
-                  // setSelectedMilestoneId(context.row.id);
+                  setActiveNodeId('roadmap.' + context.row.id);
                 }}
               />
             </div>

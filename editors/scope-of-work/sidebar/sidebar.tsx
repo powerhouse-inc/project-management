@@ -237,7 +237,9 @@ export default function SidebarMenu(props: any) {
         {activeNodeId ? (
           displayActiveNode(activeNodeId)
         ) : (
-          <ScopeOfWork {...props} />
+          <ScopeOfWork {...props} 
+          setActiveNodeId={setActiveNodeId}
+          />
         )}
       </div>
     </div>
