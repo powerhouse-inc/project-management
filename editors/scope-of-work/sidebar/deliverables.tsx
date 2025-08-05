@@ -1,5 +1,9 @@
-import { useMemo, useState, useEffect } from "react";   
-import { Deliverable, Milestone, Project } from "../../../document-models/scope-of-work/gen/types.js";
+import { useMemo, useState, useEffect } from "react";
+import {
+  Deliverable,
+  Milestone,
+  Project,
+} from "../../../document-models/scope-of-work/gen/types.js";
 import {
   TextInput,
   ObjectSetTable,
@@ -19,7 +23,14 @@ interface ProjectsProps {
   document: any;
 }
 
-const Deliverables: React.FC<ProjectsProps> = ({ deliverables, dispatch, milestones, projects, setActiveNodeId, document }) => {
+const Deliverables: React.FC<ProjectsProps> = ({
+  deliverables,
+  dispatch,
+  milestones,
+  projects,
+  setActiveNodeId,
+  document,
+}) => {
   const [currentTime, setCurrentTime] = useState(new Date());
 
   // Update current time every second for live timestamps
@@ -31,9 +42,13 @@ const Deliverables: React.FC<ProjectsProps> = ({ deliverables, dispatch, milesto
     return () => clearInterval(timer);
   }, []);
 
-  const latestActivity = document.operations.global.filter((operation: any) => operation.type === 'EDIT_DELIVERABLE' || operation.type === 'ADD_DELIVERABLE');
+  const latestActivity = document.operations.global.filter(
+    (operation: any) =>
+      operation.type === "EDIT_DELIVERABLE" ||
+      operation.type === "ADD_DELIVERABLE"
+  );
 
-    // Create a map of deliverable IDs to their latest activity
+  // Create a map of deliverable IDs to their latest activity
   const latestActivityMap = new Map();
   latestActivity?.forEach((activity: any) => {
     if (activity.input?.id) {
@@ -45,41 +60,44 @@ const Deliverables: React.FC<ProjectsProps> = ({ deliverables, dispatch, milesto
     }
   });
 
-  const richDeliverables = [
-    // From milestones
-    ...(milestones?.flatMap(milestone =>
-      milestone.scope?.deliverables?.map(deliverableId => {
-        const deliverable = deliverables?.find(d => d.id === deliverableId);
-        if (!deliverable) return null;
-        return {
-          ...deliverable,
-          milestoneId: milestone.id,
-          milestoneTitle: milestone.title,
-          latestActivity: latestActivityMap.get(deliverableId),
-        };
-      }) || []
-    ) || []),
-    // From projects
-    ...(projects?.flatMap(project =>
-      project.scope?.deliverables?.map(deliverableId => {
-        const deliverable = deliverables?.find(d => d.id === deliverableId);
-        if (!deliverable) return null;
-        return {
-          ...deliverable,
-          projectId: project.id,
-          projectTitle: project.title,
-          latestActivity: latestActivityMap.get(deliverableId),
-        };
-      }) || []
-    ) || []),
-  ].filter(Boolean).map((deliverable) => {
-    if (!deliverable) return null;
-    return {
-      ...deliverable,
-      latestActivity: parseLatestActivity(deliverable.latestActivity, currentTime),
-    };
-  });
-
+  const richDeliverables = useMemo(
+    () =>
+      [
+        // From milestones
+        ...(milestones?.flatMap(
+          (milestone) =>
+            milestone.scope?.deliverables?.map((deliverableId) => {
+              const deliverable = deliverables?.find(
+                (d) => d.id === deliverableId
+              );
+              if (!deliverable) return null;
+              return {
+                ...deliverable,
+                milestoneId: milestone.id,
+                milestoneTitle: milestone.title,
+                latestActivity: latestActivityMap.get(deliverableId),
+              };
+            }) || []
+        ) || []),
+        // From projects
+        ...(projects?.flatMap(
+          (project) =>
+            project.scope?.deliverables?.map((deliverableId) => {
+              const deliverable = deliverables?.find(
+                (d) => d.id === deliverableId
+              );
+              if (!deliverable) return null;
+              return {
+                ...deliverable,
+                projectId: project.id,
+                projectTitle: project.title,
+                latestActivity: latestActivityMap.get(deliverableId),
+              };
+            }) || []
+        ) || []),
+      ].filter(Boolean),
+    [milestones, projects, deliverables, latestActivityMap]
+  );
 
   const columns = useMemo<Array<ColumnDef<any>>>(
     () => [
@@ -134,21 +152,61 @@ const Deliverables: React.FC<ProjectsProps> = ({ deliverables, dispatch, milesto
         title: "Milestone",
         editable: false,
         align: "center" as ColumnAlignment,
+        renderCell: (value: any, context: any) => {
+          if (!context.row.milestoneTitle) return "";
+          return (
+            <div className="flex items-center justify-center">
+              <span>
+                <Icon
+                  className="hover:cursor-pointer"
+                  name="Moved"
+                  size={12}
+                  onClick={() => {
+                    setActiveNodeId(`milestone.${context.row.milestoneId}`);
+                  }}
+                />
+              </span>
+              <span className="text-sm ml-2"> {value}</span>
+            </div>
+          );
+        },
       },
       {
         field: "projectTitle",
         title: "Project",
         editable: false,
         align: "center" as ColumnAlignment,
+        renderCell: (value: any, context: any) => {
+            if (!context.row.projectTitle) return "";
+            return (
+              <div className="flex items-center justify-center">
+                <span>
+                  <Icon
+                    className="hover:cursor-pointer"
+                    name="Moved"
+                    size={12}
+                    onClick={() => {
+                      setActiveNodeId(`project.${context.row.projectId}`);
+                    }}
+                  />
+                </span>
+                <span className="text-sm ml-2"> {value}</span>
+              </div>
+            );
+          },
       },
       {
         field: "latestActivity",
         title: "Latest Activity",
         editable: false,
         align: "center" as ColumnAlignment,
+        renderCell: (value: any, context: any) => {
+          if (!context.row.latestActivity) return "";
+          return parseLatestActivity(context.row.latestActivity, currentTime);
+        },
       },
     ],
-    []
+    [currentTime]
   );
 
   return (
@@ -180,35 +238,33 @@ const Deliverables: React.FC<ProjectsProps> = ({ deliverables, dispatch, milesto
 
 export default Deliverables;
 
-
 const parseLatestActivity = (latestActivity: any, currentTime: Date) => {
-    
-    if (!latestActivity) {
-        return "";
-    }
+  if (!latestActivity) {
+    return "";
+  }
 
-    let activity;
+  let activity;
 
-    if (latestActivity.type === 'ADD_DELIVERABLE') {
-        activity = "Added Deliverable";
-    } else if (latestActivity.type === 'EDIT_DELIVERABLE') {
-        activity = `Edited ${Object.keys(latestActivity.input)[1]}`;
-    }
+  if (latestActivity.type === "ADD_DELIVERABLE") {
+    activity = "Added Deliverable";
+  } else if (latestActivity.type === "EDIT_DELIVERABLE") {
+    activity = `Edited ${Object.keys(latestActivity.input)[1]}`;
+  }
 
-    const timeSince = currentTime.getTime() - new Date(latestActivity.timestamp).getTime();
-    const timeSinceInSeconds = Math.abs(timeSince / 1000);
-    const timeSinceInMinutes = timeSinceInSeconds / 60;
-    const timeSinceInHours = timeSinceInMinutes / 60;
-    const timeSinceInDays = timeSinceInHours / 24;
+  const timeSince =
+    currentTime.getTime() - new Date(latestActivity.timestamp).getTime();
+  const timeSinceInSeconds = Math.abs(timeSince / 1000);
+  const timeSinceInMinutes = timeSinceInSeconds / 60;
+  const timeSinceInHours = timeSinceInMinutes / 60;
+  const timeSinceInDays = timeSinceInHours / 24;
 
-    if (timeSinceInDays >= 1) {
-        return `${activity} ${Math.round(timeSinceInDays)} days ago`;
-    } else if (timeSinceInHours >= 1) {
-        return `${activity} ${Math.round(timeSinceInHours)} hours ago`;
-    } else if (timeSinceInMinutes >= 1) {
-        return `${activity} ${Math.round(timeSinceInMinutes)} minutes ago`;
-    } else {
-        return `${activity} ${Math.round(timeSinceInSeconds)} seconds ago`;
-    }       
-
-}
+  if (timeSinceInDays >= 1) {
+    return `${activity} ${Math.round(timeSinceInDays)} days ago`;
+  } else if (timeSinceInHours >= 1) {
+    return `${activity} ${Math.round(timeSinceInHours)} hours ago`;
+  } else if (timeSinceInMinutes >= 1) {
+    return `${activity} ${Math.round(timeSinceInMinutes)} minutes ago`;
+  } else {
+    return `${activity} ${Math.round(timeSinceInSeconds)} seconds ago`;
+  }
+};
