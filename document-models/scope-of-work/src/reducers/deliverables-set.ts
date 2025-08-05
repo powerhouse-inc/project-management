@@ -116,27 +116,40 @@ export const reducer: ScopeOfWorkDeliverablesSetOperations = {
   },
   removeDeliverableInSetOperation(state, action, dispatch) {
     try {
-      const foundRoadmap = state.roadmaps.find((roadmap) => {
-        return roadmap.milestones.some((milestone) => String(milestone.id) === String(action.input.milestoneId));
-      });
-      if (!foundRoadmap) {
-        throw new Error("Roadmap with milestone not found");
+      if (action.input.milestoneId) {
+        const foundRoadmap = state.roadmaps.find((roadmap) => {
+          return roadmap.milestones.some((milestone) => String(milestone.id) === String(action.input.milestoneId));
+        });
+        if (!foundRoadmap) {
+          throw new Error("Roadmap with milestone not found");
+        }
+
+        const foundMilestone = foundRoadmap.milestones.find((milestone) => String(milestone.id) === String(action.input.milestoneId));
+        if (!foundMilestone) {
+          throw new Error("Milestone not found");
+        }
+
+        if (!foundMilestone.scope) {
+          throw new Error("Milestone scope not found");
+        }
+
+        foundMilestone.scope.deliverables = foundMilestone.scope.deliverables.filter((deliverableId) => String(deliverableId) !== String(action.input.deliverableId));
+
+        state.roadmaps = state.roadmaps.map((roadmap) => {
+          return String(roadmap.id) === String(foundRoadmap.id) ? foundRoadmap : roadmap;
+        });
+      } else if (action.input.projectId) {
+        const foundProject = state.projects.find((project) => String(project.id) === String(action.input.projectId));
+        if (!foundProject || !foundProject.scope) {
+          throw new Error(`Project with id ${action.input.projectId} not found`);
+        }
+
+        foundProject.scope.deliverables = foundProject.scope.deliverables.filter((deliverableId) => String(deliverableId) !== String(action.input.deliverableId));
+
+        state.projects = state.projects.map((project) => {
+          return String(project.id) === String(action.input.projectId) ? foundProject : project;
+        });
       }
-
-      const foundMilestone = foundRoadmap.milestones.find((milestone) => String(milestone.id) === String(action.input.milestoneId));
-      if (!foundMilestone) {
-        throw new Error("Milestone not found");
-      }
-
-      if (!foundMilestone.scope) {
-        throw new Error("Milestone scope not found");
-      }
-
-      foundMilestone.scope.deliverables = foundMilestone.scope.deliverables.filter((deliverableId) => String(deliverableId) !== String(action.input.deliverableId));
-
-      state.roadmaps = state.roadmaps.map((roadmap) => {
-        return String(roadmap.id) === String(foundRoadmap.id) ? foundRoadmap : roadmap;
-      });
     } catch (error) {
       console.error(error);
     }

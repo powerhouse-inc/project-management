@@ -136,6 +136,27 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
           return <div className="text-left">{value}</div>;
         },
       },
+      {
+        field: "actions",
+        title: "Actions",
+        editable: true,
+        align: "center" as ColumnAlignment,
+        width: 200,
+        renderCell: (value: any, context: any) => {
+          return (
+            <span className="cursor-pointer flex items-center justify-center">
+              <Icon
+                name="Trash"
+                size={18}
+                className="hover:text-red-500"
+                onClick={() => {
+                  dispatch(actions.removeProject({ projectId: context.row.id }));
+                }}
+              />
+            </span>
+          );
+        },
+      },
     ],
     []
   );

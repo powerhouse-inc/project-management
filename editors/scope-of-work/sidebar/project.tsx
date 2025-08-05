@@ -48,7 +48,6 @@ const Project: React.FC<ProjectProps> = ({
     project?.scope?.deliverables.map((d: any) =>
       deliverables.find((d2: any) => d2.id === d)
     ) || [];
-  console.log("projectDeliverables", projectDeliverables);
 
   // Validate image URL by checking file extension
   const isValidImageUrl = (url: string): boolean => {
@@ -109,6 +108,29 @@ const Project: React.FC<ProjectProps> = ({
             return true;
           }
           return false;
+        },
+      },
+      {
+        field: "actions",
+        title: "Actions",
+        editable: true,
+        align: "center" as ColumnAlignment,
+        width: 200,
+        renderCell: (value: any, context: any) => {
+          if (!project) return null;
+          return (
+            <span className="cursor-pointer flex items-center justify-center">
+              <Icon
+                name="Trash"
+                size={18}
+                className="hover:text-red-500"
+                onClick={() => {
+                  dispatch(actions.removeDeliverableInSet({ projectId: project!.id, deliverableId: context.row.id }));
+                  dispatch(actions.removeDeliverable({ id: context.row.id }));
+                }}
+              />
+            </span>
+          );
         },
       },
     ],

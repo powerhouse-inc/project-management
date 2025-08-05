@@ -101,6 +101,28 @@ const Milestones: React.FC<MilestonesProps> = ({
           return false;
         },
       },
+      {
+        field: "actions",
+        title: "Actions",
+        editable: true,
+        align: "center" as ColumnAlignment,
+        width: 200,
+        renderCell: (value: any, context: any) => {
+          return (
+            <span className="cursor-pointer flex items-center justify-center">
+              <Icon
+                name="Trash"
+                size={18}
+                className="hover:text-red-500"
+                onClick={() => {
+                  dispatch(actions.removeDeliverableInSet({ milestoneId: milestone.id, deliverableId: context.row.id }));
+                  dispatch(actions.removeDeliverable({ id: context.row.id }));
+                }}
+              />
+            </span>
+          );
+        },
+      },
     ],
     []
   );

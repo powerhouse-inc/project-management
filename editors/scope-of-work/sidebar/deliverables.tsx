@@ -219,17 +219,17 @@ const Deliverables: React.FC<ProjectsProps> = ({
           columns={columns}
           data={richDeliverables || []}
           allowRowSelection={true}
-          onAdd={(data) => {
-            if (data.title) {
-              console.log("title", data.title);
-              dispatch(
-                actions.addDeliverable({
-                  id: generateId(),
-                  title: data.title as string,
-                })
-              );
-            }
-          }}
+          // onAdd={(data) => {
+          //   if (data.title) {
+          //     console.log("title", data.title);
+          //     dispatch(
+          //       actions.addDeliverable({
+          //         id: generateId(),
+          //         title: data.title as string,
+          //       })
+          //     );
+          //   }
+          // }}
         />
       </div>
     </div>

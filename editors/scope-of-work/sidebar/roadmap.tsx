@@ -131,6 +131,27 @@ const Roadmap: React.FC<RoadmapsProps> = ({ roadmaps , dispatch, setActiveNodeId
         //   return <DatePicker name="deliveryTarget" value={value}  />;
         // },
       },
+      {
+        field: "actions",
+        title: "Actions",
+        editable: true,
+        align: "center" as ColumnAlignment,
+        width: 200,
+        renderCell: (value: any, context: any) => {
+          return (
+            <span className="cursor-pointer flex items-center justify-center">
+              <Icon
+                name="Trash"
+                size={18}
+                className="hover:text-red-500"
+                onClick={() => {
+                  dispatch(actions.removeMilestone({ id: context.row.id, roadmapId: roadmap.id }));
+                }}
+              />
+            </span>
+          );
+        },
+      },
     ],
     []
   );
