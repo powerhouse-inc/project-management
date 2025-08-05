@@ -33,7 +33,6 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
         width: 20,
         align: "center" as ColumnAlignment,
         renderCell: (value: any, context: any) => {
-          console.log("context", context);
           return (
             <div className="text-center">
               <Icon
@@ -88,6 +87,53 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
               />
             </span>
           );
+        },
+      },
+    ],
+    []
+  );
+
+  const projectColumns = useMemo<Array<ColumnDef<any>>>(
+    () => [
+      {
+        field: "link",
+        width: 20,
+        align: "center" as ColumnAlignment,
+        renderCell: (value: any, context: any) => {
+          return (
+            <div className="text-center">
+              <Icon
+                className="hover:cursor-pointer"
+                name="Moved"
+                size={18}
+                onClick={() => {
+                  setActiveNodeId(`project.${context.row.id}`);
+                }}
+              />
+            </div>
+          );
+        },
+      },
+      {
+        field: "title",
+        title: "Title",
+        editable: true,
+        align: "left" as ColumnAlignment,
+        onSave: (newValue: any, context: any) => {
+          if (newValue !== context.row.title) {
+            // dispatch(
+            //   actions.editMilestone({
+            //     id: context.row.id,
+            //     roadmapId: roadmap.id,
+            //     title: newValue as string,
+            //   })
+            // );
+            return true;
+          }
+          return false;
+        },
+        renderCell: (value: any, context: any) => {
+          return <div className="text-left">{value}</div>;
         },
       },
     ],
@@ -235,6 +281,24 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
           }
         }}
       />
+      <label className="text-sm font-medium text-gray-700 mb-2 mt-4">Projects</label>
+      <ObjectSetTable
+          columns={projectColumns}
+          data={state.projects || []}
+          allowRowSelection={true}
+          onAdd={(data) => {
+            if (data.title) {
+              console.log("title", data.title);
+              dispatch(
+                actions.addProject({
+                  id: generateId(),
+                  code: '',
+                  title: data.title as string,
+                })
+              );
+            }
+          }}
+        />
     </div>
   );
 };
