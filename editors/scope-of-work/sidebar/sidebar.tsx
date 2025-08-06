@@ -187,6 +187,7 @@ export default function SidebarMenu(props: any) {
           <Deliverable
             dispatch={dispatch}
             deliverables={deliverables.filter((d: any) => d.id === id)}
+            projects={projects}
           />
         );
       case "projects":

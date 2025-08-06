@@ -7,12 +7,14 @@ import {
   Select,
   Checkbox,
   NumberInput,
+  Icon,
 } from "@powerhousedao/document-engineering";
 import {
   Milestone,
   Roadmap,
   type Deliverable,
   PmDeliverableStatusInput,
+  Project,
 } from "../../../document-models/scope-of-work/index.js";
 import { actions } from "../../../document-models/scope-of-work/index.js";
 import { useEffect, useMemo, useState } from "react";
@@ -20,6 +22,7 @@ import { generateId } from "document-model";
 interface DeliverablesProps {
   deliverables: Deliverable[];
   dispatch: any;
+  projects: Project[];
 }
 
 const statusOptions = [
@@ -35,6 +38,7 @@ const statusOptions = [
 const Deliverable: React.FC<DeliverablesProps> = ({
   deliverables,
   dispatch,
+  projects,
 }) => {
   const currentDeliverable = deliverables[0];
   const [stateDeliverable, setStateDeliverable] = useState(currentDeliverable);
@@ -55,7 +59,10 @@ const Deliverable: React.FC<DeliverablesProps> = ({
     setIsSP(false);
 
     if (currentDeliverable.workProgress) {
-      if ("completed" in currentDeliverable.workProgress && !("total" in currentDeliverable.workProgress)) {
+      if (
+        "completed" in currentDeliverable.workProgress &&
+        !("total" in currentDeliverable.workProgress)
+      ) {
         setIsBoolean(true);
       } else if ("value" in currentDeliverable.workProgress) {
         setIsPercentage(true);
@@ -313,22 +320,28 @@ const Deliverable: React.FC<DeliverablesProps> = ({
           </button>
         </div>
         <div className="col-span-3 flex justify-end items-end mr-4">
-          {isBoolean && <Checkbox 
-            key={`checkbox-${currentDeliverable.id}-${workProgress && "completed" in workProgress ? Boolean(workProgress.completed) : false}`}
-            label="Delivered"
-            // defaultChecked={workProgress && "isBinary" in workProgress ? (workProgress.isBinary ?? false) : false}
-            defaultChecked={workProgress && "completed" in workProgress ? Boolean(workProgress.completed) : false}
-            onChange={(e: any) => {
-              dispatch(
-                actions.setDeliverableProgress({
-                  id: currentDeliverable.id,
-                  workProgress: {
-                    completed: e,
-                  },
-                })
-              );
-            }}
-          />}
+          {isBoolean && (
+            <Checkbox
+              key={`checkbox-${currentDeliverable.id}-${workProgress && "completed" in workProgress ? Boolean(workProgress.completed) : false}`}
+              label="Delivered"
+              // defaultChecked={workProgress && "isBinary" in workProgress ? (workProgress.isBinary ?? false) : false}
+              defaultChecked={
+                workProgress && "completed" in workProgress
+                  ? Boolean(workProgress.completed)
+                  : false
+              }
+              onChange={(e: any) => {
+                dispatch(
+                  actions.setDeliverableProgress({
+                    id: currentDeliverable.id,
+                    workProgress: {
+                      completed: e,
+                    },
+                  })
+                );
+              }}
+            />
+          )}
           {isPercentage && (
             <div className="flex flex-col">
               <label className="text-sm font-medium mb-1">Percentage</label>
@@ -336,7 +349,9 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                 type="number"
                 className="w-16 h-8 border border-gray-300 rounded px-2"
                 defaultValue={
-                  workProgress && "value" in workProgress ? workProgress.value ?? 0 : 0
+                  workProgress && "value" in workProgress
+                    ? (workProgress.value ?? 0)
+                    : 0
                 }
                 onBlur={(e) => {
                   dispatch(
@@ -375,16 +390,16 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                     });
                   }}
                   onBlur={(e) => {
-                    if (
-                      workProgress &&
-                      "completed" in workProgress
-                    ) {
+                    if (workProgress && "completed" in workProgress) {
                       dispatch(
                         actions.setDeliverableProgress({
                           id: currentDeliverable.id,
                           workProgress: {
                             storyPoints: {
-                              total: workProgress && "total" in workProgress ? workProgress.total : 0,
+                              total:
+                                workProgress && "total" in workProgress
+                                  ? workProgress.total
+                                  : 0,
                               completed: parseInt(e.target.value),
                             },
                           },
@@ -416,10 +431,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                     });
                   }}
                   onBlur={(e) => {
-                    if (
-                      workProgress &&
-                      "total" in workProgress
-                    ) {
+                    if (workProgress && "total" in workProgress) {
                       dispatch(
                         actions.setDeliverableProgress({
                           id: currentDeliverable.id,
@@ -437,6 +449,42 @@ const Deliverable: React.FC<DeliverablesProps> = ({
               </div>
             </div>
           )}
+        </div>
+      </div>
+      <div className="mt-8 grid grid-cols-2 gap-2">
+        <div className="col-span-1 gap-2 w-[300px]">
+          <Select
+            label="Budget Anchor"
+            options={projects.map((project) => ({
+              label: project.title,
+              value: project.id,
+            }))}
+            value={stateDeliverable.budgetAnchor?.project}
+            onChange={(value) => {
+              dispatch(
+                actions.setDeliverableBudgetAnchorProject({
+                  deliverableId: currentDeliverable.id,
+                  project: value as string,
+                  unit: "Hours",
+                  unitCost: 0,
+                  quantity: 0,
+                  margin: 0,
+                })
+              );
+            }}
+          />
+        </div>
+        <div className="flex items-center gap-2 col-span-1 align-center">
+          <span>Budget Calculator</span>
+          <Icon
+            className="hover:cursor-pointer"
+            name="Moved"
+            size={18}
+            onClick={() => {
+              // setDeliverablesOpen(true);
+              // setSelectedDeliverableId(context.row.id);
+            }}
+          />
         </div>
       </div>
       <div className="mt-8">
