@@ -19,6 +19,7 @@ import {
 import { Icon } from "@powerhousedao/design-system";
 import { actions } from "../../../document-models/scope-of-work/index.js";
 import { generateId } from "document-model";
+import BudgetCalculator from "./budgetCalculator.js";
 
 interface ProjectProps {
   project: Project | undefined;
@@ -43,6 +44,11 @@ const Project: React.FC<ProjectProps> = ({
     project?.abstract as string
   );
   const [budget, setBudget] = useState(project?.budget || 0);
+  const [budgetCalculatorOpen, setBudgetCalculatorOpen] = useState(false);
+
+  useEffect(() => {
+    setBudget(project?.budget || 0);
+  }, [deliverables, project?.id]);
 
   const projectDeliverables =
     project?.scope?.deliverables.map((d: any) =>
@@ -119,9 +125,7 @@ const Project: React.FC<ProjectProps> = ({
         renderCell: (value: any, context: any) => {
           const progress = context.row.workProgress;
           if (!progress) return null;
-          return (
-            <ProgressBar progress={progress} />
-          );
+          return <ProgressBar progress={progress} />;
         },
       },
       {
@@ -132,9 +136,7 @@ const Project: React.FC<ProjectProps> = ({
         width: 200,
         renderCell: (value: any, context: any) => {
           return (
-            <span className="flex items-center justify-center">
-              {value}
-            </span>
+            <span className="flex items-center justify-center">{value}</span>
           );
         },
       },
@@ -153,7 +155,12 @@ const Project: React.FC<ProjectProps> = ({
                 size={18}
                 className="hover:text-red-500"
                 onClick={() => {
-                  dispatch(actions.removeDeliverableInSet({ projectId: project!.id, deliverableId: context.row.id }));
+                  dispatch(
+                    actions.removeDeliverableInSet({
+                      projectId: project!.id,
+                      deliverableId: context.row.id,
+                    })
+                  );
                   dispatch(actions.removeDeliverable({ id: context.row.id }));
                 }}
               />
@@ -166,259 +173,275 @@ const Project: React.FC<ProjectProps> = ({
   );
 
   return (
-    <div className="border border-gray-300 p-4 rounded-md">
-      <div className="mt-2 grid grid-cols-8 gap-2">
-        <div className="col-span-2">
-          <TextInput
-            className="w-full"
-            label="Code"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            onBlur={(e) => {
-              if (!project) return;
-              if (e.target.value === project.code) return;
-              dispatch(
-                actions.updateProject({
-                  id: project.id,
-                  code: e.target.value,
-                })
-              );
-            }}
-          />
-        </div>
-        <div className="col-span-6">
-          <TextInput
-            className="w-full"
-            label="Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            onBlur={(e) => {
-              if (!project) return;
-              if (e.target.value === project.title) return;
-              dispatch(
-                actions.updateProject({
-                  id: project.id,
-                  title: e.target.value,
-                })
-              );
-            }}
-          />
-        </div>
-      </div>
-      {/* Project Owner and Image URL */}
-      <div className="mt-8 grid grid-cols-3 gap-2">
-        <div className="col-span-1">
-          <Form
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (!project) return;
-              // dispatch(actions.updateProject({ id: project.id, projectOwner: projectOwner }));
-            }}
-          >
-            <AIDField
-              className="w-full"
-              label="Project Owner"
-              name="projectOwner"
-              value={project?.projectOwner as string}
-              onChange={(e) => setProjectOwner(e)}
-              fetchOptionsCallback={async (userInput: string) => {
-                return [];
-              }}
-            />
-          </Form>
-        </div>
-        <div className="col-span-1">
-          <TextInput
-            label="Cover Image"
-            className="w-full"
-            placeholder="Enter image URL"
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-            onBlur={(e) => {
-              if (project && e.target.value !== project.imageUrl) {
-                dispatch(
-                  actions.updateProject({
-                    id: project.id,
-                    imageUrl: e.target.value,
-                  })
-                );
-              }
-            }}
-            errors={
-              imageUrl && !isValidImageUrl(imageUrl)
-                ? [
-                    "Invalid image URL. Must end with .jpg, .jpeg, .png, or .svg",
-                  ]
-                : []
-            }
-          />
-        </div>
-        <div className="col-span-1 flex justify-center items-start align-end pt-6">
-          {imageUrl && (
-            <div>
-              {isValidImageUrl(imageUrl) ? (
-                <img
-                  src={imageUrl}
-                  alt="Project cover"
-                  className="w-[100px] h-[100px] object-cover rounded border"
+    <>
+      {budgetCalculatorOpen ? (
+        <BudgetCalculator
+          setBudgetCalculatorOpen={setBudgetCalculatorOpen}
+          project={project}
+          deliverables={projectDeliverables as Deliverable[]}
+          dispatch={dispatch}
+        />
+      ) : (
+        <div className="border border-gray-300 p-4 rounded-md">
+          <div className="mt-2 grid grid-cols-8 gap-2">
+            <div className="col-span-2">
+              <TextInput
+                className="w-full"
+                label="Code"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                onBlur={(e) => {
+                  if (!project) return;
+                  if (e.target.value === project.code) return;
+                  dispatch(
+                    actions.updateProject({
+                      id: project.id,
+                      code: e.target.value,
+                    })
+                  );
+                }}
+              />
+            </div>
+            <div className="col-span-6">
+              <TextInput
+                className="w-full"
+                label="Title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                onBlur={(e) => {
+                  if (!project) return;
+                  if (e.target.value === project.title) return;
+                  dispatch(
+                    actions.updateProject({
+                      id: project.id,
+                      title: e.target.value,
+                    })
+                  );
+                }}
+              />
+            </div>
+          </div>
+          {/* Project Owner and Image URL */}
+          <div className="mt-8 grid grid-cols-3 gap-2">
+            <div className="col-span-1">
+              <Form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (!project) return;
+                  // dispatch(actions.updateProject({ id: project.id, projectOwner: projectOwner }));
+                }}
+              >
+                <AIDField
+                  className="w-full"
+                  label="Project Owner"
+                  name="projectOwner"
+                  value={project?.projectOwner as string}
+                  onChange={(e) => setProjectOwner(e)}
+                  fetchOptionsCallback={async (userInput: string) => {
+                    return [];
+                  }}
                 />
-              ) : (
-                <div className="w-[100px] h-[100px] bg-red-100 border border-red-300 rounded flex items-center justify-center text-red-500 text-xs">
-                  Invalid
+              </Form>
+            </div>
+            <div className="col-span-1">
+              <TextInput
+                label="Cover Image"
+                className="w-full"
+                placeholder="Enter image URL"
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                onBlur={(e) => {
+                  if (project && e.target.value !== project.imageUrl) {
+                    dispatch(
+                      actions.updateProject({
+                        id: project.id,
+                        imageUrl: e.target.value,
+                      })
+                    );
+                  }
+                }}
+                errors={
+                  imageUrl && !isValidImageUrl(imageUrl)
+                    ? [
+                        "Invalid image URL. Must end with .jpg, .jpeg, .png, or .svg",
+                      ]
+                    : []
+                }
+              />
+            </div>
+            <div className="col-span-1 flex justify-center items-start align-end pt-6">
+              {imageUrl && (
+                <div>
+                  {isValidImageUrl(imageUrl) ? (
+                    <img
+                      src={imageUrl}
+                      alt="Project cover"
+                      className="w-[100px] h-[100px] object-cover rounded border"
+                    />
+                  ) : (
+                    <div className="w-[100px] h-[100px] bg-red-100 border border-red-300 rounded flex items-center justify-center text-red-500 text-xs">
+                      Invalid
+                    </div>
+                  )}
                 </div>
               )}
             </div>
-          )}
+          </div>
+          {/* Description */}
+          <div className="mt-2">
+            <Textarea
+              className="w-full"
+              label="Abstract"
+              value={projectAbstract}
+              onChange={(e) => setProjectAbstract(e.target.value)}
+              onBlur={(e) => {
+                if (!project) return;
+                if (e.target.value === project.abstract) return;
+                dispatch(
+                  actions.updateProject({
+                    id: project.id,
+                    abstract: e.target.value,
+                  })
+                );
+              }}
+            />
+          </div>
+          <div className="mt-8 grid grid-cols-4 gap-2">
+            <div>
+              <Select
+                label="Budget Type"
+                options={[
+                  { label: "Contingency", value: "CONTINGENCY" },
+                  { label: "Opex", value: "OPEX" },
+                  { label: "Capex", value: "CAPEX" },
+                  { label: "Overhead", value: "OVERHEAD" },
+                ]}
+                value={project?.budgetType as string}
+                onChange={(value) => {
+                  dispatch(
+                    actions.updateProject({
+                      id: project?.id as string,
+                      budgetType: value as PmBudgetTypeInput,
+                    })
+                  );
+                }}
+              />
+            </div>
+            <div>
+              <Select
+                label="Currency"
+                options={[
+                  { label: "DAI", value: "DAI" },
+                  { label: "USDS", value: "USDS" },
+                  { label: "EUR", value: "EUR" },
+                  { label: "USD", value: "USD" },
+                ]}
+                value={project?.currency as string}
+                onChange={(value) => {
+                  dispatch(
+                    actions.updateProject({
+                      id: project?.id as string,
+                      currency: value as PmCurrencyInput,
+                    })
+                  );
+                }}
+              />
+            </div>
+            <div>
+              <NumberInput
+                name="budget"
+                label="Budget"
+                value={parseFloat(budget.toFixed(2))}
+                disabled={true}
+                onChange={(e) => setBudget(e.target.value as any)}
+                numericType="NonNegativeFloat"
+                onBlur={(e) => {
+                  if (!project) return;
+                  dispatch(
+                    actions.updateProject({
+                      id: project.id,
+                      budget: parseFloat(e.target.value),
+                    })
+                  );
+                }}
+              />
+            </div>
+            <div className="flex items-center gap-2 col-span-1 align-center">
+              <span>Budget Calculator</span>
+              <Icon
+                className="hover:cursor-pointer hover:bg-gray-500"
+                name="Moved"
+                size={18}
+                onClick={() => {
+                  setBudgetCalculatorOpen(true);
+                }}
+              />
+            </div>
+          </div>
+          <div className="mt-8">
+            <label className="text-sm font-medium text-gray-700 mb-2">
+              Deliverables
+            </label>
+            <ObjectSetTable
+              columns={columns}
+              data={projectDeliverables}
+              allowRowSelection={true}
+              onAdd={(data) => {
+                if (data.title) {
+                  if (!project) return;
+                  const deliverableId = generateId();
+                  dispatch(
+                    actions.addDeliverable({
+                      id: deliverableId,
+                      title:
+                        typeof data.title === "string" ? data.title : undefined,
+                    })
+                  );
+                  dispatch(
+                    actions.addDeliverableInSet({
+                      projectId: project.id,
+                      deliverableId: deliverableId,
+                    })
+                  );
+                }
+                if (data.owner) {
+                  if (!project) return;
+                  const deliverableId = generateId();
+                  dispatch(
+                    actions.addDeliverable({
+                      id: deliverableId,
+                      owner:
+                        typeof data.owner === "string" ? data.owner : undefined,
+                    })
+                  );
+                  dispatch(
+                    actions.addDeliverableInSet({
+                      projectId: project.id,
+                      deliverableId: deliverableId,
+                    })
+                  );
+                }
+              }}
+            />
+          </div>
         </div>
-      </div>
-      {/* Description */}
-      <div className="mt-2">
-        <Textarea
-          className="w-full"
-          label="Abstract"
-          value={projectAbstract}
-          onChange={(e) => setProjectAbstract(e.target.value)}
-          onBlur={(e) => {
-            if (!project) return;
-            if (e.target.value === project.abstract) return;
-            dispatch(
-              actions.updateProject({
-                id: project.id,
-                abstract: e.target.value,
-              })
-            );
-          }}
-        />
-      </div>
-      <div className="mt-8 grid grid-cols-4 gap-2">
-        <div>
-          <Select
-            label="Budget Type"
-            options={[
-              { label: "Contingency", value: "CONTINGENCY" },
-              { label: "Opex", value: "OPEX" },
-              { label: "Capex", value: "CAPEX" },
-              { label: "Overhead", value: "OVERHEAD" },
-            ]}
-            value={project?.budgetType as string}
-            onChange={(value) => {
-              dispatch(
-                actions.updateProject({
-                  id: project?.id as string,
-                  budgetType: value as PmBudgetTypeInput,
-                })
-              );
-            }}
-          />
-        </div>
-        <div>
-          <Select
-            label="Currency"
-            options={[
-              { label: "DAI", value: "DAI" },
-              { label: "USDS", value: "USDS" },
-              { label: "EUR", value: "EUR" },
-              { label: "USD", value: "USD" },
-            ]}
-            value={project?.currency as string}
-            onChange={(value) => {
-              dispatch(
-                actions.updateProject({
-                  id: project?.id as string,
-                  currency: value as PmCurrencyInput,
-                })
-              );
-            }}
-          />
-        </div>
-        <div>
-          <NumberInput
-            name="budget"
-            label="Budget"
-            value={budget}
-            onChange={(e) => setBudget(e.target.value as any)}
-            numericType="NonNegativeFloat"
-            onBlur={(e) => {
-              if (!project) return;
-              dispatch(
-                actions.updateProject({
-                  id: project.id,
-                  budget: parseFloat(e.target.value),
-                })
-              );
-            }}
-          />
-        </div>
-        <div className="flex items-center gap-2 col-span-1 align-center">
-          <span>Budget Calculator</span>
-          <Icon
-            className="hover:cursor-pointer"
-            name="Moved"
-            size={18}
-            onClick={() => {
-              // setDeliverablesOpen(true);
-              // setSelectedDeliverableId(context.row.id);
-            }}
-          />
-        </div>
-      </div>
-      <div className="mt-8">
-        <label className="text-sm font-medium text-gray-700 mb-2">
-          Deliverables
-        </label>
-        <ObjectSetTable
-          columns={columns}
-          data={projectDeliverables}
-          allowRowSelection={true}
-          onAdd={(data) => {
-            if (data.title) {
-              if (!project) return;
-              const deliverableId = generateId();
-              dispatch(
-                actions.addDeliverable({
-                  id: deliverableId,
-                  title:
-                    typeof data.title === "string" ? data.title : undefined,
-                })
-              );
-              dispatch(
-                actions.addDeliverableInSet({
-                  projectId: project.id,
-                  deliverableId: deliverableId,
-                })
-              );
-            }
-            if (data.owner) {
-              if (!project) return;
-              const deliverableId = generateId();
-              dispatch(
-                actions.addDeliverable({
-                  id: deliverableId,
-                  owner:
-                    typeof data.owner === "string" ? data.owner : undefined,
-                })
-              );
-              dispatch(
-                actions.addDeliverableInSet({
-                  projectId: project.id,
-                  deliverableId: deliverableId,
-                })
-              );
-            }
-          }}
-        />
-      </div>
-    </div>
+      )}
+    </>
   );
 };
 
 export default Project;
 
-const ProgressBar = ({progress}: {progress: any}) => {
+const ProgressBar = ({ progress }: { progress: any }) => {
   if (!progress) {
-    return <div className="w-full bg-gray-200 rounded-full h-2">
-      <div className="bg-gray-300 h-2 rounded-full" style={{width: '0%'}}></div>
-    </div>;
+    return (
+      <div className="w-full bg-gray-200 rounded-full h-2">
+        <div
+          className="bg-gray-300 h-2 rounded-full"
+          style={{ width: "0%" }}
+        ></div>
+      </div>
+    );
   }
 
   // Case 1: Binary progress {completed: boolean}
@@ -427,7 +450,10 @@ const ProgressBar = ({progress}: {progress: any}) => {
     const bgColor = progress.completed ? "bg-green-500" : "bg-gray-300";
     return (
       <div className="w-full bg-gray-200 rounded-full h-2">
-        <div className={`${bgColor} h-2 rounded-full transition-all duration-300`} style={{width: `${percentage}%`}}></div>
+        <div
+          className={`${bgColor} h-2 rounded-full transition-all duration-300`}
+          style={{ width: `${percentage}%` }}
+        ></div>
       </div>
     );
   }
@@ -435,29 +461,60 @@ const ProgressBar = ({progress}: {progress: any}) => {
   // Case 2: Percentage progress {value: number}
   if ("value" in progress && typeof progress.value === "number") {
     const percentage = Math.min(Math.max(progress.value, 0), 100);
-    const bgColor = percentage >= 100 ? "bg-green-500" : percentage >= 50 ? "bg-yellow-500" : "bg-blue-500";
+    const bgColor =
+      percentage >= 100
+        ? "bg-green-500"
+        : percentage >= 50
+          ? "bg-yellow-500"
+          : "bg-blue-500";
     return (
       <div className="w-full bg-gray-200 rounded-full h-2">
-        <div className={`${bgColor} h-2 rounded-full transition-all duration-300`} style={{width: `${percentage}%`}}></div>
-        <div className="text-xs text-gray-600 mt-1">{percentage.toFixed(1)}%</div>
+        <div
+          className={`${bgColor} h-2 rounded-full transition-all duration-300`}
+          style={{ width: `${percentage}%` }}
+        ></div>
+        <div className="text-xs text-gray-600 mt-1">
+          {percentage.toFixed(1)}%
+        </div>
       </div>
     );
   }
 
   // Case 3: Story points progress {completed: number, total: number}
-  if ("completed" in progress && "total" in progress && typeof progress.completed === "number" && typeof progress.total === "number") {
-    const percentage = progress.total > 0 ? (progress.completed / progress.total) * 100 : 0;
-    const bgColor = percentage >= 100 ? "bg-green-500" : percentage >= 50 ? "bg-yellow-500" : "bg-blue-500";
+  if (
+    "completed" in progress &&
+    "total" in progress &&
+    typeof progress.completed === "number" &&
+    typeof progress.total === "number"
+  ) {
+    const percentage =
+      progress.total > 0 ? (progress.completed / progress.total) * 100 : 0;
+    const bgColor =
+      percentage >= 100
+        ? "bg-green-500"
+        : percentage >= 50
+          ? "bg-yellow-500"
+          : "bg-blue-500";
     return (
       <div className="w-full bg-gray-200 rounded-full h-2">
-        <div className={`${bgColor} h-2 rounded-full transition-all duration-300`} style={{width: `${percentage}%`}}></div>
-        <div className="text-xs text-gray-600 mt-1">{progress.completed}/{progress.total} SP</div>
+        <div
+          className={`${bgColor} h-2 rounded-full transition-all duration-300`}
+          style={{ width: `${percentage}%` }}
+        ></div>
+        <div className="text-xs text-gray-600 mt-1">
+          {progress.completed}/{progress.total} SP
+        </div>
       </div>
     );
   }
 
   // Fallback for unknown progress type
-  return <div className="w-full bg-gray-200 rounded-full h-2">
-    <div className="bg-gray-300 h-2 rounded-full" style={{width: '0%'}}></div>
-  </div>;
-}
+  return (
+    <div className="w-full bg-gray-200 rounded-full h-2">
+      <div
+        className="bg-gray-300 h-2 rounded-full"
+        style={{ width: "0%" }}
+      ></div>
+    </div>
+  );
+};

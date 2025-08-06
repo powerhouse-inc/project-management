@@ -19,6 +19,7 @@ import {
 import { actions } from "../../../document-models/scope-of-work/index.js";
 import { useEffect, useMemo, useState } from "react";
 import { generateId } from "document-model";
+import BudgetCalculator from "./budgetCalculator.js";
 interface DeliverablesProps {
   deliverables: Deliverable[];
   dispatch: any;
@@ -48,6 +49,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
   const [workProgress, setWorkProgress] = useState(
     deliverables[0]?.workProgress
   );
+  const [budgetCalculatorOpen, setBudgetCalculatorOpen] = useState(false);
 
   useEffect(() => {
     const currentDeliverable = deliverables[0];
@@ -117,397 +119,409 @@ const Deliverable: React.FC<DeliverablesProps> = ({
   }, [currentDeliverable, dispatch]);
 
   return (
-    <div className="border border-gray-300 p-4 rounded-md">
-      <div className="mt-2 grid grid-cols-8 gap-2">
-        <div className="col-span-2">
-          <TextInput
-            className="w-full"
-            label="Code"
-            value={stateDeliverable.code}
-            onChange={(e) =>
-              setStateDeliverable((prevValue) => ({
-                ...prevValue,
-                code: e.target.value,
-              }))
-            }
-            onBlur={(e) => {
-              if (e.target.value === "") {
-                dispatch(
-                  actions.editDeliverable({
-                    id: currentDeliverable.id,
-                    code: " ",
-                  })
-                );
-              }
-              if (e.target.value === currentDeliverable.code) return;
-              dispatch(
-                actions.editDeliverable({
-                  id: currentDeliverable.id,
-                  code: e.target.value,
-                })
-              );
-            }}
-          />
-        </div>
-        <div className="col-span-6">
-          <TextInput
-            className="w-full"
-            label="Title"
-            value={stateDeliverable.title}
-            onChange={(e) =>
-              setStateDeliverable({
-                ...stateDeliverable,
-                title: e.target.value,
-              })
-            }
-            onBlur={(e) => {
-              if (e.target.value === "") {
-                dispatch(
-                  actions.editDeliverable({
-                    id: currentDeliverable.id,
-                    title: " ",
-                  })
-                );
-              }
-              if (e.target.value === currentDeliverable.title) return;
-              dispatch(
-                actions.editDeliverable({
-                  id: currentDeliverable.id,
-                  title: e.target.value,
-                })
-              );
-            }}
-          />
-        </div>
-      </div>
-      {/* Coordinators and Delivery Target */}
-      <div className="mt-8 grid grid-cols-8 gap-2">
-        <div className="col-span-4">
-          <TextInput
-            className="w-full"
-            label="Deliverable Owner"
-            value={stateDeliverable.owner || ""}
-            onChange={(e) =>
-              setStateDeliverable({
-                ...stateDeliverable,
-                owner: e.target.value,
-              })
-            }
-            onBlur={(e) => {
-              if (e.target.value === "") {
-                dispatch(
-                  actions.editDeliverable({
-                    id: currentDeliverable.id,
-                    owner: " ",
-                  })
-                );
-              }
-              if (e.target.value === currentDeliverable.owner) return;
-              dispatch(
-                actions.editDeliverable({
-                  id: currentDeliverable.id,
-                  owner: e.target.value,
-                })
-              );
-            }}
-          />
-        </div>
-      </div>
-      {/* Description */}
-      <div className="mt-8">
-        <Textarea
-          className="w-full"
-          label="Description"
-          value={stateDeliverable.description}
-          onChange={(e) =>
-            setStateDeliverable({
-              ...stateDeliverable,
-              description: e.target.value,
-            })
-          }
-          onBlur={(e) => {
-            if (e.target.value === "") {
-              dispatch(
-                actions.editDeliverable({
-                  id: currentDeliverable.id,
-                  description: " ",
-                })
-              );
-            }
-            if (e.target.value === currentDeliverable.description) return;
-            dispatch(
-              actions.editDeliverable({
-                id: currentDeliverable.id,
-                description: e.target.value,
-              })
-            );
-          }}
-        />
-      </div>
-      <div className="mt-8 grid grid-cols-8 gap-2">
-        <div className="mt-2 w-[150px] col-span-2">
-          <Select
-            label="Status"
-            options={statusOptions}
-            value={stateDeliverable.status}
-            onChange={(value) => {
-              dispatch(
-                actions.editDeliverable({
-                  id: currentDeliverable.id,
-                  status: value as PmDeliverableStatusInput,
-                })
-              );
-            }}
-          />
-        </div>
-        <div className="col-span-3 flex justify-center items-end">
-          <button
-            className={`p-2 border border-gray-300 w-12 h-8 text-sm hover:bg-gray-100 ${isBoolean ? "bg-blue-100" : "bg-white"}`}
-            onClick={() => {
-              setIsBoolean(true);
-              setIsPercentage(false);
-              setIsSP(false);
-              dispatch(
-                actions.setDeliverableProgress({
-                  id: currentDeliverable.id,
-                  workProgress: {
-                    completed: false,
-                  },
-                })
-              );
-            }}
-          >
-            -
-          </button>
-          <button
-            className={`p-2 border border-gray-300 w-12 h-8 text-sm hover:bg-gray-100 ${isPercentage ? "bg-blue-100" : "bg-white"}`}
-            onClick={() => {
-              setIsBoolean(false);
-              setIsPercentage(true);
-              setIsSP(false);
-              dispatch(
-                actions.setDeliverableProgress({
-                  id: currentDeliverable.id,
-                  workProgress: {
-                    percentage: 0,
-                  },
-                })
-              );
-            }}
-          >
-            %
-          </button>
-          <button
-            className={`p-2 border border-gray-300 w-12 h-8 text-sm hover:bg-gray-100 ${isSP ? "bg-blue-100" : "bg-white"}`}
-            onClick={() => {
-              setIsBoolean(false);
-              setIsPercentage(false);
-              setIsSP(true);
-              dispatch(
-                actions.setDeliverableProgress({
-                  id: currentDeliverable.id,
-                  workProgress: {
-                    storyPoints: {
-                      total: 0,
-                      completed: 0,
-                    },
-                  },
-                })
-              );
-            }}
-          >
-            SP
-          </button>
-        </div>
-        <div className="col-span-3 flex justify-end items-end mr-4">
-          {isBoolean && (
-            <Checkbox
-              key={`checkbox-${currentDeliverable.id}-${workProgress && "completed" in workProgress ? Boolean(workProgress.completed) : false}`}
-              label="Delivered"
-              // defaultChecked={workProgress && "isBinary" in workProgress ? (workProgress.isBinary ?? false) : false}
-              defaultChecked={
-                workProgress && "completed" in workProgress
-                  ? Boolean(workProgress.completed)
-                  : false
-              }
-              onChange={(e: any) => {
-                dispatch(
-                  actions.setDeliverableProgress({
-                    id: currentDeliverable.id,
-                    workProgress: {
-                      completed: e,
-                    },
-                  })
-                );
-              }}
-            />
+    <div>
+      {budgetCalculatorOpen ? (
+        <BudgetCalculator
+          setBudgetCalculatorOpen={setBudgetCalculatorOpen}
+          project={projects.find(
+            (p) => p.id === stateDeliverable.budgetAnchor?.project
           )}
-          {isPercentage && (
-            <div className="flex flex-col">
-              <label className="text-sm font-medium mb-1">Percentage</label>
-              <input
-                type="number"
-                className="w-16 h-8 border border-gray-300 rounded px-2"
-                defaultValue={
-                  workProgress && "value" in workProgress
-                    ? (workProgress.value ?? 0)
-                    : 0
+          deliverables={[stateDeliverable]}
+          dispatch={dispatch}
+        />
+      ) : (
+        <div className="border border-gray-300 p-4 rounded-md">
+          <div className="mt-2 grid grid-cols-8 gap-2">
+            <div className="col-span-2">
+              <TextInput
+                className="w-full"
+                label="Code"
+                value={stateDeliverable.code}
+                onChange={(e) =>
+                  setStateDeliverable((prevValue) => ({
+                    ...prevValue,
+                    code: e.target.value,
+                  }))
                 }
                 onBlur={(e) => {
+                  if (e.target.value === "") {
+                    dispatch(
+                      actions.editDeliverable({
+                        id: currentDeliverable.id,
+                        code: " ",
+                      })
+                    );
+                  }
+                  if (e.target.value === currentDeliverable.code) return;
                   dispatch(
-                    actions.setDeliverableProgress({
+                    actions.editDeliverable({
                       id: currentDeliverable.id,
-                      workProgress: {
-                        percentage: parseFloat(e.target.value),
-                      },
+                      code: e.target.value,
                     })
                   );
                 }}
               />
             </div>
-          )}
-          {isSP && (
-            <div className="text-sm grid grid-cols-2 gap-2">
-              <div className="col-span-1">
-                <label>Completed</label>
-                <input
-                  type="number"
-                  className="w-16 h-8 flex items-end"
-                  value={
-                    workProgress && "completed" in workProgress
-                      ? Number(workProgress.completed) || 0
-                      : 0
+            <div className="col-span-6">
+              <TextInput
+                className="w-full"
+                label="Title"
+                value={stateDeliverable.title}
+                onChange={(e) =>
+                  setStateDeliverable({
+                    ...stateDeliverable,
+                    title: e.target.value,
+                  })
+                }
+                onBlur={(e) => {
+                  if (e.target.value === "") {
+                    dispatch(
+                      actions.editDeliverable({
+                        id: currentDeliverable.id,
+                        title: " ",
+                      })
+                    );
                   }
-                  onChange={(e) => {
-                    setWorkProgress((prev: any) => {
-                      if (prev && "completed" in prev) {
-                        return {
-                          ...prev,
-                          completed: parseInt(e.target.value),
-                        };
-                      }
-                      return prev;
-                    });
-                  }}
-                  onBlur={(e) => {
-                    if (workProgress && "completed" in workProgress) {
-                      dispatch(
-                        actions.setDeliverableProgress({
-                          id: currentDeliverable.id,
-                          workProgress: {
-                            storyPoints: {
-                              total:
-                                workProgress && "total" in workProgress
-                                  ? workProgress.total
-                                  : 0,
-                              completed: parseInt(e.target.value),
-                            },
-                          },
-                        })
-                      );
-                    }
-                  }}
-                />
-              </div>
-              <div className="col-span-1">
-                <label>Total</label>
-                <input
-                  type="number"
-                  className="w-16 h-8 flex items-end"
-                  value={
-                    workProgress && "total" in workProgress
-                      ? workProgress.total
-                      : 0
-                  }
-                  onChange={(e) => {
-                    setWorkProgress((prev) => {
-                      if (prev && "total" in prev) {
-                        return {
-                          ...prev,
-                          total: parseInt(e.target.value),
-                        };
-                      }
-                      return prev;
-                    });
-                  }}
-                  onBlur={(e) => {
-                    if (workProgress && "total" in workProgress) {
-                      dispatch(
-                        actions.setDeliverableProgress({
-                          id: currentDeliverable.id,
-                          workProgress: {
-                            storyPoints: {
-                              total: parseInt(e.target.value),
-                              completed: workProgress?.completed || 0,
-                            },
-                          },
-                        })
-                      );
-                    }
-                  }}
-                />
-              </div>
+                  if (e.target.value === currentDeliverable.title) return;
+                  dispatch(
+                    actions.editDeliverable({
+                      id: currentDeliverable.id,
+                      title: e.target.value,
+                    })
+                  );
+                }}
+              />
             </div>
-          )}
-        </div>
-      </div>
-      <div className="mt-8 grid grid-cols-2 gap-2">
-        <div className="col-span-1 gap-2 w-[300px]">
-          <Select
-            label="Budget Anchor"
-            options={projects.map((project) => ({
-              label: project.title,
-              value: project.id,
-            }))}
-            value={stateDeliverable.budgetAnchor?.project}
-            onChange={(value) => {
-              dispatch(
-                actions.setDeliverableBudgetAnchorProject({
-                  deliverableId: currentDeliverable.id,
-                  project: value as string,
-                  unit: "Hours",
-                  unitCost: 0,
-                  quantity: 0,
-                  margin: 0,
+          </div>
+          {/* Coordinators and Delivery Target */}
+          <div className="mt-8 grid grid-cols-8 gap-2">
+            <div className="col-span-4">
+              <TextInput
+                className="w-full"
+                label="Deliverable Owner"
+                value={stateDeliverable.owner || ""}
+                onChange={(e) =>
+                  setStateDeliverable({
+                    ...stateDeliverable,
+                    owner: e.target.value,
+                  })
+                }
+                onBlur={(e) => {
+                  if (e.target.value === "") {
+                    dispatch(
+                      actions.editDeliverable({
+                        id: currentDeliverable.id,
+                        owner: " ",
+                      })
+                    );
+                  }
+                  if (e.target.value === currentDeliverable.owner) return;
+                  dispatch(
+                    actions.editDeliverable({
+                      id: currentDeliverable.id,
+                      owner: e.target.value,
+                    })
+                  );
+                }}
+              />
+            </div>
+          </div>
+          {/* Description */}
+          <div className="mt-8">
+            <Textarea
+              className="w-full"
+              label="Description"
+              value={stateDeliverable.description}
+              onChange={(e) =>
+                setStateDeliverable({
+                  ...stateDeliverable,
+                  description: e.target.value,
                 })
-              );
-            }}
-          />
-        </div>
-        <div className="flex items-center gap-2 col-span-1 align-center">
-          <span>Budget Calculator</span>
-          <Icon
-            className="hover:cursor-pointer"
-            name="Moved"
-            size={18}
-            onClick={() => {
-              // setDeliverablesOpen(true);
-              // setSelectedDeliverableId(context.row.id);
-            }}
-          />
-        </div>
-      </div>
-      <div className="mt-8">
-        <label className="text-sm font-medium">Add Key Results</label>
-        {currentDeliverable && (
-          <ObjectSetTable
-            columns={columns}
-            data={currentDeliverable.keyResults || []}
-            allowRowSelection={true}
-            onAdd={(data) => {
-              if (data.title) {
+              }
+              onBlur={(e) => {
+                if (e.target.value === "") {
+                  dispatch(
+                    actions.editDeliverable({
+                      id: currentDeliverable.id,
+                      description: " ",
+                    })
+                  );
+                }
+                if (e.target.value === currentDeliverable.description) return;
                 dispatch(
-                  actions.addKeyResult({
-                    id: generateId(),
-                    deliverableId: currentDeliverable.id,
-                    title: typeof data.title === "string" ? data.title : "",
+                  actions.editDeliverable({
+                    id: currentDeliverable.id,
+                    description: e.target.value,
                   })
                 );
-              }
-            }}
-          />
-        )}
-      </div>
+              }}
+            />
+          </div>
+          <div className="mt-8 grid grid-cols-8 gap-2">
+            <div className="mt-2 w-[150px] col-span-2">
+              <Select
+                label="Status"
+                options={statusOptions}
+                value={stateDeliverable.status}
+                onChange={(value) => {
+                  dispatch(
+                    actions.editDeliverable({
+                      id: currentDeliverable.id,
+                      status: value as PmDeliverableStatusInput,
+                    })
+                  );
+                }}
+              />
+            </div>
+            <div className="col-span-3 flex justify-center items-end">
+              <button
+                className={`p-2 border border-gray-300 w-12 h-8 text-sm hover:bg-gray-100 ${isBoolean ? "bg-blue-100" : "bg-white"}`}
+                onClick={() => {
+                  setIsBoolean(true);
+                  setIsPercentage(false);
+                  setIsSP(false);
+                  dispatch(
+                    actions.setDeliverableProgress({
+                      id: currentDeliverable.id,
+                      workProgress: {
+                        completed: false,
+                      },
+                    })
+                  );
+                }}
+              >
+                -
+              </button>
+              <button
+                className={`p-2 border border-gray-300 w-12 h-8 text-sm hover:bg-gray-100 ${isPercentage ? "bg-blue-100" : "bg-white"}`}
+                onClick={() => {
+                  setIsBoolean(false);
+                  setIsPercentage(true);
+                  setIsSP(false);
+                  dispatch(
+                    actions.setDeliverableProgress({
+                      id: currentDeliverable.id,
+                      workProgress: {
+                        percentage: 0,
+                      },
+                    })
+                  );
+                }}
+              >
+                %
+              </button>
+              <button
+                className={`p-2 border border-gray-300 w-12 h-8 text-sm hover:bg-gray-100 ${isSP ? "bg-blue-100" : "bg-white"}`}
+                onClick={() => {
+                  setIsBoolean(false);
+                  setIsPercentage(false);
+                  setIsSP(true);
+                  dispatch(
+                    actions.setDeliverableProgress({
+                      id: currentDeliverable.id,
+                      workProgress: {
+                        storyPoints: {
+                          total: 0,
+                          completed: 0,
+                        },
+                      },
+                    })
+                  );
+                }}
+              >
+                SP
+              </button>
+            </div>
+            <div className="col-span-3 flex justify-end items-end mr-4">
+              {isBoolean && (
+                <Checkbox
+                  key={`checkbox-${currentDeliverable.id}-${workProgress && "completed" in workProgress ? Boolean(workProgress.completed) : false}`}
+                  label="Delivered"
+                  // defaultChecked={workProgress && "isBinary" in workProgress ? (workProgress.isBinary ?? false) : false}
+                  defaultChecked={
+                    workProgress && "completed" in workProgress
+                      ? Boolean(workProgress.completed)
+                      : false
+                  }
+                  onChange={(e: any) => {
+                    dispatch(
+                      actions.setDeliverableProgress({
+                        id: currentDeliverable.id,
+                        workProgress: {
+                          completed: e,
+                        },
+                      })
+                    );
+                  }}
+                />
+              )}
+              {isPercentage && (
+                <div className="flex flex-col">
+                  <label className="text-sm font-medium mb-1">Percentage</label>
+                  <input
+                    type="number"
+                    className="w-16 h-8 border border-gray-300 rounded px-2"
+                    defaultValue={
+                      workProgress && "value" in workProgress
+                        ? (workProgress.value ?? 0)
+                        : 0
+                    }
+                    onBlur={(e) => {
+                      dispatch(
+                        actions.setDeliverableProgress({
+                          id: currentDeliverable.id,
+                          workProgress: {
+                            percentage: parseFloat(e.target.value),
+                          },
+                        })
+                      );
+                    }}
+                  />
+                </div>
+              )}
+              {isSP && (
+                <div className="text-sm grid grid-cols-2 gap-2">
+                  <div className="col-span-1">
+                    <label>Completed</label>
+                    <input
+                      type="number"
+                      className="w-16 h-8 flex items-end"
+                      value={
+                        workProgress && "completed" in workProgress
+                          ? Number(workProgress.completed) || 0
+                          : 0
+                      }
+                      onChange={(e) => {
+                        setWorkProgress((prev: any) => {
+                          if (prev && "completed" in prev) {
+                            return {
+                              ...prev,
+                              completed: parseInt(e.target.value),
+                            };
+                          }
+                          return prev;
+                        });
+                      }}
+                      onBlur={(e) => {
+                        if (workProgress && "completed" in workProgress) {
+                          dispatch(
+                            actions.setDeliverableProgress({
+                              id: currentDeliverable.id,
+                              workProgress: {
+                                storyPoints: {
+                                  total:
+                                    workProgress && "total" in workProgress
+                                      ? workProgress.total
+                                      : 0,
+                                  completed: parseInt(e.target.value),
+                                },
+                              },
+                            })
+                          );
+                        }
+                      }}
+                    />
+                  </div>
+                  <div className="col-span-1">
+                    <label>Total</label>
+                    <input
+                      type="number"
+                      className="w-16 h-8 flex items-end"
+                      value={
+                        workProgress && "total" in workProgress
+                          ? workProgress.total
+                          : 0
+                      }
+                      onChange={(e) => {
+                        setWorkProgress((prev) => {
+                          if (prev && "total" in prev) {
+                            return {
+                              ...prev,
+                              total: parseInt(e.target.value),
+                            };
+                          }
+                          return prev;
+                        });
+                      }}
+                      onBlur={(e) => {
+                        if (workProgress && "total" in workProgress) {
+                          dispatch(
+                            actions.setDeliverableProgress({
+                              id: currentDeliverable.id,
+                              workProgress: {
+                                storyPoints: {
+                                  total: parseInt(e.target.value),
+                                  completed: workProgress?.completed || 0,
+                                },
+                              },
+                            })
+                          );
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="mt-8 grid grid-cols-2 gap-2">
+            <div className="col-span-1 gap-2 w-[300px]">
+              <Select
+                label="Budget Anchor"
+                options={projects.map((project) => ({
+                  label: project.title,
+                  value: project.id,
+                }))}
+                value={stateDeliverable.budgetAnchor?.project}
+                onChange={(value) => {
+                  dispatch(
+                    actions.setDeliverableBudgetAnchorProject({
+                      deliverableId: currentDeliverable.id,
+                      project: value as string,
+                      unit: "Hours",
+                      unitCost: 0,
+                      quantity: 0,
+                      margin: 0,
+                    })
+                  );
+                }}
+              />
+            </div>
+            <div className="flex items-center gap-2 col-span-1 align-center">
+              <span>Budget Calculator</span>
+              <Icon
+                className="hover:cursor-pointer hover:bg-gray-500"
+                name="Moved"
+                size={18}
+                onClick={() => {
+                  setBudgetCalculatorOpen(true);
+                }}
+              />
+            </div>
+          </div>
+          <div className="mt-8">
+            <label className="text-sm font-medium">Add Key Results</label>
+            {currentDeliverable && (
+              <ObjectSetTable
+                columns={columns}
+                data={currentDeliverable.keyResults || []}
+                allowRowSelection={true}
+                onAdd={(data) => {
+                  if (data.title) {
+                    dispatch(
+                      actions.addKeyResult({
+                        id: generateId(),
+                        deliverableId: currentDeliverable.id,
+                        title: typeof data.title === "string" ? data.title : "",
+                      })
+                    );
+                  }
+                }}
+              />
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

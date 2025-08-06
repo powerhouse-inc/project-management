@@ -23,7 +23,13 @@ interface ScopeOfWorkProps {
 }
 
 const ScopeOfWork = (props: ScopeOfWorkProps) => {
-  const { setSelectedRoadmapId, setRoadmapsOpen, dispatch, document, setActiveNodeId } = props;
+  const {
+    setSelectedRoadmapId,
+    setRoadmapsOpen,
+    dispatch,
+    document,
+    setActiveNodeId,
+  } = props;
   const state = document.state.global;
 
   const columns = useMemo<Array<ColumnDef<any>>>(
@@ -40,7 +46,7 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
                 name="Moved"
                 size={18}
                 onClick={() => {
-                  setActiveNodeId('roadmap.' + context.row.id);
+                  setActiveNodeId("roadmap." + context.row.id);
                 }}
               />
             </div>
@@ -150,7 +156,9 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
                 size={18}
                 className="hover:text-red-500"
                 onClick={() => {
-                  dispatch(actions.removeProject({ projectId: context.row.id }));
+                  dispatch(
+                    actions.removeProject({ projectId: context.row.id })
+                  );
                 }}
               />
             </span>
@@ -280,7 +288,9 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
           }}
         />
       </div>
-      <label className="text-sm font-medium text-gray-700 mb-2 mt-4">Roadmaps</label>
+      <label className="text-sm font-medium text-gray-700 mb-2 mt-4">
+        Roadmaps
+      </label>
       <ObjectSetTable
         columns={columns}
         data={state.roadmaps || []}
@@ -302,24 +312,26 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
           }
         }}
       />
-      <label className="text-sm font-medium text-gray-700 mb-2 mt-4">Projects</label>
+      <label className="text-sm font-medium text-gray-700 mb-2 mt-4">
+        Projects
+      </label>
       <ObjectSetTable
-          columns={projectColumns}
-          data={state.projects || []}
-          allowRowSelection={true}
-          onAdd={(data) => {
-            if (data.title) {
-              console.log("title", data.title);
-              dispatch(
-                actions.addProject({
-                  id: generateId(),
-                  code: '',
-                  title: data.title as string,
-                })
-              );
-            }
-          }}
-        />
+        columns={projectColumns}
+        data={state.projects || []}
+        allowRowSelection={true}
+        onAdd={(data) => {
+          if (data.title) {
+            console.log("title", data.title);
+            dispatch(
+              actions.addProject({
+                id: generateId(),
+                code: "",
+                title: data.title as string,
+              })
+            );
+          }
+        }}
+      />
     </div>
   );
 };
