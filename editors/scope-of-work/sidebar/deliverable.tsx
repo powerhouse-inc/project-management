@@ -55,7 +55,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
     setIsSP(false);
 
     if (currentDeliverable.workProgress) {
-      if ("isBinary" in currentDeliverable.workProgress) {
+      if ("completed" in currentDeliverable.workProgress && !("total" in currentDeliverable.workProgress)) {
         setIsBoolean(true);
       } else if ("value" in currentDeliverable.workProgress) {
         setIsPercentage(true);
@@ -264,7 +264,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                 actions.setDeliverableProgress({
                   id: currentDeliverable.id,
                   workProgress: {
-                    binary: true,
+                    completed: false,
                   },
                 })
               );
@@ -313,40 +313,43 @@ const Deliverable: React.FC<DeliverablesProps> = ({
           </button>
         </div>
         <div className="col-span-3 flex justify-end items-end mr-4">
-          {isBoolean && <Checkbox label="Delivered"
+          {isBoolean && <Checkbox 
+            key={`checkbox-${currentDeliverable.id}-${workProgress && "completed" in workProgress ? Boolean(workProgress.completed) : false}`}
+            label="Delivered"
             // defaultChecked={workProgress && "isBinary" in workProgress ? (workProgress.isBinary ?? false) : false}
-            defaultChecked={workProgress && "isBinary" in workProgress ? (workProgress.isBinary ?? false) : false}
+            defaultChecked={workProgress && "completed" in workProgress ? Boolean(workProgress.completed) : false}
             onChange={(e: any) => {
               dispatch(
                 actions.setDeliverableProgress({
                   id: currentDeliverable.id,
                   workProgress: {
-                    binary: e,
+                    completed: e,
                   },
                 })
               );
             }}
           />}
           {isPercentage && (
-            <NumberInput
-              key={`percentage-${currentDeliverable.id}${workProgress}`}
-              name="Percentage"
-              label="Percentage"
-              className="w-16"
-              value={
-                workProgress && "value" in workProgress ? workProgress.value ?? 0 : 0
-              }
-              onBlur={(e) => {
-                dispatch(
-                  actions.setDeliverableProgress({
-                    id: currentDeliverable.id,
-                    workProgress: {
-                      percentage: parseFloat(e.target.value),
-                    },
-                  })
-                );
-              }}
-            />
+            <div className="flex flex-col">
+              <label className="text-sm font-medium mb-1">Percentage</label>
+              <input
+                type="number"
+                className="w-16 h-8 border border-gray-300 rounded px-2"
+                defaultValue={
+                  workProgress && "value" in workProgress ? workProgress.value ?? 0 : 0
+                }
+                onBlur={(e) => {
+                  dispatch(
+                    actions.setDeliverableProgress({
+                      id: currentDeliverable.id,
+                      workProgress: {
+                        percentage: parseFloat(e.target.value),
+                      },
+                    })
+                  );
+                }}
+              />
+            </div>
           )}
           {isSP && (
             <div className="text-sm grid grid-cols-2 gap-2">
@@ -357,11 +360,11 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                   className="w-16 h-8 flex items-end"
                   value={
                     workProgress && "completed" in workProgress
-                      ? workProgress.completed
+                      ? Number(workProgress.completed) || 0
                       : 0
                   }
                   onChange={(e) => {
-                    setWorkProgress((prev) => {
+                    setWorkProgress((prev: any) => {
                       if (prev && "completed" in prev) {
                         return {
                           ...prev,
@@ -381,7 +384,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                           id: currentDeliverable.id,
                           workProgress: {
                             storyPoints: {
-                              total: workProgress.total ?? 0,
+                              total: workProgress && "total" in workProgress ? workProgress.total : 0,
                               completed: parseInt(e.target.value),
                             },
                           },
