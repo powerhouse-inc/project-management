@@ -208,7 +208,7 @@
                             "id": "306568c6-39d1-415b-b096-670ed99eaa04",
                             "name": "SET_DELIVERABLE_BUDGET_ANCHOR_PROJECT",
                             "description": "",
-                            "schema": "input SetDeliverableBudgetAnchorProjectInput {\n  deliverableId: ID!\n  project: OID!\n  unit: Unit\n  unitCost: Float!\n  quantity: Float!\n  margin: Float!\n}",
+                            "schema": "input SetDeliverableBudgetAnchorProjectInput {\n  deliverableId: ID!\n  project: OID!\n  unit: Unit\n  unitCost: Float\n  quantity: Float\n  margin: Float\n}",
                             "template": "",
                             "reducer": "",
                             "errors": [],

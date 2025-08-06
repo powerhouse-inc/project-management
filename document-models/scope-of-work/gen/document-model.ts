@@ -225,7 +225,7 @@ export const documentModel: DocumentModelState = {
               name: "SET_DELIVERABLE_BUDGET_ANCHOR_PROJECT",
               description: "",
               schema:
-                "input SetDeliverableBudgetAnchorProjectInput {\n  deliverableId: ID!\n  project: OID!\n  unit: Unit\n  unitCost: Float!\n  quantity: Float!\n  margin: Float!\n}",
+                "input SetDeliverableBudgetAnchorProjectInput {\n  deliverableId: ID!\n  project: OID!\n  unit: Unit\n  unitCost: Float\n  quantity: Float\n  margin: Float\n}",
               template: "",
               reducer: "",
               errors: [],

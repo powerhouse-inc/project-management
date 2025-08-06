@@ -577,11 +577,11 @@ export function SetDeliverableBudgetAnchorProjectInputSchema(): z.ZodObject<
 > {
   return z.object({
     deliverableId: z.string(),
-    margin: z.number(),
+    margin: z.number().nullish(),
     project: z.string(),
-    quantity: z.number(),
+    quantity: z.number().nullish(),
     unit: UnitSchema.nullish(),
-    unitCost: z.number(),
+    unitCost: z.number().nullish(),
   });
 }
 

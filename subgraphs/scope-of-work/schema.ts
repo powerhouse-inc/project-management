@@ -416,9 +416,9 @@ export const schema: DocumentNode = gql`
     deliverableId: ID!
     project: OID!
     unit: Unit
-    unitCost: Float!
-    quantity: Float!
-    margin: Float!
+    unitCost: Float
+    quantity: Float
+    margin: Float
   }
 
   """

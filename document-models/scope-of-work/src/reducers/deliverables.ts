@@ -77,15 +77,15 @@ export const reducer: ScopeOfWorkDeliverablesOperations = {
 
       const updatedDeliverable = {
         ...deliverable,
-        workProgress: action.input.workProgress ? 
-          (action.input.workProgress.percentage !== undefined && action.input.workProgress.percentage !== null) ? 
+        workProgress: action.input.workProgress ?
+          (action.input.workProgress.percentage !== undefined && action.input.workProgress.percentage !== null) ?
             { value: action.input.workProgress.percentage } :
-          action.input.workProgress.storyPoints ? 
-            { total: action.input.workProgress.storyPoints.total, completed: action.input.workProgress.storyPoints.completed } :
-          action.input.workProgress.completed !== undefined && action.input.workProgress.completed !== null ? 
-            { completed: action.input.workProgress.completed } :
-          deliverable.workProgress
-        : deliverable.workProgress,
+            action.input.workProgress.storyPoints ?
+              { total: action.input.workProgress.storyPoints.total, completed: action.input.workProgress.storyPoints.completed } :
+              action.input.workProgress.completed !== undefined && action.input.workProgress.completed !== null ?
+                { completed: action.input.workProgress.completed } :
+                deliverable.workProgress
+          : deliverable.workProgress,
       }
 
       state.deliverables = state.deliverables.map((deliverable) => String(deliverable.id) === String(action.input.id) ? updatedDeliverable : deliverable);
@@ -163,15 +163,8 @@ export const reducer: ScopeOfWorkDeliverablesOperations = {
         throw new Error("Deliverable not found");
       }
 
-      const budgetAnchor = {
-        project: action.input.project,
-        unit: action.input.unit || "Hours",
-        unitCost: action.input.unitCost,
-        quantity: action.input.quantity,
-        margin: action.input.margin,
-      }
+      Object.assign(foundDeliverable, { budgetAnchor: { ...foundDeliverable.budgetAnchor, ...action.input } });
 
-      foundDeliverable.budgetAnchor = budgetAnchor;
       state.deliverables = state.deliverables.map((deliverable) => String(deliverable.id) === String(action.input.deliverableId) ? foundDeliverable : deliverable);
     } catch (error) {
       console.error(error);

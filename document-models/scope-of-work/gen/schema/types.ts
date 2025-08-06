@@ -391,11 +391,11 @@ export type ScopeOfWorkStatusInput =
 
 export type SetDeliverableBudgetAnchorProjectInput = {
   deliverableId: Scalars["ID"]["input"];
-  margin: Scalars["Float"]["input"];
+  margin?: InputMaybe<Scalars["Float"]["input"]>;
   project: Scalars["OID"]["input"];
-  quantity: Scalars["Float"]["input"];
+  quantity?: InputMaybe<Scalars["Float"]["input"]>;
   unit?: InputMaybe<Unit | `${Unit}`>;
-  unitCost: Scalars["Float"]["input"];
+  unitCost?: InputMaybe<Scalars["Float"]["input"]>;
 };
 
 export type SetDeliverableProgressInput = {
