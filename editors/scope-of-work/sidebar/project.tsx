@@ -145,7 +145,7 @@ const Project: React.FC<ProjectProps> = ({
         align: "center" as ColumnAlignment,
         width: 200,
         renderCell: (value: any, context: any) => {
-          if (!project) return null;
+          if (!context.row.id) return null;
           return (
             <span className="cursor-pointer flex items-center justify-center">
               <Icon
