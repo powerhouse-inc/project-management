@@ -6,7 +6,7 @@ export const module: EditorModule<ScopeOfWorkDocument> = {
   Component: Editor,
   documentTypes: ["powerhouse/scopeofwork"],
   config: {
-    id: "editor-id",
+    id: "powerhouse/scope-of-work-editor",
     disableExternalControls: true,
     documentToolbarEnabled: true,
     showSwitchboardLink: true,
