@@ -309,7 +309,7 @@ export const documentModel: DocumentModelState = {
               name: "ADD_MILESTONE",
               description: "",
               schema:
-                "input AddMilestoneInput {\n  id: OID!\n  roadmapId:OID!\n  sequenceCode: String\n  title: String\n  description: String\n  deliveryTarget: String\n  estimatedBudgetCap: String\n}",
+                "input AddMilestoneInput {\n  id: OID!\n  roadmapId:OID!\n  sequenceCode: String\n  title: String\n  description: String\n  deliveryTarget: String\n}",
               template: "",
               reducer: "",
               errors: [],
@@ -333,7 +333,7 @@ export const documentModel: DocumentModelState = {
               name: "EDIT_MILESTONE",
               description: "",
               schema:
-                "input EditMilestoneInput {\n  id: OID!\n  roadmapId: OID!\n  sequenceCode: String\n  title: String\n  description: String\n  deliveryTarget: String\n  estimatedBudgetCap: String\n}",
+                "input EditMilestoneInput {\n  id: OID!\n  roadmapId: OID!\n  sequenceCode: String\n  title: String\n  description: String\n  deliveryTarget: String\n}",
               template: "",
               reducer: "",
               errors: [],

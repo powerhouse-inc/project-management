@@ -25,7 +25,6 @@ export const reducer: ScopeOfWorkMilestonesOperations = {
         title: action.input.title || foundMilestone.title,
         description: action.input.description || foundMilestone.description,
         deliveryTarget: action.input.deliveryTarget || foundMilestone.deliveryTarget,
-        estimatedBudgetCap: action.input.estimatedBudgetCap || foundMilestone.estimatedBudgetCap,
       };
 
       foundRoadmap.milestones = foundRoadmap.milestones.map((milestone) => String(milestone.id) === String(action.input.id) ? updatedMilestone : milestone);

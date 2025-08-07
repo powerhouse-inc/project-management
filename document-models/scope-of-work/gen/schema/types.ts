@@ -93,7 +93,6 @@ export type AddKeyResultInput = {
 export type AddMilestoneInput = {
   deliveryTarget?: InputMaybe<Scalars["String"]["input"]>;
   description?: InputMaybe<Scalars["String"]["input"]>;
-  estimatedBudgetCap?: InputMaybe<Scalars["String"]["input"]>;
   id: Scalars["OID"]["input"];
   roadmapId: Scalars["OID"]["input"];
   sequenceCode?: InputMaybe<Scalars["String"]["input"]>;
@@ -239,7 +238,6 @@ export type EditKeyResultInput = {
 export type EditMilestoneInput = {
   deliveryTarget?: InputMaybe<Scalars["String"]["input"]>;
   description?: InputMaybe<Scalars["String"]["input"]>;
-  estimatedBudgetCap?: InputMaybe<Scalars["String"]["input"]>;
   id: Scalars["OID"]["input"];
   roadmapId: Scalars["OID"]["input"];
   sequenceCode?: InputMaybe<Scalars["String"]["input"]>;

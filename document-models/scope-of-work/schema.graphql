@@ -308,7 +308,6 @@ input AddMilestoneInput {
   title: String
   description: String
   deliveryTarget: String
-  estimatedBudgetCap: String
 }
 
 input RemoveMilestoneInput {
@@ -323,7 +322,6 @@ input EditMilestoneInput {
   title: String
   description: String
   deliveryTarget: String
-  estimatedBudgetCap: String
 }
 
 input AddCoordinatorInput {

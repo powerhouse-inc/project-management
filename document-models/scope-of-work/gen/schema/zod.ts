@@ -212,7 +212,6 @@ export function AddMilestoneInputSchema(): z.ZodObject<
   return z.object({
     deliveryTarget: z.string().nullish(),
     description: z.string().nullish(),
-    estimatedBudgetCap: z.string().nullish(),
     id: z.string(),
     roadmapId: z.string(),
     sequenceCode: z.string().nullish(),
@@ -390,7 +389,6 @@ export function EditMilestoneInputSchema(): z.ZodObject<
   return z.object({
     deliveryTarget: z.string().nullish(),
     description: z.string().nullish(),
-    estimatedBudgetCap: z.string().nullish(),
     id: z.string(),
     roadmapId: z.string(),
     sequenceCode: z.string().nullish(),

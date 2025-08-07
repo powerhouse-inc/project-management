@@ -451,7 +451,6 @@ export const schema: DocumentNode = gql`
     title: String
     description: String
     deliveryTarget: String
-    estimatedBudgetCap: String
   }
   input ScopeOfWork_RemoveMilestoneInput {
     id: OID!
@@ -464,7 +463,6 @@ export const schema: DocumentNode = gql`
     title: String
     description: String
     deliveryTarget: String
-    estimatedBudgetCap: String
   }
   input ScopeOfWork_AddCoordinatorInput {
     id: ID!
