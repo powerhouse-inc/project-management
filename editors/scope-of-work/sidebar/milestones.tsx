@@ -5,16 +5,19 @@ import {
   Textarea,
   TextInput,
   ColumnAlignment,
+  Select,
 } from "@powerhousedao/document-engineering";
 import {
   Milestone,
   Roadmap,
   Deliverable,
+  DeliverableSetStatusInput,
 } from "../../../document-models/scope-of-work/index.js";
 import { actions } from "../../../document-models/scope-of-work/index.js";
 import { useEffect, useMemo, useState } from "react";
 import { generateId } from "document-model";
 import { Icon } from "@powerhousedao/design-system";
+import ProgressBar from "../components/progressBar.js";
 
 interface MilestonesProps {
   roadmaps: Roadmap[];
@@ -45,7 +48,6 @@ const Milestones: React.FC<MilestonesProps> = ({
   useEffect(() => {
     setStateMilestone(milestone);
   }, [milestone]);
-
 
   const columns = useMemo<Array<ColumnDef<any>>>(
     () => [
@@ -102,12 +104,37 @@ const Milestones: React.FC<MilestonesProps> = ({
         },
       },
       {
+        field: "workProgress",
+        title: "Progress",
+        editable: true,
+        align: "center" as ColumnAlignment,
+        width: 200,
+        renderCell: (value: any, context: any) => {
+          const progress = context.row.workProgress;
+          if (!progress) return null;
+          return <ProgressBar progress={progress} />;
+        },
+      },
+      {
+        field: "status",
+        title: "Status",
+        editable: true,
+        align: "center" as ColumnAlignment,
+        width: 200,
+        renderCell: (value: any, context: any) => {
+          return (
+            <span className="flex items-center justify-center">{value}</span>
+          );
+        },
+      },
+      {
         field: "actions",
         title: "Actions",
         editable: true,
         align: "center" as ColumnAlignment,
         width: 200,
         renderCell: (value: any, context: any) => {
+          if (!context.row.id) return null;
           return (
             <span className="cursor-pointer flex items-center justify-center">
               <Icon
@@ -115,7 +142,12 @@ const Milestones: React.FC<MilestonesProps> = ({
                 size={18}
                 className="hover:text-red-500"
                 onClick={() => {
-                  dispatch(actions.removeDeliverableInSet({ milestoneId: milestone.id, deliverableId: context.row.id }));
+                  dispatch(
+                    actions.removeDeliverableInSet({
+                      milestoneId: milestone.id,
+                      deliverableId: context.row.id,
+                    })
+                  );
                   dispatch(actions.removeDeliverable({ id: context.row.id }));
                 }}
               />
@@ -135,7 +167,12 @@ const Milestones: React.FC<MilestonesProps> = ({
             className="w-full"
             label="Code"
             value={stateMilestone.sequenceCode}
-            onChange={(e) => setStateMilestone(prevValue => ({ ...prevValue, sequenceCode: e.target.value }))}
+            onChange={(e) =>
+              setStateMilestone((prevValue) => ({
+                ...prevValue,
+                sequenceCode: e.target.value,
+              }))
+            }
             onBlur={(e) => {
               if (!roadmap) return;
               if (e.target.value === milestone.title) return;
@@ -149,12 +186,17 @@ const Milestones: React.FC<MilestonesProps> = ({
             }}
           />
         </div>
-        <div className="col-span-6">
+        <div className="col-span-4">
           <TextInput
             className="w-full"
             label="Title"
             value={stateMilestone.title}
-            onChange={(e) => setStateMilestone(prevValue => ({ ...prevValue, title: e.target.value }))}
+            onChange={(e) =>
+              setStateMilestone((prevValue) => ({
+                ...prevValue,
+                title: e.target.value,
+              }))
+            }
             onBlur={(e) => {
               if (!roadmap) return;
               if (e.target.value === milestone.title) return;
@@ -168,6 +210,28 @@ const Milestones: React.FC<MilestonesProps> = ({
             }}
           />
         </div>
+        <div className="col-span-2">
+          <Select
+            className="w-full"
+            label="Status"
+            value={stateMilestone.scope?.status}
+            options={[
+              { label: "Draft", value: "DRAFT" },
+              { label: "To Do", value: "TODO" },
+              { label: "In Progress", value: "IN_PROGRESS" },
+              { label: "Finished", value: "FINISHED" },
+              { label: "Cancelled", value: "CANCELLED" },
+            ]}
+            onChange={(value) => {
+              dispatch(
+                actions.editDeliverablesSet({
+                  milestoneId: milestone.id,
+                  status: value as DeliverableSetStatusInput,
+                })
+              );
+            }}
+          />
+        </div>
       </div>
       {/* Coordinators and Delivery Target */}
       <div className="mt-8 grid grid-cols-8 gap-2">
@@ -176,7 +240,12 @@ const Milestones: React.FC<MilestonesProps> = ({
             className="w-full"
             label="Coordinators"
             value={stateMilestone.coordinators.join(", ")}
-            onChange={(e) => setStateMilestone(prevValue => ({ ...prevValue, coordinators: e.target.value.split(", ") }))}
+            onChange={(e) =>
+              setStateMilestone((prevValue) => ({
+                ...prevValue,
+                coordinators: e.target.value.split(", "),
+              }))
+            }
             onBlur={(e) => {
               if (!roadmap) return;
               if (e.target.value === milestone.coordinators.join(", ")) return;
@@ -227,7 +296,12 @@ const Milestones: React.FC<MilestonesProps> = ({
           className="w-full"
           label="Description"
           value={stateMilestone.description}
-          onChange={(e) => setStateMilestone(prevValue => ({ ...prevValue, description: e.target.value }))}
+          onChange={(e) =>
+            setStateMilestone((prevValue) => ({
+              ...prevValue,
+              description: e.target.value,
+            }))
+          }
           onBlur={(e) => {
             if (!roadmap) return;
             if (e.target.value === milestone.description) return;

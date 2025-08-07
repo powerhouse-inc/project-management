@@ -9,47 +9,50 @@ import type { ScopeOfWorkDeliverablesSetOperations } from "../../gen/deliverable
 export const reducer: ScopeOfWorkDeliverablesSetOperations = {
   editDeliverablesSetOperation(state, action, dispatch) {
     try {
-      const foundRoadmap = state.roadmaps.find((roadmap) => {
-        return roadmap.milestones.some((milestone) => String(milestone.id) === String(action.input.milestoneId));
-      });
-      if (!foundRoadmap) {
-        throw new Error("Roadmap with milestone not found");
-      }
-
-      const foundMilestone = foundRoadmap.milestones.find((milestone) => String(milestone.id) === String(action.input.milestoneId));
-      if (!foundMilestone || !foundMilestone.scope) {
-        throw new Error("Milestone or scope not found");
-      }
-
-      const updatedScope = {
-        ...foundMilestone.scope,
-        status: action.input.status || foundMilestone.scope.status,
-        deliverablesCompleted: action.input.deliverablesCompleted || foundMilestone.scope.deliverablesCompleted,
-      };
-
-      foundMilestone.scope = updatedScope;
-      state.roadmaps = state.roadmaps.map((roadmap) => {
-        return String(roadmap.id) === String(foundRoadmap.id) ? foundRoadmap : roadmap;
-      });
-
-      // update project set
-      const project = state.projects.find((p) => p.id === action.input.projectId);
-      if (!project) {
-        throw new Error(`Project with id ${action.input.projectId} not found`);
-      }
-      const updatedProject = {
-        ...project,
-        scope: {
-          deliverables: project.scope?.deliverables || [],
-          status: action.input.status || project.scope?.status || "DRAFT" as const,
-          progress: project.scope?.progress || { value: 0 },
-          deliverablesCompleted: action.input.deliverablesCompleted || project.scope?.deliverablesCompleted || { total: 0, completed: 0 },
+      if (action.input.milestoneId && !action.input.projectId) {
+        const foundRoadmap = state.roadmaps.find((roadmap) => {
+          return roadmap.milestones.some((milestone) => String(milestone.id) === String(action.input.milestoneId));
+        });
+        if (!foundRoadmap) {
+          throw new Error("Roadmap with milestone not found");
         }
-      }
 
-      state.projects = state.projects.map((project) => {
-        return String(project.id) === String(action.input.projectId) ? updatedProject : project;
-      });
+        const foundMilestone = foundRoadmap.milestones.find((milestone) => String(milestone.id) === String(action.input.milestoneId));
+        if (!foundMilestone || !foundMilestone.scope) {
+          throw new Error("Milestone or scope not found");
+        }
+
+        const updatedScope = {
+          ...foundMilestone.scope,
+          status: action.input.status || foundMilestone.scope.status,
+          deliverablesCompleted: action.input.deliverablesCompleted || foundMilestone.scope.deliverablesCompleted,
+        };
+
+        foundMilestone.scope = updatedScope;
+        state.roadmaps = state.roadmaps.map((roadmap) => {
+          return String(roadmap.id) === String(foundRoadmap.id) ? foundRoadmap : roadmap;
+        });
+      } else if (action.input.projectId && !action.input.milestoneId) {
+
+        // update project set
+        const project = state.projects.find((p) => p.id === action.input.projectId);
+        if (!project) {
+          throw new Error(`Project with id ${action.input.projectId} not found`);
+        }
+        const updatedProject = {
+          ...project,
+          scope: {
+            deliverables: project.scope?.deliverables || [],
+            status: action.input.status || project.scope?.status || "DRAFT" as const,
+            progress: project.scope?.progress || { value: 0 },
+            deliverablesCompleted: action.input.deliverablesCompleted || project.scope?.deliverablesCompleted || { total: 0, completed: 0 },
+          }
+        }
+
+        state.projects = state.projects.map((project) => {
+          return String(project.id) === String(action.input.projectId) ? updatedProject : project;
+        });
+      }
 
     } catch (error) {
       console.error(error);
