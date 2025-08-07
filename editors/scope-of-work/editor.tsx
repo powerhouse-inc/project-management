@@ -3,7 +3,6 @@ import {
   type ScopeOfWorkDocument,
   actions,
 } from "../../document-models/scope-of-work/index.js";
-import Sidebar from "./sidebar/oldSidebar.js";
 import SidebarMenu from "./sidebar/sidebar.js";
 
 export type IProps = EditorProps<ScopeOfWorkDocument>;

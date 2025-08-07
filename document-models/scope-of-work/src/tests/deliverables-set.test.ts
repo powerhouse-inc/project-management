@@ -42,7 +42,6 @@ describe("DeliverablesSet Operations", () => {
       title: "Milestone 1",
       description: "desc",
       deliveryTarget: "2024-12-31",
-      estimatedBudgetCap: "1000",
     }));
 
     const input: EditDeliverablesSetInput = {
@@ -90,7 +89,6 @@ describe("DeliverablesSet Operations", () => {
       title: "Milestone 1",
       description: "desc",
       deliveryTarget: "2024-12-31",
-      estimatedBudgetCap: "1000",
     }));
 
     const input: AddDeliverableInSetInput = {
@@ -132,7 +130,6 @@ describe("DeliverablesSet Operations", () => {
       title: "Milestone 1",
       description: "desc",
       deliveryTarget: "2024-12-31",
-      estimatedBudgetCap: "1000",
     }));
 
     // Add a deliverable to the set first
@@ -182,7 +179,6 @@ describe("DeliverablesSet Operations", () => {
       title: "Milestone 1",
       description: "desc",
       deliveryTarget: "2024-12-31",
-      estimatedBudgetCap: "1000",
     }));
 
     const input: SetProgressInDeliverablesSetInput = {

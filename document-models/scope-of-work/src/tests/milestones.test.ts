@@ -41,7 +41,6 @@ describe("Milestones Operations", () => {
       title: "Milestone 1",
       description: "desc",
       deliveryTarget: "2024-12-31",
-      estimatedBudgetCap: "1000",
     };
 
     const updatedDocument = reducer(document, creators.addMilestone(input));
@@ -76,7 +75,6 @@ describe("Milestones Operations", () => {
       title: "Milestone 1",
       description: "desc",
       deliveryTarget: "2024-12-31",
-      estimatedBudgetCap: "1000",
     }));
 
     const input: EditMilestoneInput = {
@@ -86,7 +84,6 @@ describe("Milestones Operations", () => {
       title: "Milestone 1 Updated",
       description: "desc updated",
       deliveryTarget: "2025-01-01",
-      estimatedBudgetCap: "2000",
     };
 
     updatedDocument = reducer(updatedDocument, creators.editMilestone(input));
@@ -103,7 +100,6 @@ describe("Milestones Operations", () => {
     expect(milestone!.sequenceCode).toBe(input.sequenceCode);
     expect(milestone!.description).toBe(input.description);
     expect(milestone!.deliveryTarget).toBe(input.deliveryTarget);
-    expect(milestone!.estimatedBudgetCap).toBe(input.estimatedBudgetCap);
   });
 
   it("should handle removeMilestone operation", () => {
@@ -125,7 +121,6 @@ describe("Milestones Operations", () => {
       title: "Milestone 1",
       description: "desc",
       deliveryTarget: "2024-12-31",
-      estimatedBudgetCap: "1000",
     }));
 
     const input: RemoveMilestoneInput = {
@@ -163,7 +158,6 @@ describe("Milestones Operations", () => {
       title: "Milestone 1",
       description: "desc",
       deliveryTarget: "2024-12-31",
-      estimatedBudgetCap: "1000",
     }));
 
     const input: AddCoordinatorInput = {
@@ -203,7 +197,6 @@ describe("Milestones Operations", () => {
       title: "Milestone 1",
       description: "desc",
       deliveryTarget: "2024-12-31",
-      estimatedBudgetCap: "1000",
     }));
 
     // Add a coordinator first

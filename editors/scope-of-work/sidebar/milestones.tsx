@@ -241,25 +241,6 @@ const Milestones: React.FC<MilestonesProps> = ({
           }}
         />
       </div>
-      <div className="mt-2 w-[150px]">
-        <TextInput
-          className="w-full"
-          label="Estimated Budget Cap"
-          value={stateMilestone.estimatedBudgetCap}
-          onChange={(e) => setStateMilestone(prevValue => ({ ...prevValue, estimatedBudgetCap: e.target.value }))}
-          onBlur={(e) => {
-            if (!roadmap) return;
-            if (e.target.value === milestone.estimatedBudgetCap) return;
-            dispatch(
-              actions.editMilestone({
-                id: milestone.id,
-                roadmapId: roadmap.id,
-                estimatedBudgetCap: e.target.value,
-              })
-            );
-          }}
-        />
-      </div>
       <div className="mt-2">
         <label className="text-sm font-medium text-gray-700 mb-2">
           Deliverables

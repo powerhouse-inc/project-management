@@ -12,23 +12,9 @@ export interface ReducerError {
   errorCode: ErrorCode;
 }
 
-export class DeliverableNotFound extends Error implements ReducerError {
-  errorCode = "DeliverableNotFound" as ErrorCode;
-  constructor(message = "DeliverableNotFound") {
-    super(message);
-  }
-}
-
 export class InvalidStatusTransition extends Error implements ReducerError {
   errorCode = "InvalidStatusTransition" as ErrorCode;
   constructor(message = "InvalidStatusTransition") {
-    super(message);
-  }
-}
-
-export class MissingRequiredFields extends Error implements ReducerError {
-  errorCode = "MissingRequiredFields" as ErrorCode;
-  constructor(message = "MissingRequiredFields") {
     super(message);
   }
 }

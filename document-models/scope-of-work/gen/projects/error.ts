@@ -21,27 +21,12 @@ export class ProjectIdAlreadyExists extends Error implements ReducerError {
   }
 }
 
-export class ProjectCodeAlreadyExists extends Error implements ReducerError {
-  errorCode = "ProjectCodeAlreadyExists" as ErrorCode;
-  constructor(message = "ProjectCodeAlreadyExists") {
-    super(message);
-  }
-}
-
 export class InvalidOwnerId extends Error implements ReducerError {
   errorCode = "InvalidOwnerId" as ErrorCode;
   constructor(message = "InvalidOwnerId") {
     super(message);
   }
 }
-
-export class ProjectNotFound extends Error implements ReducerError {
-  errorCode = "ProjectNotFound" as ErrorCode;
-  constructor(message = "ProjectNotFound") {
-    super(message);
-  }
-}
-
 export class InvalidProjectStatusForUpdate
   extends Error
   implements ReducerError

@@ -100,7 +100,6 @@ export const reducer: ScopeOfWorkMilestonesOperations = {
         title: action.input.title || "",
         description: action.input.description || "",
         deliveryTarget: action.input.deliveryTarget || "",
-        estimatedBudgetCap: action.input.estimatedBudgetCap || "",
         coordinators: [],
         scope: {
           deliverables: [],
