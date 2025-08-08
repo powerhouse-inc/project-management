@@ -6,6 +6,8 @@ import {
   type EditMilestoneInput,
   type AddCoordinatorInput,
   type RemoveCoordinatorInput,
+  type AddMilestoneDeliverableInput,
+  type RemoveMilestoneDeliverableInput,
 } from "../types.js";
 import {
   type AddMilestoneAction,
@@ -13,6 +15,8 @@ import {
   type EditMilestoneAction,
   type AddCoordinatorAction,
   type RemoveCoordinatorAction,
+  type AddMilestoneDeliverableAction,
+  type RemoveMilestoneDeliverableAction,
 } from "./actions.js";
 
 export const addMilestone = (input: AddMilestoneInput) =>
@@ -57,5 +61,25 @@ export const removeCoordinator = (input: RemoveCoordinatorInput) =>
     { ...input },
     undefined,
     z.RemoveCoordinatorInputSchema,
+    "global",
+  );
+
+export const addMilestoneDeliverable = (input: AddMilestoneDeliverableInput) =>
+  createAction<AddMilestoneDeliverableAction>(
+    "ADD_MILESTONE_DELIVERABLE",
+    { ...input },
+    undefined,
+    z.AddMilestoneDeliverableInputSchema,
+    "global",
+  );
+
+export const removeMilestoneDeliverable = (
+  input: RemoveMilestoneDeliverableInput,
+) =>
+  createAction<RemoveMilestoneDeliverableAction>(
+    "REMOVE_MILESTONE_DELIVERABLE",
+    { ...input },
+    undefined,
+    z.RemoveMilestoneDeliverableInputSchema,
     "global",
   );

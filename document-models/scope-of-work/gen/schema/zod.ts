@@ -5,7 +5,9 @@ import type {
   AddDeliverableInSetInput,
   AddDeliverableInput,
   AddKeyResultInput,
+  AddMilestoneDeliverableInput,
   AddMilestoneInput,
+  AddProjectDeliverableInput,
   AddProjectInput,
   AddRoadmapInput,
   Agent,
@@ -43,7 +45,9 @@ import type {
   RemoveDeliverableInSetInput,
   RemoveDeliverableInput,
   RemoveKeyResultInput,
+  RemoveMilestoneDeliverableInput,
   RemoveMilestoneInput,
+  RemoveProjectDeliverableInput,
   RemoveProjectInput,
   RemoveRoadmapInput,
   Roadmap,
@@ -207,6 +211,16 @@ export function AddKeyResultInputSchema(): z.ZodObject<
   });
 }
 
+export function AddMilestoneDeliverableInputSchema(): z.ZodObject<
+  Properties<AddMilestoneDeliverableInput>
+> {
+  return z.object({
+    deliverableId: z.string(),
+    milestoneId: z.string(),
+    title: z.string(),
+  });
+}
+
 export function AddMilestoneInputSchema(): z.ZodObject<
   Properties<AddMilestoneInput>
 > {
@@ -217,6 +231,16 @@ export function AddMilestoneInputSchema(): z.ZodObject<
     roadmapId: z.string(),
     sequenceCode: z.string().nullish(),
     title: z.string().nullish(),
+  });
+}
+
+export function AddProjectDeliverableInputSchema(): z.ZodObject<
+  Properties<AddProjectDeliverableInput>
+> {
+  return z.object({
+    deliverableId: z.string(),
+    projectId: z.string(),
+    title: z.string(),
   });
 }
 
@@ -521,12 +545,30 @@ export function RemoveKeyResultInputSchema(): z.ZodObject<
   });
 }
 
+export function RemoveMilestoneDeliverableInputSchema(): z.ZodObject<
+  Properties<RemoveMilestoneDeliverableInput>
+> {
+  return z.object({
+    deliverableId: z.string(),
+    milestoneId: z.string(),
+  });
+}
+
 export function RemoveMilestoneInputSchema(): z.ZodObject<
   Properties<RemoveMilestoneInput>
 > {
   return z.object({
     id: z.string(),
     roadmapId: z.string(),
+  });
+}
+
+export function RemoveProjectDeliverableInputSchema(): z.ZodObject<
+  Properties<RemoveProjectDeliverableInput>
+> {
+  return z.object({
+    deliverableId: z.string(),
+    projectId: z.string(),
   });
 }
 

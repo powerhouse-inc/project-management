@@ -119,6 +119,62 @@ export const reducer: ScopeOfWorkProjectsOperations = {
       console.error(error);
     }
   },
+  addProjectDeliverableOperation(state, action, dispatch) {
+    try {
+
+      // add deliverable to deliverables 
+      const newDeliverable: Deliverable = {
+        id: action.input.deliverableId,
+        owner: '',
+        title: action.input.title,
+        code: '',
+        description: '',
+        status: 'DRAFT',
+        workProgress: {
+          value: 0,
+        },
+        keyResults: [],
+        budgetAnchor: {
+          project: action.input.projectId,
+          unit: 'Hours',
+          unitCost: 0,
+          quantity: 0,
+          margin: 0,
+        },
+      }
+
+      state.deliverables.push(newDeliverable);
+
+      const project = state.projects.find((p) => p.id === action.input.projectId);
+      if (!project) {
+        throw new Error("Project not found");
+      }
+      if (!project.scope) {
+        throw new Error("Project deliverable set not found");
+      }
+      project.scope.deliverables.push(newDeliverable.id);
+
+    } catch (error) {
+      console.error(error);
+    }
+  },
+  removeProjectDeliverableOperation(state, action, dispatch) {
+    try {
+      const project = state.projects.find((p) => p.id === action.input.projectId);
+      if (!project) {
+        throw new Error("Project not found");
+      }
+      if (!project.scope) {
+        throw new Error("Project deliverable set not found");
+      }
+      project.scope.deliverables = project.scope.deliverables.filter((d) => d !== action.input.deliverableId);
+      state.deliverables = state.deliverables.filter((d) => d.id !== action.input.deliverableId);
+      applyInvariants(state, ["budget", "margin"]);
+      
+    } catch (error) {
+      console.error(error);
+    }
+  },
 };
 
 

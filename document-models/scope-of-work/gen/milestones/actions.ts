@@ -5,6 +5,8 @@ import type {
   EditMilestoneInput,
   AddCoordinatorInput,
   RemoveCoordinatorInput,
+  AddMilestoneDeliverableInput,
+  RemoveMilestoneDeliverableInput,
 } from "../types.js";
 
 export type AddMilestoneAction = BaseAction<
@@ -32,10 +34,22 @@ export type RemoveCoordinatorAction = BaseAction<
   RemoveCoordinatorInput,
   "global"
 >;
+export type AddMilestoneDeliverableAction = BaseAction<
+  "ADD_MILESTONE_DELIVERABLE",
+  AddMilestoneDeliverableInput,
+  "global"
+>;
+export type RemoveMilestoneDeliverableAction = BaseAction<
+  "REMOVE_MILESTONE_DELIVERABLE",
+  RemoveMilestoneDeliverableInput,
+  "global"
+>;
 
 export type ScopeOfWorkMilestonesAction =
   | AddMilestoneAction
   | RemoveMilestoneAction
   | EditMilestoneAction
   | AddCoordinatorAction
-  | RemoveCoordinatorAction;
+  | RemoveCoordinatorAction
+  | AddMilestoneDeliverableAction
+  | RemoveMilestoneDeliverableAction;

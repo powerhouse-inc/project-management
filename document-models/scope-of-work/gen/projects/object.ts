@@ -6,6 +6,8 @@ import {
   type RemoveProjectInput,
   type SetProjectMarginInput,
   type SetProjectTotalBudgetInput,
+  type AddProjectDeliverableInput,
+  type RemoveProjectDeliverableInput,
   type ScopeOfWorkState,
   type ScopeOfWorkLocalState,
 } from "../types.js";
@@ -16,6 +18,8 @@ import {
   removeProject,
   setProjectMargin,
   setProjectTotalBudget,
+  addProjectDeliverable,
+  removeProjectDeliverable,
 } from "./creators.js";
 import { type ScopeOfWorkAction } from "../actions.js";
 
@@ -46,5 +50,13 @@ export default class ScopeOfWork_Projects extends BaseDocumentClass<
 
   public setProjectTotalBudget(input: SetProjectTotalBudgetInput) {
     return this.dispatch(setProjectTotalBudget(input));
+  }
+
+  public addProjectDeliverable(input: AddProjectDeliverableInput) {
+    return this.dispatch(addProjectDeliverable(input));
+  }
+
+  public removeProjectDeliverable(input: RemoveProjectDeliverableInput) {
+    return this.dispatch(removeProjectDeliverable(input));
   }
 }

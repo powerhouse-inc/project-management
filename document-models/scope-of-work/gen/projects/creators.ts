@@ -7,6 +7,8 @@ import {
   type RemoveProjectInput,
   type SetProjectMarginInput,
   type SetProjectTotalBudgetInput,
+  type AddProjectDeliverableInput,
+  type RemoveProjectDeliverableInput,
 } from "../types.js";
 import {
   type AddProjectAction,
@@ -15,6 +17,8 @@ import {
   type RemoveProjectAction,
   type SetProjectMarginAction,
   type SetProjectTotalBudgetAction,
+  type AddProjectDeliverableAction,
+  type RemoveProjectDeliverableAction,
 } from "./actions.js";
 
 export const addProject = (input: AddProjectInput) =>
@@ -68,5 +72,25 @@ export const setProjectTotalBudget = (input: SetProjectTotalBudgetInput) =>
     { ...input },
     undefined,
     z.SetProjectTotalBudgetInputSchema,
+    "global",
+  );
+
+export const addProjectDeliverable = (input: AddProjectDeliverableInput) =>
+  createAction<AddProjectDeliverableAction>(
+    "ADD_PROJECT_DELIVERABLE",
+    { ...input },
+    undefined,
+    z.AddProjectDeliverableInputSchema,
+    "global",
+  );
+
+export const removeProjectDeliverable = (
+  input: RemoveProjectDeliverableInput,
+) =>
+  createAction<RemoveProjectDeliverableAction>(
+    "REMOVE_PROJECT_DELIVERABLE",
+    { ...input },
+    undefined,
+    z.RemoveProjectDeliverableInputSchema,
     "global",
   );

@@ -5,6 +5,8 @@ import {
   type EditMilestoneAction,
   type AddCoordinatorAction,
   type RemoveCoordinatorAction,
+  type AddMilestoneDeliverableAction,
+  type RemoveMilestoneDeliverableAction,
 } from "./actions.js";
 import { type ScopeOfWorkState } from "../types.js";
 
@@ -32,6 +34,16 @@ export interface ScopeOfWorkMilestonesOperations {
   removeCoordinatorOperation: (
     state: ScopeOfWorkState,
     action: RemoveCoordinatorAction,
+    dispatch?: SignalDispatch,
+  ) => void;
+  addMilestoneDeliverableOperation: (
+    state: ScopeOfWorkState,
+    action: AddMilestoneDeliverableAction,
+    dispatch?: SignalDispatch,
+  ) => void;
+  removeMilestoneDeliverableOperation: (
+    state: ScopeOfWorkState,
+    action: RemoveMilestoneDeliverableAction,
     dispatch?: SignalDispatch,
   ) => void;
 }

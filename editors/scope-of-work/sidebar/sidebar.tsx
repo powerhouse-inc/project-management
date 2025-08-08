@@ -8,7 +8,7 @@ import {
 import { ReactElement, useState, useEffect, useMemo } from "react";
 import ScopeOfWork from "./scopeOfWork.js";
 import Roadmap from "./roadmap.js";
-import Milestones from "./milestones.js";
+import Milestone from "./milestone.js";
 import Deliverable from "./deliverable.js";
 import Projects from "./projects.js";
 import Project from "./project.js";
@@ -163,7 +163,7 @@ export default function SidebarMenu(props: any) {
         );
       case "milestone":
         return (
-          <Milestones
+          <Milestone
             dispatch={dispatch}
             milestones={milestones.filter((m: any) => m.id === id)}
             roadmaps={roadmaps}

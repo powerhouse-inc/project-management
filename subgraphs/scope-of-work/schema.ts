@@ -271,6 +271,16 @@ export const schema: DocumentNode = gql`
       docId: PHID
       input: ScopeOfWork_RemoveCoordinatorInput
     ): Int
+    ScopeOfWork_addMilestoneDeliverable(
+      driveId: String
+      docId: PHID
+      input: ScopeOfWork_AddMilestoneDeliverableInput
+    ): Int
+    ScopeOfWork_removeMilestoneDeliverable(
+      driveId: String
+      docId: PHID
+      input: ScopeOfWork_RemoveMilestoneDeliverableInput
+    ): Int
     ScopeOfWork_editDeliverablesSet(
       driveId: String
       docId: PHID
@@ -330,6 +340,16 @@ export const schema: DocumentNode = gql`
       driveId: String
       docId: PHID
       input: ScopeOfWork_SetProjectTotalBudgetInput
+    ): Int
+    ScopeOfWork_addProjectDeliverable(
+      driveId: String
+      docId: PHID
+      input: ScopeOfWork_AddProjectDeliverableInput
+    ): Int
+    ScopeOfWork_removeProjectDeliverable(
+      driveId: String
+      docId: PHID
+      input: ScopeOfWork_RemoveProjectDeliverableInput
     ): Int
   }
 
@@ -478,6 +498,15 @@ export const schema: DocumentNode = gql`
     id: ID!
     milestoneId: OID! # Coordinator can potentially be coordinating multiple milestones/roadmaps.
   }
+  input ScopeOfWork_AddMilestoneDeliverableInput {
+    milestoneId: OID!
+    deliverableId: OID!
+    title: String!
+  }
+  input ScopeOfWork_RemoveMilestoneDeliverableInput {
+    milestoneId: OID!
+    deliverableId: OID!
+  }
 
   """
   Module: DeliverablesSet
@@ -592,5 +621,14 @@ export const schema: DocumentNode = gql`
   input ScopeOfWork_SetProjectTotalBudgetInput {
     projectId: OID!
     totalBudget: Float!
+  }
+  input ScopeOfWork_AddProjectDeliverableInput {
+    projectId: OID!
+    deliverableId: ID!
+    title: String!
+  }
+  input ScopeOfWork_RemoveProjectDeliverableInput {
+    projectId: OID!
+    deliverableId: OID!
   }
 `;

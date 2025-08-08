@@ -9,7 +9,7 @@ import {
   NumberInput,
 } from "@powerhousedao/document-engineering";
 import {
-  Milestone,
+  type Milestone,
   Roadmap,
   Deliverable,
   DeliverableSetStatusInput,
@@ -28,7 +28,7 @@ interface MilestonesProps {
   setActiveNodeId: (id: string) => void;
 }
 
-const Milestones: React.FC<MilestonesProps> = ({
+const Milestone: React.FC<MilestonesProps> = ({
   milestones,
   roadmaps,
   dispatch,
@@ -144,12 +144,11 @@ const Milestones: React.FC<MilestonesProps> = ({
                 className="hover:text-red-500"
                 onClick={() => {
                   dispatch(
-                    actions.removeDeliverableInSet({
+                    actions.removeMilestoneDeliverable({
                       milestoneId: milestone.id,
                       deliverableId: context.row.id,
                     })
                   );
-                  dispatch(actions.removeDeliverable({ id: context.row.id }));
                 }}
               />
             </span>
@@ -335,33 +334,10 @@ const Milestones: React.FC<MilestonesProps> = ({
               if (!roadmap) return;
               const deliverableId = generateId();
               dispatch(
-                actions.addDeliverable({
-                  id: deliverableId,
-                  title:
-                    typeof data.title === "string" ? data.title : undefined,
-                })
-              );
-              dispatch(
-                actions.addDeliverableInSet({
+                actions.addMilestoneDeliverable({
                   milestoneId: milestone.id,
                   deliverableId: deliverableId,
-                })
-              );
-            }
-            if (data.owner) {
-              if (!roadmap) return;
-              const deliverableId = generateId();
-              dispatch(
-                actions.addDeliverable({
-                  id: deliverableId,
-                  owner:
-                    typeof data.owner === "string" ? data.owner : undefined,
-                })
-              );
-              dispatch(
-                actions.addDeliverableInSet({
-                  milestoneId: milestone.id,
-                  deliverableId: deliverableId,
+                  title: data.title as string,
                 })
               );
             }
@@ -372,4 +348,4 @@ const Milestones: React.FC<MilestonesProps> = ({
   );
 };
 
-export default Milestones;
+export default Milestone;

@@ -322,6 +322,34 @@ export const getResolvers = (subgraph: Subgraph): Record<string, any> => {
         return (doc.header.revision["global"] ?? 0) + 1;
       },
 
+      ScopeOfWork_addMilestoneDeliverable: async (_: any, args: any) => {
+        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
+        const docId: string = args.docId || "";
+        const doc = await reactor.getDocument(driveId, docId);
+
+        await reactor.addAction(
+          driveId,
+          docId,
+          actions.addMilestoneDeliverable({ ...args.input }),
+        );
+
+        return (doc.header.revision["global"] ?? 0) + 1;
+      },
+
+      ScopeOfWork_removeMilestoneDeliverable: async (_: any, args: any) => {
+        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
+        const docId: string = args.docId || "";
+        const doc = await reactor.getDocument(driveId, docId);
+
+        await reactor.addAction(
+          driveId,
+          docId,
+          actions.removeMilestoneDeliverable({ ...args.input }),
+        );
+
+        return (doc.header.revision["global"] ?? 0) + 1;
+      },
+
       ScopeOfWork_editDeliverablesSet: async (_: any, args: any) => {
         const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
         const docId: string = args.docId || "";
@@ -485,6 +513,34 @@ export const getResolvers = (subgraph: Subgraph): Record<string, any> => {
           driveId,
           docId,
           actions.setProjectTotalBudget({ ...args.input }),
+        );
+
+        return (doc.header.revision["global"] ?? 0) + 1;
+      },
+
+      ScopeOfWork_addProjectDeliverable: async (_: any, args: any) => {
+        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
+        const docId: string = args.docId || "";
+        const doc = await reactor.getDocument(driveId, docId);
+
+        await reactor.addAction(
+          driveId,
+          docId,
+          actions.addProjectDeliverable({ ...args.input }),
+        );
+
+        return (doc.header.revision["global"] ?? 0) + 1;
+      },
+
+      ScopeOfWork_removeProjectDeliverable: async (_: any, args: any) => {
+        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
+        const docId: string = args.docId || "";
+        const doc = await reactor.getDocument(driveId, docId);
+
+        await reactor.addAction(
+          driveId,
+          docId,
+          actions.removeProjectDeliverable({ ...args.input }),
         );
 
         return (doc.header.revision["global"] ?? 0) + 1;

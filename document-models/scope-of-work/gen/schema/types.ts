@@ -90,6 +90,12 @@ export type AddKeyResultInput = {
   title: Scalars["String"]["input"];
 };
 
+export type AddMilestoneDeliverableInput = {
+  deliverableId: Scalars["OID"]["input"];
+  milestoneId: Scalars["OID"]["input"];
+  title: Scalars["String"]["input"];
+};
+
 export type AddMilestoneInput = {
   deliveryTarget?: InputMaybe<Scalars["String"]["input"]>;
   description?: InputMaybe<Scalars["String"]["input"]>;
@@ -97,6 +103,12 @@ export type AddMilestoneInput = {
   roadmapId: Scalars["OID"]["input"];
   sequenceCode?: InputMaybe<Scalars["String"]["input"]>;
   title?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type AddProjectDeliverableInput = {
+  deliverableId: Scalars["ID"]["input"];
+  projectId: Scalars["OID"]["input"];
+  title: Scalars["String"]["input"];
 };
 
 export type AddProjectInput = {
@@ -339,9 +351,19 @@ export type RemoveKeyResultInput = {
   id: Scalars["OID"]["input"];
 };
 
+export type RemoveMilestoneDeliverableInput = {
+  deliverableId: Scalars["OID"]["input"];
+  milestoneId: Scalars["OID"]["input"];
+};
+
 export type RemoveMilestoneInput = {
   id: Scalars["OID"]["input"];
   roadmapId: Scalars["OID"]["input"];
+};
+
+export type RemoveProjectDeliverableInput = {
+  deliverableId: Scalars["OID"]["input"];
+  projectId: Scalars["OID"]["input"];
 };
 
 export type RemoveProjectInput = {

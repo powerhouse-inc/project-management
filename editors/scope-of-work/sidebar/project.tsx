@@ -157,12 +157,11 @@ const Project: React.FC<ProjectProps> = ({
                 className="hover:text-red-500"
                 onClick={() => {
                   dispatch(
-                    actions.removeDeliverableInSet({
+                    actions.removeProjectDeliverable({
                       projectId: project!.id,
                       deliverableId: context.row.id,
                     })
                   );
-                  dispatch(actions.removeDeliverable({ id: context.row.id }));
                 }}
               />
             </span>
@@ -392,33 +391,10 @@ const Project: React.FC<ProjectProps> = ({
                   if (!project) return;
                   const deliverableId = generateId();
                   dispatch(
-                    actions.addDeliverable({
-                      id: deliverableId,
-                      title:
-                        typeof data.title === "string" ? data.title : undefined,
-                    })
-                  );
-                  dispatch(
-                    actions.addDeliverableInSet({
+                    actions.addProjectDeliverable({
                       projectId: project.id,
                       deliverableId: deliverableId,
-                    })
-                  );
-                }
-                if (data.owner) {
-                  if (!project) return;
-                  const deliverableId = generateId();
-                  dispatch(
-                    actions.addDeliverable({
-                      id: deliverableId,
-                      owner:
-                        typeof data.owner === "string" ? data.owner : undefined,
-                    })
-                  );
-                  dispatch(
-                    actions.addDeliverableInSet({
-                      projectId: project.id,
-                      deliverableId: deliverableId,
+                      title: data.title as string,
                     })
                   );
                 }

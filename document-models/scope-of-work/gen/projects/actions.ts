@@ -6,6 +6,8 @@ import type {
   RemoveProjectInput,
   SetProjectMarginInput,
   SetProjectTotalBudgetInput,
+  AddProjectDeliverableInput,
+  RemoveProjectDeliverableInput,
 } from "../types.js";
 
 export type AddProjectAction = BaseAction<
@@ -38,6 +40,16 @@ export type SetProjectTotalBudgetAction = BaseAction<
   SetProjectTotalBudgetInput,
   "global"
 >;
+export type AddProjectDeliverableAction = BaseAction<
+  "ADD_PROJECT_DELIVERABLE",
+  AddProjectDeliverableInput,
+  "global"
+>;
+export type RemoveProjectDeliverableAction = BaseAction<
+  "REMOVE_PROJECT_DELIVERABLE",
+  RemoveProjectDeliverableInput,
+  "global"
+>;
 
 export type ScopeOfWorkProjectsAction =
   | AddProjectAction
@@ -45,4 +57,6 @@ export type ScopeOfWorkProjectsAction =
   | UpdateProjectOwnerAction
   | RemoveProjectAction
   | SetProjectMarginAction
-  | SetProjectTotalBudgetAction;
+  | SetProjectTotalBudgetAction
+  | AddProjectDeliverableAction
+  | RemoveProjectDeliverableAction;

@@ -6,6 +6,8 @@ import {
   type RemoveProjectAction,
   type SetProjectMarginAction,
   type SetProjectTotalBudgetAction,
+  type AddProjectDeliverableAction,
+  type RemoveProjectDeliverableAction,
 } from "./actions.js";
 import { type ScopeOfWorkState } from "../types.js";
 
@@ -38,6 +40,16 @@ export interface ScopeOfWorkProjectsOperations {
   setProjectTotalBudgetOperation: (
     state: ScopeOfWorkState,
     action: SetProjectTotalBudgetAction,
+    dispatch?: SignalDispatch,
+  ) => void;
+  addProjectDeliverableOperation: (
+    state: ScopeOfWorkState,
+    action: AddProjectDeliverableAction,
+    dispatch?: SignalDispatch,
+  ) => void;
+  removeProjectDeliverableOperation: (
+    state: ScopeOfWorkState,
+    action: RemoveProjectDeliverableAction,
     dispatch?: SignalDispatch,
   ) => void;
 }

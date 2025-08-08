@@ -5,6 +5,8 @@ import {
   type EditMilestoneInput,
   type AddCoordinatorInput,
   type RemoveCoordinatorInput,
+  type AddMilestoneDeliverableInput,
+  type RemoveMilestoneDeliverableInput,
   type ScopeOfWorkState,
   type ScopeOfWorkLocalState,
 } from "../types.js";
@@ -14,6 +16,8 @@ import {
   editMilestone,
   addCoordinator,
   removeCoordinator,
+  addMilestoneDeliverable,
+  removeMilestoneDeliverable,
 } from "./creators.js";
 import { type ScopeOfWorkAction } from "../actions.js";
 
@@ -40,5 +44,13 @@ export default class ScopeOfWork_Milestones extends BaseDocumentClass<
 
   public removeCoordinator(input: RemoveCoordinatorInput) {
     return this.dispatch(removeCoordinator(input));
+  }
+
+  public addMilestoneDeliverable(input: AddMilestoneDeliverableInput) {
+    return this.dispatch(addMilestoneDeliverable(input));
+  }
+
+  public removeMilestoneDeliverable(input: RemoveMilestoneDeliverableInput) {
+    return this.dispatch(removeMilestoneDeliverable(input));
   }
 }

@@ -365,6 +365,30 @@ export const documentModel: DocumentModelState = {
               examples: [],
               scope: "global",
             },
+            {
+              id: "afc100a7-836d-4396-98b5-c5a045fe626e",
+              name: "ADD_MILESTONE_DELIVERABLE",
+              description: "",
+              schema:
+                "input AddMilestoneDeliverableInput {\n  milestoneId: OID!\n  deliverableId: OID!\n  title: String!\n}",
+              template: "",
+              reducer: "",
+              errors: [],
+              examples: [],
+              scope: "global",
+            },
+            {
+              id: "532a4d3d-389c-4d58-a933-4bbf5604b089",
+              name: "REMOVE_MILESTONE_DELIVERABLE",
+              description: "",
+              schema:
+                "input RemoveMilestoneDeliverableInput {\n  milestoneId: OID!\n  deliverableId: OID!\n}",
+              template: "",
+              reducer: "",
+              errors: [],
+              examples: [],
+              scope: "global",
+            },
           ],
         },
         {
@@ -598,6 +622,30 @@ export const documentModel: DocumentModelState = {
               description: "",
               schema:
                 "input SetProjectTotalBudgetInput {\n  projectId: OID!\n  totalBudget: Float!\n}",
+              template: "",
+              reducer: "",
+              errors: [],
+              examples: [],
+              scope: "global",
+            },
+            {
+              id: "abf9ff5b-8339-4a94-92b1-96d843ad5c96",
+              name: "ADD_PROJECT_DELIVERABLE",
+              description: "",
+              schema:
+                "input AddProjectDeliverableInput {\n  projectId: OID!\n  deliverableId: ID!\n  title: String!\n}",
+              template: "",
+              reducer: "",
+              errors: [],
+              examples: [],
+              scope: "global",
+            },
+            {
+              id: "89341293-cdf9-4f88-b085-604a37444be7",
+              name: "REMOVE_PROJECT_DELIVERABLE",
+              description: "",
+              schema:
+                "input RemoveProjectDeliverableInput {\n  projectId: OID!\n  deliverableId: OID!\n}",
               template: "",
               reducer: "",
               errors: [],

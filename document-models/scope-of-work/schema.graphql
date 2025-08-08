@@ -335,6 +335,17 @@ input RemoveCoordinatorInput {
   milestoneId: OID! # Coordinator can potentially be coordinating multiple milestones/roadmaps. 
 }
 
+input AddMilestoneDeliverableInput {
+  milestoneId: OID!
+  deliverableId: OID!
+  title: String!
+}
+
+input RemoveMilestoneDeliverableInput {
+  milestoneId: OID!
+  deliverableId: OID!
+}
+
 # deliverables_set
 
 input EditDeliverablesSetInput {
@@ -455,4 +466,15 @@ input SetProjectMarginInput {
 input SetProjectTotalBudgetInput {
   projectId: OID!
   totalBudget: Float!
+}
+
+input AddProjectDeliverableInput {
+  projectId: OID!
+  deliverableId: ID!
+  title: String!
+}
+
+input RemoveProjectDeliverableInput {
+  projectId: OID!
+  deliverableId: OID!
 }

@@ -176,6 +176,24 @@ const stateReducer: StateReducer<ScopeOfWorkDocument> = (
       );
       break;
 
+    case "ADD_MILESTONE_DELIVERABLE":
+      z.AddMilestoneDeliverableInputSchema().parse(action.input);
+      MilestonesReducer.addMilestoneDeliverableOperation(
+        state[action.scope],
+        action,
+        dispatch,
+      );
+      break;
+
+    case "REMOVE_MILESTONE_DELIVERABLE":
+      z.RemoveMilestoneDeliverableInputSchema().parse(action.input);
+      MilestonesReducer.removeMilestoneDeliverableOperation(
+        state[action.scope],
+        action,
+        dispatch,
+      );
+      break;
+
     case "EDIT_DELIVERABLES_SET":
       z.EditDeliverablesSetInputSchema().parse(action.input);
       DeliverablesSetReducer.editDeliverablesSetOperation(
@@ -266,6 +284,24 @@ const stateReducer: StateReducer<ScopeOfWorkDocument> = (
     case "SET_PROJECT_TOTAL_BUDGET":
       z.SetProjectTotalBudgetInputSchema().parse(action.input);
       ProjectsReducer.setProjectTotalBudgetOperation(
+        state[action.scope],
+        action,
+        dispatch,
+      );
+      break;
+
+    case "ADD_PROJECT_DELIVERABLE":
+      z.AddProjectDeliverableInputSchema().parse(action.input);
+      ProjectsReducer.addProjectDeliverableOperation(
+        state[action.scope],
+        action,
+        dispatch,
+      );
+      break;
+
+    case "REMOVE_PROJECT_DELIVERABLE":
+      z.RemoveProjectDeliverableInputSchema().parse(action.input);
+      ProjectsReducer.removeProjectDeliverableOperation(
         state[action.scope],
         action,
         dispatch,
