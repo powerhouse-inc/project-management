@@ -37,7 +37,7 @@ const BudgetCalculator = ({
       (deliverable) => deliverable.budgetAnchor?.margin
     );
     if (margin && margin.every((m) => m === margin[0])) {
-      setMargin(margin[0] ?? 0);
+      setMargin((margin[0] ?? 0));
     } else {
       setMargin(0);
     }
@@ -182,11 +182,11 @@ const BudgetCalculator = ({
           {richDeliverables?.reduce(
             (acc, deliverable) => acc + deliverable.subtotal,
             0
-          ) || 0}
+          ).toFixed(2) || 0}
         </div>
       </div>
       <div className="flex justify-end items-center gap-4">
-        <span>Project Margin:</span>
+        <span>Project Margin (%):</span>
         <div className="w-[100px] flex justify-end mt-2">
           <input
             type="number"
@@ -197,19 +197,10 @@ const BudgetCalculator = ({
             }}
             onBlur={() => {
               if (margin) {
-                deliverables?.forEach((deliverable) => {
-                  dispatch(
-                    actions.setDeliverableBudgetAnchorProject({
-                      deliverableId: deliverable.id,
-                      project: project!.id,
-                      margin: margin,
-                    })
-                  );
-                });
                 dispatch(
-                  actions.updateProject({
-                    id: project!.id,
-                    budget: totalBudget,
+                  actions.setProjectMargin({
+                    projectId: project!.id,
+                    margin: margin,
                   })
                 );
               }
@@ -220,7 +211,7 @@ const BudgetCalculator = ({
       <div className="flex justify-end items-center gap-4">
         <span>Total Budget:</span>
         <div className="w-[100px] h-8 border border-gray-300 rounded px-2 flex items-center justify-center">
-          {totalBudget}
+          {totalBudget.toFixed(2)}
         </div>
       </div>
     </div>

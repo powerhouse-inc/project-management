@@ -61,7 +61,7 @@ type Deliverable {
 }
 
 type BudgetAnchorProject {
-  project: OID!
+  project: OID
   unit: Unit
   unitCost: Float!
   quantity: Float!
@@ -154,6 +154,7 @@ type Milestone {
   deliveryTarget: String!
   scope: DeliverablesSet
   coordinators: [ID!]!
+  budget: Float
 }
 
 type DeliverablesSet {
@@ -271,7 +272,7 @@ input EditKeyResultInput {
 
 input SetDeliverableBudgetAnchorProjectInput {
   deliverableId: ID!
-  project: OID!
+  project: OID
   unit: Unit
   unitCost: Float
   quantity: Float
@@ -368,13 +369,6 @@ input RemoveDeliverableInSetInput {
   deliverableId: OID!
 }
 
-input SetProgressInDeliverablesSetInput {
-  milestoneId: ID!
-  projectId: ID
-  progress: ProgressInput
-}
-
-
 # agents
 
 input AddAgentInput {
@@ -451,4 +445,14 @@ input UpdateProjectOwnerInput {
 
 input RemoveProjectInput {
   projectId: ID!
+}
+
+input SetProjectMarginInput {
+  projectId: OID!
+  margin: Float!
+}
+
+input SetProjectTotalBudgetInput {
+  projectId: OID!
+  totalBudget: Float!
 }

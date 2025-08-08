@@ -6,6 +6,7 @@ import {
   TextInput,
   ColumnAlignment,
   Select,
+  NumberInput,
 } from "@powerhousedao/document-engineering";
 import {
   Milestone,
@@ -314,6 +315,12 @@ const Milestones: React.FC<MilestonesProps> = ({
             );
           }}
         />
+      </div>
+      <div>
+        <label>Budget</label>
+        <p className="text-sm rounded-md border border-gray-300 p-2 bg-gray-100 w-32 text-right">
+          {milestone.budget?.toFixed(2) || 0}
+        </p>
       </div>
       <div className="mt-2">
         <label className="text-sm font-medium text-gray-700 mb-2">

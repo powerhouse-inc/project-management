@@ -52,7 +52,7 @@ export const schema: DocumentNode = gql`
   }
 
   type BudgetAnchorProject {
-    project: OID!
+    project: OID
     unit: Unit
     unitCost: Float!
     quantity: Float!
@@ -145,6 +145,7 @@ export const schema: DocumentNode = gql`
     deliveryTarget: String!
     scope: DeliverablesSet
     coordinators: [ID!]!
+    budget: Float
   }
 
   type DeliverablesSet {
@@ -285,11 +286,6 @@ export const schema: DocumentNode = gql`
       docId: PHID
       input: ScopeOfWork_RemoveDeliverableInSetInput
     ): Int
-    ScopeOfWork_setProgressInDeliverablesSet(
-      driveId: String
-      docId: PHID
-      input: ScopeOfWork_SetProgressInDeliverablesSetInput
-    ): Int
     ScopeOfWork_addAgent(
       driveId: String
       docId: PHID
@@ -324,6 +320,16 @@ export const schema: DocumentNode = gql`
       driveId: String
       docId: PHID
       input: ScopeOfWork_RemoveProjectInput
+    ): Int
+    ScopeOfWork_setProjectMargin(
+      driveId: String
+      docId: PHID
+      input: ScopeOfWork_SetProjectMarginInput
+    ): Int
+    ScopeOfWork_setProjectTotalBudget(
+      driveId: String
+      docId: PHID
+      input: ScopeOfWork_SetProjectTotalBudgetInput
     ): Int
   }
 
@@ -414,7 +420,7 @@ export const schema: DocumentNode = gql`
   }
   input ScopeOfWork_SetDeliverableBudgetAnchorProjectInput {
     deliverableId: ID!
-    project: OID!
+    project: OID
     unit: Unit
     unitCost: Float
     quantity: Float
@@ -505,11 +511,6 @@ export const schema: DocumentNode = gql`
     projectId: ID
     deliverableId: OID!
   }
-  input ScopeOfWork_SetProgressInDeliverablesSetInput {
-    milestoneId: ID!
-    projectId: ID
-    progress: ProgressInput
-  }
 
   """
   Module: Agents
@@ -583,5 +584,13 @@ export const schema: DocumentNode = gql`
   }
   input ScopeOfWork_RemoveProjectInput {
     projectId: ID!
+  }
+  input ScopeOfWork_SetProjectMarginInput {
+    projectId: OID!
+    margin: Float!
+  }
+  input ScopeOfWork_SetProjectTotalBudgetInput {
+    projectId: OID!
+    totalBudget: Float!
   }
 `;

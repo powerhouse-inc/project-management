@@ -203,15 +203,6 @@ const stateReducer: StateReducer<ScopeOfWorkDocument> = (
       );
       break;
 
-    case "SET_PROGRESS_IN_DELIVERABLES_SET":
-      z.SetProgressInDeliverablesSetInputSchema().parse(action.input);
-      DeliverablesSetReducer.setProgressInDeliverablesSetOperation(
-        state[action.scope],
-        action,
-        dispatch,
-      );
-      break;
-
     case "ADD_AGENT":
       z.AddAgentInputSchema().parse(action.input);
       AgentsReducer.addAgentOperation(state[action.scope], action, dispatch);
@@ -257,6 +248,24 @@ const stateReducer: StateReducer<ScopeOfWorkDocument> = (
     case "REMOVE_PROJECT":
       z.RemoveProjectInputSchema().parse(action.input);
       ProjectsReducer.removeProjectOperation(
+        state[action.scope],
+        action,
+        dispatch,
+      );
+      break;
+
+    case "SET_PROJECT_MARGIN":
+      z.SetProjectMarginInputSchema().parse(action.input);
+      ProjectsReducer.setProjectMarginOperation(
+        state[action.scope],
+        action,
+        dispatch,
+      );
+      break;
+
+    case "SET_PROJECT_TOTAL_BUDGET":
+      z.SetProjectTotalBudgetInputSchema().parse(action.input);
+      ProjectsReducer.setProjectTotalBudgetOperation(
         state[action.scope],
         action,
         dispatch,

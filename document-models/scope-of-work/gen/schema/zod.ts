@@ -52,7 +52,8 @@ import type {
   ScopeOfWorkStatusInput,
   SetDeliverableBudgetAnchorProjectInput,
   SetDeliverableProgressInput,
-  SetProgressInDeliverablesSetInput,
+  SetProjectMarginInput,
+  SetProjectTotalBudgetInput,
   StoryPoint,
   StoryPointInput,
   Unit,
@@ -270,7 +271,7 @@ export function BudgetAnchorProjectSchema(): z.ZodObject<
   return z.object({
     __typename: z.literal("BudgetAnchorProject").optional(),
     margin: z.number(),
-    project: z.string(),
+    project: z.string().nullable(),
     quantity: z.number(),
     unit: UnitSchema.nullable(),
     unitCost: z.number(),
@@ -429,6 +430,7 @@ export function KeyResultSchema(): z.ZodObject<Properties<KeyResult>> {
 export function MilestoneSchema(): z.ZodObject<Properties<Milestone>> {
   return z.object({
     __typename: z.literal("Milestone").optional(),
+    budget: z.number().nullable(),
     coordinators: z.array(z.string()),
     deliveryTarget: z.string(),
     description: z.string(),
@@ -576,7 +578,7 @@ export function SetDeliverableBudgetAnchorProjectInputSchema(): z.ZodObject<
   return z.object({
     deliverableId: z.string(),
     margin: z.number().nullish(),
-    project: z.string(),
+    project: z.string().nullish(),
     quantity: z.number().nullish(),
     unit: UnitSchema.nullish(),
     unitCost: z.number().nullish(),
@@ -592,13 +594,21 @@ export function SetDeliverableProgressInputSchema(): z.ZodObject<
   });
 }
 
-export function SetProgressInDeliverablesSetInputSchema(): z.ZodObject<
-  Properties<SetProgressInDeliverablesSetInput>
+export function SetProjectMarginInputSchema(): z.ZodObject<
+  Properties<SetProjectMarginInput>
 > {
   return z.object({
-    milestoneId: z.string(),
-    progress: z.lazy(() => ProgressInputSchema().nullish()),
-    projectId: z.string().nullish(),
+    margin: z.number(),
+    projectId: z.string(),
+  });
+}
+
+export function SetProjectTotalBudgetInputSchema(): z.ZodObject<
+  Properties<SetProjectTotalBudgetInput>
+> {
+  return z.object({
+    projectId: z.string(),
+    totalBudget: z.number(),
   });
 }
 

@@ -4,13 +4,11 @@ import {
   type EditDeliverablesSetInput,
   type AddDeliverableInSetInput,
   type RemoveDeliverableInSetInput,
-  type SetProgressInDeliverablesSetInput,
 } from "../types.js";
 import {
   type EditDeliverablesSetAction,
   type AddDeliverableInSetAction,
   type RemoveDeliverableInSetAction,
-  type SetProgressInDeliverablesSetAction,
 } from "./actions.js";
 
 export const editDeliverablesSet = (input: EditDeliverablesSetInput) =>
@@ -37,16 +35,5 @@ export const removeDeliverableInSet = (input: RemoveDeliverableInSetInput) =>
     { ...input },
     undefined,
     z.RemoveDeliverableInSetInputSchema,
-    "global",
-  );
-
-export const setProgressInDeliverablesSet = (
-  input: SetProgressInDeliverablesSetInput,
-) =>
-  createAction<SetProgressInDeliverablesSetAction>(
-    "SET_PROGRESS_IN_DELIVERABLES_SET",
-    { ...input },
-    undefined,
-    z.SetProgressInDeliverablesSetInputSchema,
     "global",
   );

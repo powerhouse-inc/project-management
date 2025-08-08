@@ -6,6 +6,7 @@
 
 import type { ScopeOfWorkDeliverablesOperations } from "../../gen/deliverables/operations.js";
 import type { KeyResult } from "../../gen/types.js";
+import { applyInvariants } from "./projects.js";
 
 export const reducer: ScopeOfWorkDeliverablesOperations = {
   addDeliverableOperation(state, action, dispatch) {
@@ -41,6 +42,7 @@ export const reducer: ScopeOfWorkDeliverablesOperations = {
       }
 
       state.deliverables = state.deliverables.filter((deliverable) => String(deliverable.id) !== String(action.input.id));
+      applyInvariants(state, ["budget", "margin"]);
     } catch (error) {
       console.error(error);
     }

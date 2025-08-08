@@ -3,7 +3,6 @@ import {
   type EditDeliverablesSetAction,
   type AddDeliverableInSetAction,
   type RemoveDeliverableInSetAction,
-  type SetProgressInDeliverablesSetAction,
 } from "./actions.js";
 import { type ScopeOfWorkState } from "../types.js";
 
@@ -21,11 +20,6 @@ export interface ScopeOfWorkDeliverablesSetOperations {
   removeDeliverableInSetOperation: (
     state: ScopeOfWorkState,
     action: RemoveDeliverableInSetAction,
-    dispatch?: SignalDispatch,
-  ) => void;
-  setProgressInDeliverablesSetOperation: (
-    state: ScopeOfWorkState,
-    action: SetProgressInDeliverablesSetAction,
     dispatch?: SignalDispatch,
   ) => void;
 }

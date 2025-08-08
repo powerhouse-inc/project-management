@@ -3,7 +3,6 @@ import type {
   EditDeliverablesSetInput,
   AddDeliverableInSetInput,
   RemoveDeliverableInSetInput,
-  SetProgressInDeliverablesSetInput,
 } from "../types.js";
 
 export type EditDeliverablesSetAction = BaseAction<
@@ -21,14 +20,8 @@ export type RemoveDeliverableInSetAction = BaseAction<
   RemoveDeliverableInSetInput,
   "global"
 >;
-export type SetProgressInDeliverablesSetAction = BaseAction<
-  "SET_PROGRESS_IN_DELIVERABLES_SET",
-  SetProgressInDeliverablesSetInput,
-  "global"
->;
 
 export type ScopeOfWorkDeliverablesSetAction =
   | EditDeliverablesSetAction
   | AddDeliverableInSetAction
-  | RemoveDeliverableInSetAction
-  | SetProgressInDeliverablesSetAction;
+  | RemoveDeliverableInSetAction;

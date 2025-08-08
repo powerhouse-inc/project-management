@@ -5,12 +5,16 @@ import {
   type UpdateProjectInput,
   type UpdateProjectOwnerInput,
   type RemoveProjectInput,
+  type SetProjectMarginInput,
+  type SetProjectTotalBudgetInput,
 } from "../types.js";
 import {
   type AddProjectAction,
   type UpdateProjectAction,
   type UpdateProjectOwnerAction,
   type RemoveProjectAction,
+  type SetProjectMarginAction,
+  type SetProjectTotalBudgetAction,
 } from "./actions.js";
 
 export const addProject = (input: AddProjectInput) =>
@@ -46,5 +50,23 @@ export const removeProject = (input: RemoveProjectInput) =>
     { ...input },
     undefined,
     z.RemoveProjectInputSchema,
+    "global",
+  );
+
+export const setProjectMargin = (input: SetProjectMarginInput) =>
+  createAction<SetProjectMarginAction>(
+    "SET_PROJECT_MARGIN",
+    { ...input },
+    undefined,
+    z.SetProjectMarginInputSchema,
+    "global",
+  );
+
+export const setProjectTotalBudget = (input: SetProjectTotalBudgetInput) =>
+  createAction<SetProjectTotalBudgetAction>(
+    "SET_PROJECT_TOTAL_BUDGET",
+    { ...input },
+    undefined,
+    z.SetProjectTotalBudgetInputSchema,
     "global",
   );

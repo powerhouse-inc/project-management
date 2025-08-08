@@ -136,7 +136,7 @@ export type Binary = {
 
 export type BudgetAnchorProject = {
   margin: Scalars["Float"]["output"];
-  project: Scalars["OID"]["output"];
+  project: Maybe<Scalars["OID"]["output"]>;
   quantity: Scalars["Float"]["output"];
   unit: Maybe<Unit | `${Unit}`>;
   unitCost: Scalars["Float"]["output"];
@@ -264,6 +264,7 @@ export type KeyResult = {
 };
 
 export type Milestone = {
+  budget: Maybe<Scalars["Float"]["output"]>;
   coordinators: Array<Scalars["ID"]["output"]>;
   deliveryTarget: Scalars["String"]["output"];
   description: Scalars["String"]["output"];
@@ -390,7 +391,7 @@ export type ScopeOfWorkStatusInput =
 export type SetDeliverableBudgetAnchorProjectInput = {
   deliverableId: Scalars["ID"]["input"];
   margin?: InputMaybe<Scalars["Float"]["input"]>;
-  project: Scalars["OID"]["input"];
+  project?: InputMaybe<Scalars["OID"]["input"]>;
   quantity?: InputMaybe<Scalars["Float"]["input"]>;
   unit?: InputMaybe<Unit | `${Unit}`>;
   unitCost?: InputMaybe<Scalars["Float"]["input"]>;
@@ -401,10 +402,14 @@ export type SetDeliverableProgressInput = {
   workProgress?: InputMaybe<ProgressInput>;
 };
 
-export type SetProgressInDeliverablesSetInput = {
-  milestoneId: Scalars["ID"]["input"];
-  progress?: InputMaybe<ProgressInput>;
-  projectId?: InputMaybe<Scalars["ID"]["input"]>;
+export type SetProjectMarginInput = {
+  margin: Scalars["Float"]["input"];
+  projectId: Scalars["OID"]["input"];
+};
+
+export type SetProjectTotalBudgetInput = {
+  projectId: Scalars["OID"]["input"];
+  totalBudget: Scalars["Float"]["input"];
 };
 
 export type StoryPoint = {
