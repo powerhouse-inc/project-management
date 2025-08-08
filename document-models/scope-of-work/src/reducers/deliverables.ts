@@ -88,7 +88,12 @@ export const reducer: ScopeOfWorkDeliverablesOperations = {
           : deliverable.workProgress,
       }
 
+      if (deliverableIsCompleted(updatedDeliverable) && !["WONT_DO", "DELIVERED", "CANCELED"].includes(updatedDeliverable.status)) {
+        updatedDeliverable.status = "DELIVERED";
+      }
+
       state.deliverables = state.deliverables.map((deliverable) => String(deliverable.id) === String(action.input.id) ? updatedDeliverable : deliverable);
+
 
     } catch (error) {
       console.error(error);
@@ -171,3 +176,21 @@ export const reducer: ScopeOfWorkDeliverablesOperations = {
     }
   },
 };
+
+
+const deliverableIsCompleted = (deliverable: any) => {
+
+  if (deliverable.workProgress?.completed === true) {
+    return true;
+  }
+
+  if (deliverable.workProgress?.percentage === 100) {
+    return true;
+  }
+
+  if (deliverable.workProgress?.storyPoints?.completed === deliverable.workProgress?.storyPoints?.total && deliverable.workProgress?.storyPoints?.total > 0) {
+    return true;
+  }
+
+  return false;
+}
