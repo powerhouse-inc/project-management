@@ -48,6 +48,12 @@ const Project: React.FC<ProjectProps> = ({
   const [budgetCalculatorOpen, setBudgetCalculatorOpen] = useState(false);
 
   useEffect(() => {
+    setCode(project?.code || "");
+    setBudget(project?.budget || 0);
+    setTitle(project?.title || "");
+    setProjectOwner(project?.projectOwner || "");
+    setImageUrl(project?.imageUrl || "");
+    setProjectAbstract(project?.abstract || "");
     setBudget(project?.budget || 0);
   }, [deliverables, project?.id]);
 
@@ -228,15 +234,31 @@ const Project: React.FC<ProjectProps> = ({
                 onSubmit={(e) => {
                   e.preventDefault();
                   if (!project) return;
-                  // dispatch(actions.updateProject({ id: project.id, projectOwner: projectOwner }));
+                  if (e.target.value === project.projectOwner) return;
+                  dispatch(
+                    actions.updateProjectOwner({
+                      id: project.id,
+                      projectOwner: e.target.value,
+                    })
+                  );
                 }}
               >
                 <AIDField
                   className="w-full"
                   label="Project Owner"
                   name="projectOwner"
-                  value={project?.projectOwner as string}
+                  value={projectOwner}
                   onChange={(e) => setProjectOwner(e)}
+                  onBlur={(e) => {
+                    if (!project) return;
+                    if (e.target.value === project.projectOwner) return;
+                    dispatch(
+                      actions.updateProjectOwner({
+                        id: project.id,
+                        projectOwner: e.target.value,
+                      })
+                    );
+                  }}
                   fetchOptionsCallback={async (userInput: string) => {
                     return [];
                   }}
