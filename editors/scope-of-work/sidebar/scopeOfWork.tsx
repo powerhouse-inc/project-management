@@ -263,6 +263,7 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
           className="w-full"
           label="Description"
           defaultValue={state.description}
+          autoExpand={true}
           onBlur={(e) => {
             if (e.target.value !== state.description) {
               dispatch(
