@@ -105,8 +105,20 @@ export const reducer: ScopeOfWorkDeliverablesSetOperations = {
           throw new Error(`Project with id ${action.input.projectId} not found`);
         }
 
-        if (!foundProject.scope?.deliverables.includes(action.input.deliverableId)) {
-          foundProject!.scope!.deliverables.push(action.input.deliverableId);
+        if (!foundProject.scope) {
+          foundProject.scope = {
+            deliverables: [],
+            status: "DRAFT" as const,
+            progress: { total: 0, completed: 0 },
+            deliverablesCompleted: {
+              total: 0,
+              completed: 0,
+            },
+          };
+        }
+
+        if (!foundProject.scope.deliverables.includes(action.input.deliverableId)) {
+          foundProject.scope.deliverables.push(action.input.deliverableId);
         }
 
         state.projects = state.projects.map((project) => {
@@ -143,8 +155,12 @@ export const reducer: ScopeOfWorkDeliverablesSetOperations = {
         });
       } else if (action.input.projectId) {
         const foundProject = state.projects.find((project) => String(project.id) === String(action.input.projectId));
-        if (!foundProject || !foundProject.scope) {
+        if (!foundProject) {
           throw new Error(`Project with id ${action.input.projectId} not found`);
+        }
+
+        if (!foundProject.scope) {
+          throw new Error(`Project scope not found for project ${action.input.projectId}`);
         }
 
         foundProject.scope.deliverables = foundProject.scope.deliverables.filter((deliverableId) => String(deliverableId) !== String(action.input.deliverableId));

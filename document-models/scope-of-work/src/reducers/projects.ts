@@ -221,11 +221,10 @@ export const applyInvariants = (state: ScopeOfWorkState, updates: String[]) => {
 }
 
 export const calculateTotalCost = (state: ScopeOfWorkState, deliverableSet: DeliverablesSet) => {
-  const deliverables = deliverableSet.deliverables.map(id => state.deliverables.find(d => d.id === id));
+  const deliverables = deliverableSet.deliverables
+    .map(id => state.deliverables.find(d => d.id === id))
+    .filter(deliverable => deliverable !== undefined);
   const totalCost = deliverables.reduce((acc, deliverable) => {
-    if (!deliverable) {
-      throw new Error("Deliverable not found");
-    }
     return acc + (deliverable.budgetAnchor?.unitCost || 0) * (deliverable.budgetAnchor?.quantity || 0);
   }, 0);
   return totalCost;
@@ -233,11 +232,10 @@ export const calculateTotalCost = (state: ScopeOfWorkState, deliverableSet: Deli
 }
 
 const calculateTotalBudget = (state: ScopeOfWorkState, deliverableSet: DeliverablesSet) => {
-  const deliverables = deliverableSet.deliverables.map(id => state.deliverables.find(d => d.id === id));
+  const deliverables = deliverableSet.deliverables
+    .map(id => state.deliverables.find(d => d.id === id))
+    .filter(deliverable => deliverable !== undefined);
   const totalBudget = deliverables.reduce((acc, deliverable) => {
-    if (!deliverable) {
-      throw new Error("Deliverable not found");
-    }
     // Assume margin is a percentage (e.g., 5 means 5%)
     // Convert margin to a multiplier: (1 + margin/100)
     return acc + (deliverable.budgetAnchor?.unitCost || 0) * (deliverable.budgetAnchor?.quantity || 0) * (1 + (deliverable.budgetAnchor?.margin || 0) / 100);

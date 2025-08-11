@@ -5,7 +5,7 @@ import {
   Project,
 } from "../../../document-models/scope-of-work/gen/types.js";
 import {
-  TextInput,
+  Select,
   ObjectSetTable,
   ColumnDef,
   ColumnAlignment,
@@ -32,6 +32,8 @@ const Deliverables: React.FC<ProjectsProps> = ({
   document,
 }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [stateMilestones, setStateMilestones] = useState(milestones);
+  const [stateProjects, setStateProjects] = useState(projects);
 
   // Update current time every second for live timestamps
   useEffect(() => {
@@ -42,10 +44,18 @@ const Deliverables: React.FC<ProjectsProps> = ({
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    setStateMilestones(milestones);
+    setStateProjects(projects);
+  }, [milestones, projects, deliverables]);
+
   const latestActivity = document.operations.global.filter(
     (operation: any) =>
       operation.type === "EDIT_DELIVERABLE" ||
-      operation.type === "ADD_DELIVERABLE"
+      operation.type === "ADD_DELIVERABLE" ||
+      operation.type === "REMOVE_DELIVERABLE" ||
+      operation.type === "ADD_PROJECT_DELIVERABLE" ||
+      operation.type === "ADD_MILESTONE_DELIVERABLE"
   );
 
   // Create a map of deliverable IDs to their latest activity
@@ -57,47 +67,95 @@ const Deliverables: React.FC<ProjectsProps> = ({
         timestamp: activity.timestamp,
         input: activity.input,
       });
+    } else if (activity.input?.deliverableId) {
+      latestActivityMap.set(activity.input.deliverableId, {
+        type: activity.type,
+        timestamp: activity.timestamp,
+        input: activity.input,
+      });
     }
   });
 
-  const richDeliverables = useMemo(
-    () =>
-      [
-        // From milestones
-        ...(milestones?.flatMap(
-          (milestone) =>
-            milestone.scope?.deliverables?.map((deliverableId) => {
-              const deliverable = deliverables?.find(
-                (d) => d.id === deliverableId
-              );
-              if (!deliverable) return null;
-              return {
-                ...deliverable,
-                milestoneId: milestone.id,
-                milestoneTitle: milestone.title,
-                latestActivity: latestActivityMap.get(deliverableId),
-              };
-            }) || []
-        ) || []),
-        // From projects
-        ...(projects?.flatMap(
-          (project) =>
-            project.scope?.deliverables?.map((deliverableId) => {
-              const deliverable = deliverables?.find(
-                (d) => d.id === deliverableId
-              );
-              if (!deliverable) return null;
-              return {
-                ...deliverable,
-                projectId: project.id,
-                projectTitle: project.title,
-                latestActivity: latestActivityMap.get(deliverableId),
-              };
-            }) || []
-        ) || []),
-      ].filter(Boolean),
-    [milestones, projects, deliverables, latestActivityMap]
-  );
+  const richDeliverables = useMemo(() => {
+    // Create a map to track processed deliverable IDs to avoid duplicates
+    const processedIds = new Set();
+    const result: any[] = [];
+
+    // Helper function to add deliverable if not already processed
+    const addDeliverableIfNotProcessed = (
+      deliverable: any,
+      milestoneId: string | null,
+      milestoneTitle: string | null,
+      projectId: string | null,
+      projectTitle: string | null
+    ) => {
+      if (!deliverable || processedIds.has(deliverable.id)) return;
+
+      processedIds.add(deliverable.id);
+      result.push({
+        ...deliverable,
+        milestoneId,
+        milestoneTitle,
+        projectId,
+        projectTitle,
+        latestActivity: latestActivityMap.get(deliverable.id),
+      });
+    };
+
+    // Process deliverables from milestones
+    milestones?.forEach((milestone) => {
+      milestone.scope?.deliverables?.forEach((deliverableId) => {
+        const deliverable = deliverables?.find((d) => d.id === deliverableId);
+        if (!deliverable) return;
+
+        // Check if this deliverable is also in a project
+        const project = projects?.find((p) =>
+          p.scope?.deliverables?.includes(deliverableId)
+        );
+
+        addDeliverableIfNotProcessed(
+          deliverable,
+          milestone.id,
+          milestone.title,
+          project?.id || null,
+          project?.title || null
+        );
+      });
+    });
+
+    // Process deliverables from projects (only if not already processed)
+    projects?.forEach((project) => {
+      project.scope?.deliverables?.forEach((deliverableId) => {
+        const deliverable = deliverables?.find((d) => d.id === deliverableId);
+        if (!deliverable) return;
+
+        // Check if this deliverable is also in a milestone
+        const milestone = milestones?.find((m) =>
+          m.scope?.deliverables?.includes(deliverableId)
+        );
+
+        addDeliverableIfNotProcessed(
+          deliverable,
+          milestone?.id || null,
+          milestone?.title || null,
+          project.id,
+          project.title
+        );
+      });
+    });
+
+    // Process standalone deliverables (only if not already processed)
+    deliverables?.forEach((deliverable) => {
+      addDeliverableIfNotProcessed(deliverable, null, null, null, null);
+    });
+
+    return result.sort((a, b) => {
+      if (a?.title && b?.title) {
+        return a.title.localeCompare(b.title);
+      }
+      return 0;
+    });
+  }, [milestones, projects, deliverables, latestActivityMap]);
 
   const columns = useMemo<Array<ColumnDef<any>>>(
     () => [
@@ -137,9 +195,6 @@ const Deliverables: React.FC<ProjectsProps> = ({
           }
           return false;
         },
-        renderCell: (value: any, context: any) => {
-          return <div className="text-left">{value}</div>;
-        },
       },
       {
         field: "status",
@@ -153,20 +208,53 @@ const Deliverables: React.FC<ProjectsProps> = ({
         editable: false,
         align: "center" as ColumnAlignment,
         renderCell: (value: any, context: any) => {
-          if (!context.row.milestoneTitle) return "";
+          if (!context.row.title) return "";
           return (
             <div className="flex items-center justify-center">
-              <span>
-                <Icon
-                  className="hover:cursor-pointer"
-                  name="Moved"
-                  size={12}
-                  onClick={() => {
-                    setActiveNodeId(`milestone.${context.row.milestoneId}`);
-                  }}
-                />
-              </span>
-              <span className="text-sm ml-2"> {value}</span>
+              {context.row.milestoneId && (
+                <span>
+                  <Icon
+                    className="hover:cursor-pointer"
+                    name="Moved"
+                    size={12}
+                    onClick={() => {
+                      setActiveNodeId(`milestone.${context.row.milestoneId}`);
+                    }}
+                  />
+                </span>
+              )}
+              <Select
+                className={`w-full ${context.row.milestoneId ? "ml-2" : ""}`}
+                options={
+                  stateMilestones?.map((milestone) => ({
+                    label: milestone.title,
+                    value: milestone.id,
+                  })) || []
+                }
+                value={context.row.milestoneId || undefined}
+                placeholder="Set milestone..."
+                onChange={(value) => {
+                  console.log("milestone value", value, context.row);
+                  // If there's an existing milestone, remove it first
+                  if (context.row.milestoneId) {
+                    dispatch(
+                      actions.removeDeliverableInSet({
+                        deliverableId: context.row.id,
+                        milestoneId: context.row.milestoneId,
+                      })
+                    );
+                  }
+                  // Add the new milestone
+                  if (value) {
+                    dispatch(
+                      actions.addDeliverableInSet({
+                        deliverableId: context.row.id,
+                        milestoneId: value as string,
+                      })
+                    );
+                  }
+                }}
+              />
             </div>
           );
         },
@@ -177,9 +265,10 @@ const Deliverables: React.FC<ProjectsProps> = ({
         editable: false,
         align: "center" as ColumnAlignment,
         renderCell: (value: any, context: any) => {
-            if (!context.row.projectTitle) return "";
-            return (
-              <div className="flex items-center justify-center">
+          if (!context.row.title) return "";
+          return (
+            <div className="flex items-center justify-center">
+              {context.row.projectId && (
                 <span>
                   <Icon
                     className="hover:cursor-pointer"
@@ -190,10 +279,41 @@ const Deliverables: React.FC<ProjectsProps> = ({
                     }}
                   />
                 </span>
-                <span className="text-sm ml-2"> {value}</span>
-              </div>
-            );
-          },
+              )}
+              <Select
+                className={`w-full ${context.row.projectId ? "ml-2" : ""}`}
+                options={
+                  stateProjects?.map((project) => ({
+                    label: project.title,
+                    value: project.id,
+                  })) || []
+                }
+                value={context.row.projectId || undefined}
+                placeholder="Set project..."
+                onChange={(value) => {
+                  // If there's an existing project, remove it first
+                  if (context.row.projectId) {
+                    dispatch(
+                      actions.removeDeliverableInSet({
+                        deliverableId: context.row.id,
+                        projectId: context.row.projectId,
+                      })
+                    );
+                  }
+                  // Add the new project
+                  if (value) {
+                    dispatch(
+                      actions.addDeliverableInSet({
+                        deliverableId: context.row.id,
+                        projectId: value as string,
+                      })
+                    );
+                  }
+                }}
+              />
+            </div>
+          );
+        },
       },
       {
         field: "latestActivity",
@@ -219,17 +339,20 @@ const Deliverables: React.FC<ProjectsProps> = ({
           columns={columns}
           data={richDeliverables || []}
           allowRowSelection={true}
-          // onAdd={(data) => {
-          //   if (data.title) {
-          //     console.log("title", data.title);
-          //     dispatch(
-          //       actions.addDeliverable({
-          //         id: generateId(),
-          //         title: data.title as string,
-          //       })
-          //     );
-          //   }
-          // }}
+          onDelete={(data: any) => {
+            dispatch(actions.removeDeliverable({ id: data[0].id }));
+          }}
+          onAdd={(data) => {
+            if (data.title) {
+              const deliverableId = generateId();
+              dispatch(
+                actions.addDeliverable({
+                  id: deliverableId,
+                  title: data.title as string,
+                })
+              );
+            }
+          }}
         />
       </div>
     </div>
@@ -245,7 +368,11 @@ const parseLatestActivity = (latestActivity: any, currentTime: Date) => {
 
   let activity;
 
-  if (latestActivity.type === "ADD_DELIVERABLE") {
+  if (
+    latestActivity.type === "ADD_DELIVERABLE" ||
+    latestActivity.type === "ADD_PROJECT_DELIVERABLE" ||
+    latestActivity.type === "ADD_MILESTONE_DELIVERABLE"
+  ) {
     activity = "Added Deliverable";
   } else if (latestActivity.type === "EDIT_DELIVERABLE") {
     activity = `Edited ${Object.keys(latestActivity.input)[1]}`;

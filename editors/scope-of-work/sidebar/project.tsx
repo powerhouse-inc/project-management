@@ -130,7 +130,7 @@ const Project: React.FC<ProjectProps> = ({
         align: "center" as ColumnAlignment,
         width: 200,
         renderCell: (value: any, context: any) => {
-          const progress = context.row.workProgress;
+          const progress = context.row?.workProgress || null;
           if (!progress) return null;
           return <ProgressBar progress={progress} />;
         },
@@ -154,7 +154,7 @@ const Project: React.FC<ProjectProps> = ({
         align: "center" as ColumnAlignment,
         width: 200,
         renderCell: (value: any, context: any) => {
-          if (!context.row.id) return null;
+          if (!context.row?.id) return null;
           return (
             <span className="cursor-pointer flex items-center justify-center">
               <Icon

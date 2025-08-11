@@ -5,14 +5,14 @@
  */
 
 import type { ScopeOfWorkDeliverablesOperations } from "../../gen/deliverables/operations.js";
-import type { KeyResult } from "../../gen/types.js";
+import type { Deliverable, KeyResult } from "../../gen/types.js";
 import { applyInvariants } from "./projects.js";
 
 export const reducer: ScopeOfWorkDeliverablesOperations = {
   addDeliverableOperation(state, action, dispatch) {
     try {
 
-      const deliverable = {
+      const deliverable: Deliverable = {
         id: action.input.id,
         owner: action.input.owner || "",
         title: action.input.title || "",
@@ -21,7 +21,13 @@ export const reducer: ScopeOfWorkDeliverablesOperations = {
         status: action.input.status || "DRAFT",
         workProgress: null,
         keyResults: [],
-        budgetAnchor: null,
+        budgetAnchor: {
+          project: '',
+          unit: "Hours",
+          unitCost: 0,
+          quantity: 0,
+          margin: 0,
+        },
       };
 
       state.deliverables.push(deliverable);
@@ -40,6 +46,19 @@ export const reducer: ScopeOfWorkDeliverablesOperations = {
       if (!deliverable) {
         throw new Error("Deliverable not found");
       }
+
+      // remove deliverable from deliverable sets in milestone and project
+      const roadmap = state.roadmaps.find((roadmap) => roadmap.milestones.find((milestone) => milestone?.scope?.deliverables?.includes(action.input.id)));
+      const milestone = roadmap?.milestones.find((milestone) => milestone?.scope?.deliverables?.includes(action.input.id));
+      if (milestone && milestone.scope) {
+        milestone.scope.deliverables = milestone.scope.deliverables?.filter((deliverable) => String(deliverable) !== String(action.input.id));
+      }
+
+      const project = state.projects.find((project) => project.scope?.deliverables.includes(action.input.id));
+      if (project && project.scope) {
+        project.scope.deliverables = project.scope.deliverables?.filter((deliverable) => String(deliverable) !== String(action.input.id));
+      }
+
 
       state.deliverables = state.deliverables.filter((deliverable) => String(deliverable.id) !== String(action.input.id));
       applyInvariants(state, ["budget", "margin"]);
