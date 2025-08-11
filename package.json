@@ -1,7 +1,7 @@
 {
   "name": "@powerhousedao/project-management",
   "description": "The Scope of Work model defines a structured plan for executing contributor work; it includes deliverables and roadmaps with milestones with each being linked to ownership, progress tracking.",
-  "version": "0.0.10",
+  "version": "0.0.12",
   "license": "AGPL-3.0-only",
   "type": "module",
   "files": [
@@ -79,7 +79,7 @@
     "@tailwindcss/cli": "^4.1.4",
     "@testing-library/react": "^16.3.0",
     "@types/node": "^22.14.1",
-    "@types/react": "^19.1.8",
+    "@types/react": "^18.3.20",
     "@vitejs/plugin-react": "^4.4.1",
     "document-drive": "^4.0.4",
     "eslint": "^9.25.0",
@@ -88,8 +88,8 @@
     "globals": "^16.0.0",
     "package-manager-detector": "^0.2.8",
     "pm2": "^5.4.3",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "tailwindcss": "^4.1.4",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.30.1",
@@ -97,5 +97,7 @@
     "vitest": "^3.0.9"
   },
   "peerDependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   }
 }
