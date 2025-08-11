@@ -197,6 +197,7 @@ export const reducer: ScopeOfWorkDeliverablesOperations = {
     } catch (error) {
       console.error(error);
     }
+    applyInvariants(state, ['budget']);
   },
 };
 

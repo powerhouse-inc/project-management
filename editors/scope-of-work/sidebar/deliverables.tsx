@@ -234,7 +234,6 @@ const Deliverables: React.FC<ProjectsProps> = ({
                 value={context.row.milestoneId || undefined}
                 placeholder="Set milestone..."
                 onChange={(value) => {
-                  console.log("milestone value", value, context.row);
                   // If there's an existing milestone, remove it first
                   if (context.row.milestoneId) {
                     dispatch(

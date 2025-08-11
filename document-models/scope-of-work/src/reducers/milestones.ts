@@ -6,6 +6,7 @@
 
 import type { ScopeOfWorkMilestonesOperations } from "../../gen/milestones/operations.js";
 import type { Deliverable, Milestone } from "../../gen/types.js";
+import { applyInvariants } from "./projects.js";
 
 export const reducer: ScopeOfWorkMilestonesOperations = {
   editMilestoneOperation(state, action, dispatch) {
@@ -140,10 +141,18 @@ export const reducer: ScopeOfWorkMilestonesOperations = {
         throw new Error("Milestone not found");
       }
 
+      // remove deliverables linked to milestone from milestone.scope.deliverables
+      if (foundMilestone.scope?.deliverables) {
+        foundMilestone.scope.deliverables.forEach((deliverableId) => {
+          state.deliverables = state.deliverables.filter((deliverable) => String(deliverable.id) !== String(deliverableId));
+        })
+      }
+
       foundRoadmap.milestones = foundRoadmap.milestones.filter((milestone) => String(milestone.id) !== String(action.input.id));
       state.roadmaps = state.roadmaps.map((roadmap) => {
         return String(roadmap.id) === String(foundRoadmap.id) ? foundRoadmap : roadmap;
       });
+      applyInvariants(state, ["budget", "margin"]);
     } catch (error) {
       console.error(error);
     }

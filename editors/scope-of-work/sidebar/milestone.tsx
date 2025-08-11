@@ -57,6 +57,7 @@ const Milestone: React.FC<MilestonesProps> = ({
         width: 20,
         align: "center" as ColumnAlignment,
         renderCell: (value: any, context: any) => {
+          if (!context.row?.id) return null;
           return (
             <div className="text-center">
               <Icon
@@ -111,7 +112,7 @@ const Milestone: React.FC<MilestonesProps> = ({
         align: "center" as ColumnAlignment,
         width: 200,
         renderCell: (value: any, context: any) => {
-          const progress = context.row.workProgress;
+          const progress = context.row?.workProgress || null;
           if (!progress) return null;
           return <ProgressBar progress={progress} />;
         },
@@ -135,7 +136,7 @@ const Milestone: React.FC<MilestonesProps> = ({
         align: "center" as ColumnAlignment,
         width: 200,
         renderCell: (value: any, context: any) => {
-          if (!context.row.id) return null;
+          if (!context.row?.id) return null;
           return (
             <span className="cursor-pointer flex items-center justify-center">
               <Icon

@@ -67,7 +67,17 @@ export const reducer: ScopeOfWorkProjectsOperations = {
   },
   removeProjectOperation(state, action, dispatch) {
     try {
+
+      // remove deliverables linked to project from project scope
+      const project = state.projects.find((p) => p.id === action.input.projectId);
+      if (project?.scope?.deliverables) {
+        project.scope.deliverables.forEach((deliverableId) => {
+          state.deliverables = state.deliverables.filter((d) => d.id !== deliverableId);
+        });
+      }
+
       state.projects = state.projects.filter((p) => p.id !== action.input.projectId);
+      applyInvariants(state, ["budget", "margin"]);
     } catch (error) {
       console.error(error);
     }
@@ -101,7 +111,7 @@ export const reducer: ScopeOfWorkProjectsOperations = {
 
       });
 
-      return applyInvariants(state, ["budget"]);
+      applyInvariants(state, ["budget"]);
 
     } catch (error) {
       console.error(error);
@@ -170,7 +180,7 @@ export const reducer: ScopeOfWorkProjectsOperations = {
       project.scope.deliverables = project.scope.deliverables.filter((d) => d !== action.input.deliverableId);
       state.deliverables = state.deliverables.filter((d) => d.id !== action.input.deliverableId);
       applyInvariants(state, ["budget", "margin"]);
-      
+
     } catch (error) {
       console.error(error);
     }
@@ -227,7 +237,7 @@ export const calculateTotalCost = (state: ScopeOfWorkState, deliverableSet: Deli
   const totalCost = deliverables.reduce((acc, deliverable) => {
     return acc + (deliverable.budgetAnchor?.unitCost || 0) * (deliverable.budgetAnchor?.quantity || 0);
   }, 0);
-  return totalCost;
+  return totalCost === 0 ? 0 : Number(totalCost.toFixed(2));
 
 }
 
@@ -240,5 +250,5 @@ const calculateTotalBudget = (state: ScopeOfWorkState, deliverableSet: Deliverab
     // Convert margin to a multiplier: (1 + margin/100)
     return acc + (deliverable.budgetAnchor?.unitCost || 0) * (deliverable.budgetAnchor?.quantity || 0) * (1 + (deliverable.budgetAnchor?.margin || 0) / 100);
   }, 0);
-  return totalBudget;
+  return totalBudget === 0 ? 0 : Number(totalBudget.toFixed(2));
 }

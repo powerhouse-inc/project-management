@@ -3,7 +3,12 @@ import { Textarea, TextInput } from "@powerhousedao/document-engineering";
 import React, { useState, useEffect, useMemo } from "react";
 import { Icon } from "@powerhousedao/design-system";
 import { generateId } from "document-model";
-import { ObjectSetTable, ColumnAlignment, DatePicker, ColumnDef } from "@powerhousedao/document-engineering";
+import {
+  ObjectSetTable,
+  ColumnAlignment,
+  DatePicker,
+  ColumnDef,
+} from "@powerhousedao/document-engineering";
 
 interface Roadmap {
   id: string;
@@ -18,8 +23,11 @@ interface RoadmapsProps {
   setActiveNodeId: (id: string) => void;
 }
 
-const Roadmap: React.FC<RoadmapsProps> = ({ roadmaps , dispatch, setActiveNodeId }) => {
-  console.log("roadmaps", roadmaps);
+const Roadmap: React.FC<RoadmapsProps> = ({
+  roadmaps,
+  dispatch,
+  setActiveNodeId,
+}) => {
   const roadmap = roadmaps[0];
 
   // Controlled state for title and description
@@ -41,13 +49,18 @@ const Roadmap: React.FC<RoadmapsProps> = ({ roadmaps , dispatch, setActiveNodeId
         width: 20,
         align: "center" as ColumnAlignment,
         renderCell: (value: any, context: any) => {
-          return <div className="text-center">
-            <Icon className="hover:cursor-pointer" name="Moved" size={18} 
-              onClick={() => {
-                setActiveNodeId(`milestone.${context.row.id}`);
-              }}
-            />
-          </div>;
+          return (
+            <div className="text-center">
+              <Icon
+                className="hover:cursor-pointer"
+                name="Moved"
+                size={18}
+                onClick={() => {
+                  setActiveNodeId(`milestone.${context.row.id}`);
+                }}
+              />
+            </div>
+          );
         },
       },
       {
@@ -78,28 +91,49 @@ const Roadmap: React.FC<RoadmapsProps> = ({ roadmaps , dispatch, setActiveNodeId
         align: "center" as ColumnAlignment,
         editable: true,
         onSave: (newValue: any, context: any) => {
-          if(Array.isArray(newValue)) {
+          if (Array.isArray(newValue)) {
             newValue.forEach((id: any) => {
-              const coordinator = context.row.coordinators.find((c: any) => c === id);
-              if(!coordinator) {
-                dispatch(actions.addCoordinator({ id: id, milestoneId: context.row.id }));
+              const coordinator = context.row.coordinators.find(
+                (c: any) => c === id
+              );
+              if (!coordinator) {
+                dispatch(
+                  actions.addCoordinator({
+                    id: id,
+                    milestoneId: context.row.id,
+                  })
+                );
               }
             });
             return true;
           }
-          if(typeof newValue === "string") {
-            if(newValue === "") {
+          if (typeof newValue === "string") {
+            if (newValue === "") {
               context.row.coordinators.forEach((c: any) => {
-                dispatch(actions.removeCoordinator({ id: c, milestoneId: context.row.id }));
+                dispatch(
+                  actions.removeCoordinator({
+                    id: c,
+                    milestoneId: context.row.id,
+                  })
+                );
               });
               return true;
             }
-            const multipleValues = newValue.split(",").map((value: any) => value.trim());
+            const multipleValues = newValue
+              .split(",")
+              .map((value: any) => value.trim());
             multipleValues.forEach((value: any) => {
-              const coordinator = context.row.coordinators.find((c: any) => c === value);
-              if(!coordinator) {
-                dispatch(actions.addCoordinator({ id: value, milestoneId: context.row.id }));
-              }               
+              const coordinator = context.row.coordinators.find(
+                (c: any) => c === value
+              );
+              if (!coordinator) {
+                dispatch(
+                  actions.addCoordinator({
+                    id: value,
+                    milestoneId: context.row.id,
+                  })
+                );
+              }
               return true;
             });
           }
@@ -113,43 +147,30 @@ const Roadmap: React.FC<RoadmapsProps> = ({ roadmaps , dispatch, setActiveNodeId
         align: "center" as ColumnAlignment,
         width: 200,
         onSave: (newValue: any, context: any) => {
-          if(newValue === '') {
-            dispatch(actions.editMilestone({ id: context.row.id, roadmapId: roadmap.id, deliveryTarget: ' ' }));
+          if (newValue === "") {
+            dispatch(
+              actions.editMilestone({
+                id: context.row.id,
+                roadmapId: roadmap.id,
+                deliveryTarget: " ",
+              })
+            );
             return true;
           }
-          if(newValue !== context.row.deliveryTarget || newValue === '') {
-            dispatch(actions.editMilestone({ id: context.row.id, roadmapId: roadmap.id, deliveryTarget: newValue as string }));
+          if (newValue !== context.row.deliveryTarget || newValue === "") {
+            dispatch(
+              actions.editMilestone({
+                id: context.row.id,
+                roadmapId: roadmap.id,
+                deliveryTarget: newValue as string,
+              })
+            );
             return true;
           }
           return false;
         },
         renderCell: (value: any, context: any) => {
           return <div className="text-center">{value}</div>;
-        },
-        // renderCellEditor: (value: any, context: any) => {
-        //   console.log({value, context});
-        //   return <DatePicker name="deliveryTarget" value={value}  />;
-        // },
-      },
-      {
-        field: "actions",
-        title: "Actions",
-        editable: true,
-        align: "center" as ColumnAlignment,
-        width: 200,
-        renderCell: (value: any, context: any) => {
-          return (
-            <span className="cursor-pointer flex items-center justify-center">
-              <Icon
-                name="Trash"
-                size={18}
-                className="hover:text-red-500"
-                onClick={() => {
-                  dispatch(actions.removeMilestone({ id: context.row.id, roadmapId: roadmap.id }));
-                }}
-              />
-            </span>
-          );
         },
       },
     ],
@@ -208,6 +229,12 @@ const Roadmap: React.FC<RoadmapsProps> = ({ roadmaps , dispatch, setActiveNodeId
           columns={columns}
           data={roadmap.milestones || []}
           allowRowSelection={true}
+          onDelete={(data) => {
+            if (!roadmap) return;
+            dispatch(
+              actions.removeMilestone({ id: data[0].id, roadmapId: roadmap.id })
+            );
+          }}
           onAdd={(data) => {
             if (data.title) {
               console.log("title", data.title);

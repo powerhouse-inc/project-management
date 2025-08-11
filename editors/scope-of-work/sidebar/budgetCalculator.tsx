@@ -93,7 +93,7 @@ const BudgetCalculator = ({
             dispatch(
               actions.setDeliverableBudgetAnchorProject({
                 deliverableId: context.row.id,
-                project: project!.id,
+                project: project?.id ?? "",
                 quantity: parseFloat(newValue),
               })
             );
@@ -112,7 +112,7 @@ const BudgetCalculator = ({
             dispatch(
               actions.setDeliverableBudgetAnchorProject({
                 deliverableId: context.row.id,
-                project: project!.id,
+                project: project?.id ?? "",
                 unitCost: parseFloat(newValue),
               })
             );
@@ -198,8 +198,9 @@ const BudgetCalculator = ({
             onBlur={() => {
               if (margin) {
                 dispatch(
-                  actions.setProjectMargin({
-                    projectId: project!.id,
+                  actions.setDeliverableBudgetAnchorProject({
+                    deliverableId: richDeliverables?.[0]?.id ?? "",
+                    project: project?.id ?? "",
                     margin: margin,
                   })
                 );

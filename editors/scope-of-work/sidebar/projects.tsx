@@ -16,7 +16,11 @@ interface ProjectsProps {
   setActiveNodeId: (id: string) => void;
 }
 
-const Projects: React.FC<ProjectsProps> = ({ projects, dispatch, setActiveNodeId }) => {
+const Projects: React.FC<ProjectsProps> = ({
+  projects,
+  dispatch,
+  setActiveNodeId,
+}) => {
   const columns = useMemo<Array<ColumnDef<any>>>(
     () => [
       {
@@ -45,13 +49,12 @@ const Projects: React.FC<ProjectsProps> = ({ projects, dispatch, setActiveNodeId
         align: "left" as ColumnAlignment,
         onSave: (newValue: any, context: any) => {
           if (newValue !== context.row.title) {
-            // dispatch(
-            //   actions.editMilestone({
-            //     id: context.row.id,
-            //     roadmapId: roadmap.id,
-            //     title: newValue as string,
-            //   })
-            // );
+            dispatch(
+              actions.updateProject({
+                id: context.row.id,
+                title: newValue as string,
+              })
+            );
             return true;
           }
           return false;
@@ -61,24 +64,22 @@ const Projects: React.FC<ProjectsProps> = ({ projects, dispatch, setActiveNodeId
         },
       },
       {
-        field: "actions",
-        title: "Actions",
+        field: "projectOwner",
+        title: "Owner",
         editable: true,
         align: "center" as ColumnAlignment,
-        width: 200,
+      },
+      {
+        field: "budget",
+        title: "Budget",
+        editable: true,
+        align: "center" as ColumnAlignment,
         renderCell: (value: any, context: any) => {
-          if (!context.row.id) return null;
+          if (value == 0) return null;
           return (
-            <span className="cursor-pointer flex items-center justify-center">
-              <Icon
-                name="Trash"
-                size={18}
-                className="hover:text-red-500"
-                onClick={() => {
-                  dispatch(actions.removeProject({ projectId: context.row.id }));
-                }}
-              />
-            </span>
+            <div className="text-center">
+              {context.row.currency} {value}
+            </div>
           );
         },
       },
@@ -96,13 +97,17 @@ const Projects: React.FC<ProjectsProps> = ({ projects, dispatch, setActiveNodeId
           columns={columns}
           data={projects || []}
           allowRowSelection={true}
+          onDelete={(data: any) => {
+            if (!projects) return;
+            dispatch(actions.removeProject({ projectId: data[0].id }));
+          }}
           onAdd={(data) => {
             if (data.title) {
               console.log("title", data.title);
               dispatch(
                 actions.addProject({
                   id: generateId(),
-                  code: '',
+                  code: "",
                   title: data.title as string,
                 })
               );

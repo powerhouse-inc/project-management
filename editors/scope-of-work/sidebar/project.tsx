@@ -147,33 +147,6 @@ const Project: React.FC<ProjectProps> = ({
           );
         },
       },
-      {
-        field: "actions",
-        title: "Actions",
-        editable: true,
-        align: "center" as ColumnAlignment,
-        width: 200,
-        renderCell: (value: any, context: any) => {
-          if (!context.row?.id) return null;
-          return (
-            <span className="cursor-pointer flex items-center justify-center">
-              <Icon
-                name="Trash"
-                size={18}
-                className="hover:text-red-500"
-                onClick={() => {
-                  dispatch(
-                    actions.removeProjectDeliverable({
-                      projectId: project!.id,
-                      deliverableId: context.row.id,
-                    })
-                  );
-                }}
-              />
-            </span>
-          );
-        },
-      },
     ],
     []
   );
@@ -408,6 +381,15 @@ const Project: React.FC<ProjectProps> = ({
               columns={columns}
               data={projectDeliverables}
               allowRowSelection={true}
+              onDelete={(data: any) => {
+                if (!project) return;
+                dispatch(
+                  actions.removeProjectDeliverable({
+                    projectId: project?.id,
+                    deliverableId: data[0].id,
+                  })
+                );
+              }}
               onAdd={(data) => {
                 if (data.title) {
                   if (!project) return;
