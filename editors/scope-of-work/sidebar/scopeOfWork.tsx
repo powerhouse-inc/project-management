@@ -39,6 +39,7 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
         width: 20,
         align: "center" as ColumnAlignment,
         renderCell: (value: any, context: any) => {
+          if (!context.row?.id) return null;
           return (
             <div className="text-center">
               <Icon
@@ -57,7 +58,7 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
         field: "title",
         title: "Roadmap Title",
         editable: true,
-        align: "center" as ColumnAlignment,
+        align: "left" as ColumnAlignment,
         onSave: (newValue: any, context: any) => {
           if (newValue !== context.row.title) {
             dispatch(
@@ -74,27 +75,6 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
           return <div className="text-left">{value}</div>;
         },
       },
-      {
-        field: "actions",
-        title: "Actions",
-        editable: true,
-        align: "center" as ColumnAlignment,
-        width: 200,
-        renderCell: (value: any, context: any) => {
-          return (
-            <span className="cursor-pointer flex items-center justify-center">
-              <Icon
-                name="Trash"
-                size={18}
-                className="hover:text-red-500"
-                onClick={() => {
-                  dispatch(actions.removeRoadmap({ id: context.row.id }));
-                }}
-              />
-            </span>
-          );
-        },
-      },
     ],
     []
   );
@@ -106,6 +86,7 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
         width: 20,
         align: "center" as ColumnAlignment,
         renderCell: (value: any, context: any) => {
+          if (!context.row?.id) return null;
           return (
             <div className="text-center">
               <Icon
@@ -140,29 +121,6 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
         },
         renderCell: (value: any, context: any) => {
           return <div className="text-left">{value}</div>;
-        },
-      },
-      {
-        field: "actions",
-        title: "Actions",
-        editable: true,
-        align: "center" as ColumnAlignment,
-        width: 200,
-        renderCell: (value: any, context: any) => {
-          return (
-            <span className="cursor-pointer flex items-center justify-center">
-              <Icon
-                name="Trash"
-                size={18}
-                className="hover:text-red-500"
-                onClick={() => {
-                  dispatch(
-                    actions.removeProject({ projectId: context.row.id })
-                  );
-                }}
-              />
-            </span>
-          );
         },
       },
     ],
@@ -296,6 +254,10 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
         columns={columns}
         data={state.roadmaps || []}
         allowRowSelection={true}
+        onDelete={(data) => {
+          if (!state.roadmaps) return;
+          dispatch(actions.removeRoadmap({ id: data[0].id }));
+        }}
         onAdd={(data) => {
           if (data.title) {
             console.log("title", data.title);
@@ -320,6 +282,10 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
         columns={projectColumns}
         data={state.projects || []}
         allowRowSelection={true}
+        onDelete={(data) => {
+          if (!state.projects) return;
+          dispatch(actions.removeProject({ projectId: data[0].id }));
+        }}
         onAdd={(data) => {
           if (data.title) {
             console.log("title", data.title);

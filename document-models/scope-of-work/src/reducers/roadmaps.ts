@@ -56,6 +56,16 @@ export const reducer: ScopeOfWorkRoadmapsOperations = {
         throw new Error("Roadmap not found");
       }
 
+      if (roadmap.milestones) {
+        roadmap.milestones.forEach((milestone) => {
+          if (milestone.scope?.deliverables) {
+            milestone.scope.deliverables.forEach((deliverableId) => {
+              state.deliverables = state.deliverables.filter((deliverable) => String(deliverable.id) !== String(deliverableId));
+            });
+          }
+        });
+      }
+
       state.roadmaps = state.roadmaps.filter((roadmap) => String(roadmap.id) !== String(action.input.id));
     } catch (error) {
       console.error(error);

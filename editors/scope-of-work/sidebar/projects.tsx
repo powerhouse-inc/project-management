@@ -28,6 +28,7 @@ const Projects: React.FC<ProjectsProps> = ({
         width: 20,
         align: "center" as ColumnAlignment,
         renderCell: (value: any, context: any) => {
+          if (!context.row?.id) return null;
           return (
             <div className="text-center">
               <Icon

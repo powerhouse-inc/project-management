@@ -23,6 +23,7 @@ const Roadmaps: React.FC<ProjectsProps> = ({ roadmaps, dispatch, setActiveNodeId
         width: 20,
         align: "center" as ColumnAlignment,
         renderCell: (value: any, context: any) => {
+          if (!context.row?.id) return null;
           return (
             <div className="text-center">
               <Icon
