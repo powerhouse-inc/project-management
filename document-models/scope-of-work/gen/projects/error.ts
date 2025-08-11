@@ -52,20 +52,6 @@ export class InvalidProjectStatusForUpdate
   }
 }
 
-export class ProjectCodeAlreadyExists extends Error implements ReducerError {
-  errorCode = "ProjectCodeAlreadyExists" as ErrorCode;
-  constructor(message = "ProjectCodeAlreadyExists") {
-    super(message);
-  }
-}
-
-export class ProjectNotFound extends Error implements ReducerError {
-  errorCode = "ProjectNotFound" as ErrorCode;
-  constructor(message = "ProjectNotFound") {
-    super(message);
-  }
-}
-
 export class InvalidAgentId extends Error implements ReducerError {
   errorCode = "InvalidAgentId" as ErrorCode;
   constructor(message = "InvalidAgentId") {

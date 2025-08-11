@@ -472,7 +472,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                   label: project.title,
                   value: project.id,
                 }))}
-                value={stateDeliverable.budgetAnchor?.project}
+                value={stateDeliverable.budgetAnchor?.project || ""}
                 onChange={(value) => {
                   dispatch(
                     actions.setDeliverableBudgetAnchorProject({

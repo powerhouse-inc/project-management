@@ -8,7 +8,6 @@ import {
   type EditDeliverablesSetInput,
   type AddDeliverableInSetInput,
   type RemoveDeliverableInSetInput,
-  type SetProgressInDeliverablesSetInput,
 } from "../../gen/schema/index.js";
 import { reducer } from "../../gen/reducer.js";
 import * as creators from "../../gen/deliverables-set/creators.js";
@@ -160,46 +159,4 @@ describe("DeliverablesSet Operations", () => {
     expect(milestone!.scope!.deliverables).not.toContain(input.deliverableId);
   });
 
-  it("should handle setProgressInDeliverablesSet operation", () => {
-    // Add a roadmap first using the reducer
-    const roadmapId = "roadmap-1";
-    let updatedDocument = reducer(document, roadmapCreators.addRoadmap({
-      id: roadmapId,
-      title: "Test Roadmap",
-      slug: "test-roadmap",
-      description: "desc",
-    }));
-
-    // Add a milestone using the reducer
-    const milestoneId = "milestone-1";
-    updatedDocument = reducer(updatedDocument, milestoneCreators.addMilestone({
-      id: milestoneId,
-      roadmapId,
-      sequenceCode: "001",
-      title: "Milestone 1",
-      description: "desc",
-      deliveryTarget: "2024-12-31",
-    }));
-
-    const input: SetProgressInDeliverablesSetInput = {
-      milestoneId,
-      progress: {
-        percentage: 75,
-      },
-    };
-
-    updatedDocument = reducer(updatedDocument, creators.setProgressInDeliverablesSet(input));
-
-    expect(updatedDocument.operations.global).toHaveLength(3);
-    expect(updatedDocument.operations.global[2].type).toBe("SET_PROGRESS_IN_DELIVERABLES_SET");
-    expect(updatedDocument.operations.global[2].input).toStrictEqual(input);
-    expect(updatedDocument.operations.global[2].index).toEqual(2);
-    
-    const roadmap = updatedDocument.state.global.roadmaps.find(r => r.id === roadmapId);
-    expect(roadmap).toBeDefined();
-    const milestone = roadmap!.milestones.find(m => m.id === milestoneId);
-    expect(milestone).toBeDefined();
-    expect(milestone!.scope).toBeDefined();
-    expect(milestone!.scope!.progress).toStrictEqual({ value: input.progress!.percentage });
-  });
 });
