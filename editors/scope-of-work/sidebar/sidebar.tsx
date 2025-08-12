@@ -90,7 +90,6 @@ export default function SidebarMenu(props: any) {
 
   const { sidebarWidth, isSidebarOpen } = useSidebarWidth();
 
-
   // Use useMemo to recalculate nodes whenever the state changes
   const nodes: SidebarNode[] = useMemo(
     () => [
@@ -102,7 +101,9 @@ export default function SidebarMenu(props: any) {
           title: roadmap.title,
           children: roadmap.milestones.map((milestone: any) => ({
             id: `milestone.${milestone.id}`,
-            title: milestone.title,
+            title: milestone.sequenceCode
+              ? `${milestone.sequenceCode} - ${milestone.title}`
+              : milestone.title,
             children: [],
           })),
         })),
@@ -112,7 +113,9 @@ export default function SidebarMenu(props: any) {
         title: "Projects",
         children: projects.map((project: any) => ({
           id: `project.${project.id}`,
-          title: project.title,
+          title: project.code
+            ? `${project.code} - ${project.title}`
+            : project.title,
           children: [],
         })),
       },
@@ -191,7 +194,13 @@ export default function SidebarMenu(props: any) {
           />
         );
       case "projects":
-        return <Projects dispatch={dispatch} projects={projects} setActiveNodeId={setActiveNodeId} />;
+        return (
+          <Projects
+            dispatch={dispatch}
+            projects={projects}
+            setActiveNodeId={setActiveNodeId}
+          />
+        );
       case "project":
         return (
           <Project
@@ -238,9 +247,7 @@ export default function SidebarMenu(props: any) {
         {activeNodeId ? (
           displayActiveNode(activeNodeId)
         ) : (
-          <ScopeOfWork {...props} 
-          setActiveNodeId={setActiveNodeId}
-          />
+          <ScopeOfWork {...props} setActiveNodeId={setActiveNodeId} />
         )}
       </div>
     </div>
