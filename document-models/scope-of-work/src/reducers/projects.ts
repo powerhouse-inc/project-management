@@ -228,6 +228,20 @@ export const applyInvariants = (state: ScopeOfWorkState, updates: String[]) => {
     })
   }
 
+
+  // another invariant: deliverableSet.progress = function of deliverableSet.deliverables.progress
+  if(updates.includes("progress")) {
+    calculateDeliverableSetsProgress(state);
+  }
+
+  // recalculate when
+  /*
+    - deliverableSet.deliverables.progress changes
+    - deliverableSet.deliverables.status changes
+    - deliverable is added / created / removed / deleted to deliverableSet
+    - deliverable is added / created / removed / deleted from deliverableSet
+  */
+
 }
 
 export const calculateTotalCost = (state: ScopeOfWorkState, deliverableSet: DeliverablesSet) => {
@@ -251,4 +265,25 @@ const calculateTotalBudget = (state: ScopeOfWorkState, deliverableSet: Deliverab
     return acc + (deliverable.budgetAnchor?.unitCost || 0) * (deliverable.budgetAnchor?.quantity || 0) * (1 + (deliverable.budgetAnchor?.margin || 0) / 100);
   }, 0);
   return totalBudget === 0 ? 0 : Number(totalBudget.toFixed(2));
+}
+
+const calculateDeliverableSetsProgress = (state: ScopeOfWorkState) => {
+
+  // run through all deliverable sets in milestones, projects and calculate the progress from each deliverable
+  /* For every set
+    1) Remove / ignore CANCELLED or WONT_DO deliverables
+    2) Determine storyPointsOnly = true or false
+      if storyPointsOnly = true => set progress to StoryPoints on deliverableSet
+      if storyPointsOnly = false => set progress to Percentage on deliverableSet
+    (completed / total) * 100
+    3.a) If StoryPoints only => deliverableSet.progress.completed = Sum (completed[i]), deliverableSet.progress.total = Sum (total[i])
+    3.b) If !storyPointsOnly => AVERAGE (percentageCompletedEquivalent[i])
+    percentageCompletedEquivalent[i] = 
+    Progress.percentage ? percentageValue
+    Progress.storyPoints ? completed / total
+    Progress.binary ? (status = IN_PROGESS ) : 50% : ( completed ? 100 : 0 ))
+
+  */
+  
+
 }
