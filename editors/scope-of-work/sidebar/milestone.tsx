@@ -305,12 +305,16 @@ const Milestone: React.FC<MilestonesProps> = ({
           allowRowSelection={true}
           onDelete={(data) => {
             if (!milestoneDeliverables || data.length === 0) return;
-            dispatch(
-              actions.removeMilestoneDeliverable({
-                milestoneId: milestone.id,
-                deliverableId: data[0].id,
-              })
-            );
+            if (data.length > 0) {
+              data.forEach((d: any) => {
+                dispatch(
+                  actions.removeMilestoneDeliverable({
+                    milestoneId: milestone.id,
+                    deliverableId: d.id,
+                  })
+                );
+              });
+            }
           }}
           onAdd={(data) => {
             if (data.title) {

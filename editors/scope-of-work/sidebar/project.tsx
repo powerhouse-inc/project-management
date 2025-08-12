@@ -384,12 +384,16 @@ const Project: React.FC<ProjectProps> = ({
               allowRowSelection={true}
               onDelete={(data: any) => {
                 if (!project) return;
-                dispatch(
-                  actions.removeProjectDeliverable({
-                    projectId: project?.id,
-                    deliverableId: data[0].id,
-                  })
-                );
+                if (data.length > 0) {
+                  data.forEach((d: any) => {
+                    dispatch(
+                      actions.removeProjectDeliverable({
+                        projectId: project?.id,
+                        deliverableId: d.id,
+                      })
+                    );
+                  });
+                }
               }}
               onAdd={(data) => {
                 if (data.title) {

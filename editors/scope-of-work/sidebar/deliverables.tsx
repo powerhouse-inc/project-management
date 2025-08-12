@@ -340,7 +340,11 @@ const Deliverables: React.FC<ProjectsProps> = ({
           data={richDeliverables || []}
           allowRowSelection={true}
           onDelete={(data: any) => {
-            dispatch(actions.removeDeliverable({ id: data[0].id }));
+            if (data.length > 0) {
+              data.forEach((d: any) => {
+                dispatch(actions.removeDeliverable({ id: d.id }));
+              });
+            }
           }}
           onAdd={(data) => {
             if (data.title) {

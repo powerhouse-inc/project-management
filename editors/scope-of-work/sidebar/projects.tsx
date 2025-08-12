@@ -100,7 +100,11 @@ const Projects: React.FC<ProjectsProps> = ({
           allowRowSelection={true}
           onDelete={(data: any) => {
             if (!projects) return;
-            dispatch(actions.removeProject({ projectId: data[0].id }));
+            if (data.length > 0) {
+              data.forEach((d: any) => {
+                dispatch(actions.removeProject({ projectId: d.id }));
+              });
+            }
           }}
           onAdd={(data) => {
             if (data.title) {
