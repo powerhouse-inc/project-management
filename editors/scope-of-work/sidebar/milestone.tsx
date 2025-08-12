@@ -129,33 +129,6 @@ const Milestone: React.FC<MilestonesProps> = ({
           );
         },
       },
-      {
-        field: "actions",
-        title: "Actions",
-        editable: true,
-        align: "center" as ColumnAlignment,
-        width: 200,
-        renderCell: (value: any, context: any) => {
-          if (!context.row?.id) return null;
-          return (
-            <span className="cursor-pointer flex items-center justify-center">
-              <Icon
-                name="Trash"
-                size={18}
-                className="hover:text-red-500"
-                onClick={() => {
-                  dispatch(
-                    actions.removeMilestoneDeliverable({
-                      milestoneId: milestone.id,
-                      deliverableId: context.row.id,
-                    })
-                  );
-                }}
-              />
-            </span>
-          );
-        },
-      },
     ],
     []
   );
@@ -330,6 +303,15 @@ const Milestone: React.FC<MilestonesProps> = ({
           columns={columns}
           data={milestoneDeliverables}
           allowRowSelection={true}
+          onDelete={(data) => {
+            if (!milestoneDeliverables || data.length === 0) return;
+            dispatch(
+              actions.removeMilestoneDeliverable({
+                milestoneId: milestone.id,
+                deliverableId: data[0].id,
+              })
+            );
+          }}
           onAdd={(data) => {
             if (data.title) {
               if (!roadmap) return;
