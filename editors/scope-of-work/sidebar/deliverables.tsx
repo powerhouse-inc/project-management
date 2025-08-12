@@ -322,7 +322,14 @@ const Deliverables: React.FC<ProjectsProps> = ({
         align: "center" as ColumnAlignment,
         renderCell: (value: any, context: any) => {
           if (!context.row.latestActivity) return "";
-          return parseLatestActivity(context.row.latestActivity, currentTime);
+          const activityText = parseLatestActivity(context.row.latestActivity, currentTime);
+          const [activity, time] = activityText.split('\n');
+          return (
+            <div className="text-xs">
+              <div>{activity}</div>
+              <div className=" text-gray-500">{time}</div>
+            </div>
+          );
         },
       },
     ],
@@ -390,12 +397,12 @@ const parseLatestActivity = (latestActivity: any, currentTime: Date) => {
   const timeSinceInDays = timeSinceInHours / 24;
 
   if (timeSinceInDays >= 1) {
-    return `${activity} ${Math.round(timeSinceInDays)} days ago`;
+    return `${activity}\n${Math.round(timeSinceInDays)} days ago`;
   } else if (timeSinceInHours >= 1) {
-    return `${activity} ${Math.round(timeSinceInHours)} hours ago`;
+    return `${activity}\n${Math.round(timeSinceInHours)} hours ago`;
   } else if (timeSinceInMinutes >= 1) {
-    return `${activity} ${Math.round(timeSinceInMinutes)} minutes ago`;
+    return `${activity}\n${Math.round(timeSinceInMinutes)} minutes ago`;
   } else {
-    return `${activity} ${Math.round(timeSinceInSeconds)} seconds ago`;
+    return `${activity}\n${Math.round(timeSinceInSeconds)} seconds ago`;
   }
 };
