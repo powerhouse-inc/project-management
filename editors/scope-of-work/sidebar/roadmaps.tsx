@@ -15,7 +15,11 @@ interface ProjectsProps {
   setActiveNodeId: (id: string) => void;
 }
 
-const Roadmaps: React.FC<ProjectsProps> = ({ roadmaps, dispatch, setActiveNodeId }) => {
+const Roadmaps: React.FC<ProjectsProps> = ({
+  roadmaps,
+  dispatch,
+  setActiveNodeId,
+}) => {
   const columns = useMemo<Array<ColumnDef<any>>>(
     () => [
       {
@@ -74,6 +78,10 @@ const Roadmaps: React.FC<ProjectsProps> = ({ roadmaps, dispatch, setActiveNodeId
           columns={columns}
           data={roadmaps || []}
           allowRowSelection={true}
+          onDelete={(data: any) => {
+            if (!roadmaps || data.length === 0) return;
+            dispatch(actions.removeRoadmap({ id: data[0].id }));
+          }}
           onAdd={(data) => {
             if (data.title) {
               const newId = generateId();
@@ -82,9 +90,9 @@ const Roadmaps: React.FC<ProjectsProps> = ({ roadmaps, dispatch, setActiveNodeId
                   id: generateId(),
                   title: data.title as string,
                   slug: (data.title as string)
-                  .toLowerCase()
-                  .replace(/ /g, "-")
-                  .concat(`-${newId.substring(newId.length - 8)}`),
+                    .toLowerCase()
+                    .replace(/ /g, "-")
+                    .concat(`-${newId.substring(newId.length - 8)}`),
                 })
               );
             }
