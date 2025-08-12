@@ -103,8 +103,8 @@ export const reducer: ScopeOfWorkDeliverablesOperations = {
             { value: action.input.workProgress.percentage } :
             action.input.workProgress.storyPoints ?
               { total: action.input.workProgress.storyPoints.total, completed: action.input.workProgress.storyPoints.completed } :
-              action.input.workProgress.completed !== undefined && action.input.workProgress.completed !== null ?
-                { completed: action.input.workProgress.completed } :
+              action.input.workProgress.done !== undefined && action.input.workProgress.done !== null ?
+                { done: action.input.workProgress.done } :
                 deliverable.workProgress
           : deliverable.workProgress,
       }

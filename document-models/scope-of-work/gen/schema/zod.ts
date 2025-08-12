@@ -275,9 +275,8 @@ export function AgentSchema(): z.ZodObject<Properties<Agent>> {
   return z.object({
     __typename: z.literal("Agent").optional(),
     agentType: AgentTypeSchema,
-    code: z.string(),
+    code: z.string().nullable(),
     id: z.string(),
-    imageUrl: z.string().nullable(),
     name: z.string(),
   });
 }
@@ -285,7 +284,7 @@ export function AgentSchema(): z.ZodObject<Properties<Agent>> {
 export function BinarySchema(): z.ZodObject<Properties<Binary>> {
   return z.object({
     __typename: z.literal("Binary").optional(),
-    completed: z.boolean().nullable(),
+    done: z.boolean().nullable(),
   });
 }
 
@@ -478,7 +477,7 @@ export function ProgressSchema() {
 
 export function ProgressInputSchema(): z.ZodObject<Properties<ProgressInput>> {
   return z.object({
-    completed: z.boolean().nullish(),
+    done: z.boolean().nullish(),
     percentage: z.number().nullish(),
     storyPoints: z.lazy(() => StoryPointInputSchema().nullish()),
   });
@@ -604,7 +603,7 @@ export function ScopeOfWorkStateSchema(): z.ZodObject<
 > {
   return z.object({
     __typename: z.literal("ScopeOfWorkState").optional(),
-    agents: z.array(AgentSchema()),
+    contributors: z.array(AgentSchema()),
     deliverables: z.array(DeliverableSchema()),
     description: z.string(),
     projects: z.array(ProjectSchema()),

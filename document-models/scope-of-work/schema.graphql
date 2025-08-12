@@ -21,7 +21,7 @@ type ScopeOfWorkState {
   deliverables: [Deliverable!]!
   projects: [Project!]!
   roadmaps: [Roadmap!]!
-  agents: [Agent!]!
+  contributors: [Agent!]!
 }
 
 enum ScopeOfWorkStatus {
@@ -38,8 +38,7 @@ type Agent {
   id: ID!
   agentType: AgentType!
   name: String!
-  code: String!
-  imageUrl: String
+  code: String
 }
 
 enum AgentType {
@@ -90,7 +89,7 @@ type Percentage {
 }
 
 type Binary {
-  completed: Boolean
+  done: Boolean
 }
 
 type StoryPoint {
@@ -242,7 +241,7 @@ input ProgressInput {
   # Only one of these fields should be provided
   percentage: Float
   storyPoints: StoryPointInput
-  completed: Boolean
+  done: Boolean
 }
 
 input StoryPointInput {

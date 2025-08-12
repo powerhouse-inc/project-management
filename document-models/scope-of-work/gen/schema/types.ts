@@ -132,9 +132,8 @@ export type AddRoadmapInput = {
 
 export type Agent = {
   agentType: AgentType | `${AgentType}`;
-  code: Scalars["String"]["output"];
+  code: Maybe<Scalars["String"]["output"]>;
   id: Scalars["ID"]["output"];
-  imageUrl: Maybe<Scalars["String"]["output"]>;
   name: Scalars["String"]["output"];
 };
 
@@ -143,7 +142,7 @@ export type AgentType = "AI" | "GROUP" | "HUMAN";
 export type AgentTypeInput = "AI" | "GROUP" | "HUMAN";
 
 export type Binary = {
-  completed: Maybe<Scalars["Boolean"]["output"]>;
+  done: Maybe<Scalars["Boolean"]["output"]>;
 };
 
 export type BudgetAnchorProject = {
@@ -308,7 +307,7 @@ export type Percentage = {
 export type Progress = Binary | Percentage | StoryPoint;
 
 export type ProgressInput = {
-  completed?: InputMaybe<Scalars["Boolean"]["input"]>;
+  done?: InputMaybe<Scalars["Boolean"]["input"]>;
   percentage?: InputMaybe<Scalars["Float"]["input"]>;
   storyPoints?: InputMaybe<StoryPointInput>;
 };
@@ -383,7 +382,7 @@ export type Roadmap = {
 };
 
 export type ScopeOfWorkState = {
-  agents: Array<Agent>;
+  contributors: Array<Agent>;
   deliverables: Array<Deliverable>;
   description: Scalars["String"]["output"];
   projects: Array<Project>;

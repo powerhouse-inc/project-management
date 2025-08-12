@@ -23,7 +23,7 @@ export const reducer: ScopeOfWorkAgentsOperations = {
         imageUrl: action.input.imageUrl || "",
       };
 
-      state.agents.push(agent);
+      state.contributors.push(agent);
 
     } catch (error) {
       console.error(error);
@@ -36,12 +36,12 @@ export const reducer: ScopeOfWorkAgentsOperations = {
         throw new Error("Invalid agent id input");
       }
 
-      const agent = state.agents.find((agent) => agent.id === action.input.id);
+      const agent = state.contributors.find((agent) => agent.id === action.input.id);
       if (!agent) {
         throw new Error("Agent not found");
       }
 
-      state.agents = state.agents.filter((agent) => agent.id !== action.input.id);
+      state.contributors = state.contributors.filter((agent) => agent.id !== action.input.id);
 
     } catch (error) {
       console.error(error);
@@ -54,7 +54,7 @@ export const reducer: ScopeOfWorkAgentsOperations = {
         throw new Error("Invalid agent id input");
       }
 
-      const agent = state.agents.find((agent) => agent.id === action.input.id);
+      const agent = state.contributors.find((agent) => agent.id === action.input.id);
       if (!agent) {
         throw new Error("Agent not found");
       }
@@ -64,10 +64,9 @@ export const reducer: ScopeOfWorkAgentsOperations = {
         name: action.input.name || agent.name,
         agentType: action.input.agentType as AgentType || agent.agentType,
         code: action.input.code || agent.code,
-        imageUrl: action.input.imageUrl || agent.imageUrl,
       };
 
-      state.agents = state.agents.map((agent) => agent.id === action.input.id ? updatedAgent : agent);
+      state.contributors = state.contributors.map((agent) => agent.id === action.input.id ? updatedAgent : agent);
 
     } catch (error) {
       console.error(error);

@@ -62,7 +62,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
 
     if (currentDeliverable.workProgress) {
       if (
-        "completed" in currentDeliverable.workProgress &&
+        "done" in currentDeliverable.workProgress &&
         !("total" in currentDeliverable.workProgress)
       ) {
         setIsBoolean(true);
@@ -284,7 +284,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                     actions.setDeliverableProgress({
                       id: currentDeliverable.id,
                       workProgress: {
-                        completed: false,
+                        done: false,
                       },
                     })
                   );
@@ -339,8 +339,8 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                   label="Delivered"
                   // defaultChecked={workProgress && "isBinary" in workProgress ? (workProgress.isBinary ?? false) : false}
                   defaultChecked={
-                    workProgress && "completed" in workProgress
-                      ? Boolean(workProgress.completed)
+                    workProgress && "done" in workProgress
+                      ? Boolean(workProgress.done)
                       : false
                   }
                   onChange={(e: any) => {
@@ -348,7 +348,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                       actions.setDeliverableProgress({
                         id: currentDeliverable.id,
                         workProgress: {
-                          completed: e,
+                          done: e,
                         },
                       })
                     );

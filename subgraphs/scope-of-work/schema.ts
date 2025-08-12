@@ -12,7 +12,7 @@ export const schema: DocumentNode = gql`
     deliverables: [Deliverable!]!
     projects: [Project!]!
     roadmaps: [Roadmap!]!
-    agents: [Agent!]!
+    contributors: [Agent!]!
   }
 
   enum ScopeOfWorkStatus {
@@ -29,8 +29,7 @@ export const schema: DocumentNode = gql`
     id: ID!
     agentType: AgentType!
     name: String!
-    code: String!
-    imageUrl: String
+    code: String
   }
 
   enum AgentType {
@@ -81,7 +80,7 @@ export const schema: DocumentNode = gql`
   }
 
   type Binary {
-    completed: Boolean
+    done: Boolean
   }
 
   type StoryPoint {
@@ -414,7 +413,7 @@ export const schema: DocumentNode = gql`
     # Only one of these fields should be provided
     percentage: Float
     storyPoints: StoryPointInput
-    completed: Boolean
+    done: Boolean
   }
 
   input StoryPointInput {
