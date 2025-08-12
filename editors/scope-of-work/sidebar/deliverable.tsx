@@ -26,7 +26,7 @@ interface DeliverablesProps {
   projects: Project[];
 }
 
-const statusOptions = [
+export const statusOptions = [
   { label: "Wont Do", value: "WONT_DO" },
   { label: "Draft", value: "DRAFT" },
   { label: "To Do", value: "TODO" },
@@ -264,6 +264,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                 options={statusOptions}
                 value={stateDeliverable.status}
                 onChange={(value) => {
+                  if (!value) return null;
                   dispatch(
                     actions.editDeliverable({
                       id: currentDeliverable.id,

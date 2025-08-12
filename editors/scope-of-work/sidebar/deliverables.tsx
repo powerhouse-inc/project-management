@@ -3,6 +3,7 @@ import {
   Deliverable,
   Milestone,
   Project,
+  PmDeliverableStatusInput,
 } from "../../../document-models/scope-of-work/gen/types.js";
 import {
   Select,
@@ -13,6 +14,7 @@ import {
 import { Icon } from "@powerhousedao/design-system";
 import { actions } from "../../../document-models/scope-of-work/index.js";
 import { generateId } from "document-model";
+import { statusOptions } from "./deliverable.js";
 
 interface ProjectsProps {
   deliverables: Deliverable[] | undefined;
@@ -202,6 +204,51 @@ const Deliverables: React.FC<ProjectsProps> = ({
         title: "Status",
         editable: false,
         align: "center" as ColumnAlignment,
+        renderCell: (value: any, context: any) => {
+          if (!context.row.status) return "";
+          return (
+            <div>
+              <Select
+                className={String.raw`
+                  [&]:!pl-2
+                  [&]:!pt-0
+                  [&]:!pb-0
+                  [&_.select\\_\\_search]:!p-0
+                  [&_.select\\_\\_trigger]:!text-xs
+                  [&_.select\\_\\_value]:!text-xs
+                  [&_.select\\_\\_trigger]:!text-[12px]
+                  [&_.select\\_\\_value]:!text-[12px]
+                  [&_*]:!text-xs
+                  [&_*]:!text-[12px]
+                  [&_.select\\_\\_trigger]:!p-0
+                  [&_.select\\_\\_value]:!p-0
+                  [&_.select\\_\\_item]:!p-0
+                  [&_.select\\_\\_content]:!p-0
+                  [&_*]:!p-0
+                `}
+                contentClassName={String.raw`
+                  [&_.select\\_\\_content]:!w-full
+                  [&_.select\\_\\_list-item]:!text-xs
+                  [&_.select\\_\\_content]:!text-[12px]
+                  [&_.select\\_\\_list-item]:!text-[12px]
+                  [&_*]:!text-xs
+                  [&_*]:!text-[12px]
+                `}
+                options={statusOptions}
+                value={context.row.status}
+                onChange={(value) => {
+                  if (!value) return null;
+                  dispatch(
+                    actions.editDeliverable({
+                      id: context.row.id,
+                      status: value as PmDeliverableStatusInput,
+                    })
+                  );
+                }}
+              />
+            </div>
+          );
+        },
       },
       {
         field: "milestoneTitle",
@@ -225,7 +272,53 @@ const Deliverables: React.FC<ProjectsProps> = ({
                 </span>
               )}
               <Select
-                className={`w-full ${context.row.milestoneId ? "ml-2" : ""}`}
+                className={String.raw`
+                ${context.row.milestoneId ? "ml-2" : ""}
+                  [&]:!pl-2
+                  [&]:!pt-0
+                  [&]:!pb-0
+                  [&]:!w-[120px]
+                  [&]:!max-w-[120px]
+                  [&_.select\\_\\_search]:!p-0
+                  [&_.select\\_\\_trigger]:!text-xs
+                  [&_.select\\_\\_value]:!text-xs
+                  [&_.select\\_\\_trigger]:!text-[12px]
+                  [&_.select\\_\\_value]:!text-[12px]
+                  [&_*]:!text-xs
+                  [&_*]:!text-[12px]
+                  [&_.select\\_\\_trigger]:!p-0
+                  [&_.select\\_\\_value]:!p-0
+                  [&_.select\\_\\_item]:!p-0
+                  [&_.select\\_\\_content]:!p-0
+                  [&_*]:!p-0
+                  [&_.select\\_\\_trigger]:!w-[150px]
+                  [&_.select\\_\\_trigger]:!max-w-[150px]
+                  [&_.select\\_\\_value]:!w-[150px]
+                  [&_.select\\_\\_value]:!max-w-[150px]
+                  [&_.select\\_\\_value]:!truncate
+                `}
+                contentClassName={String.raw`
+                  [&_.select\\_\\_content]:!w-fit
+                  [&_.select\\_\\_content]:!min-w-[150px]
+                  [&_.select\\_\\_content]:!max-w-[500px]
+                  [&_.select\\_\\_content]:!bg-white
+                  [&_.select\\_\\_content]:!border
+                  [&_.select\\_\\_content]:!border-[0.5px]
+                  [&_.select\\_\\_content]:!border-gray-300
+                  [&_.select\\_\\_content]:!rounded-md
+                  [&_.select\\_\\_list-item]:!text-xs
+                  [&_.select\\_\\_content]:!text-[12px]
+                  [&_.select\\_\\_list-item]:!text-[12px]
+                  [&_*]:!text-xs
+                  [&_*]:!text-[12px]
+                  [&_.select\\_\\_list-item]:!whitespace-nowrap
+                  [&_.select\\_\\_list-item]:!overflow-visible
+                  [&_.select\\_\\_list-item]:!text-ellipsis-none
+                  [&_.select\\_\\_list-item]:bg-white
+                  [&_.select\\_\\_list-item]:hover:bg-gray-100
+                  [&_.select\\_\\_content]:bg-white
+                  [&_.select\\_\\_item]:bg-white
+                `}
                 options={
                   stateMilestones?.map((milestone) => ({
                     label: milestone.title,
@@ -281,7 +374,53 @@ const Deliverables: React.FC<ProjectsProps> = ({
                 </span>
               )}
               <Select
-                className={`w-full ${context.row.projectId ? "ml-2" : ""}`}
+                className={String.raw`
+                  ${context.row.projectId ? "ml-2" : ""}
+                    [&]:!pl-2
+                    [&]:!pt-0
+                    [&]:!pb-0
+                    [&]:!w-[120px]
+                    [&]:!max-w-[120px]
+                    [&_.select\\_\\_search]:!p-0
+                    [&_.select\\_\\_trigger]:!text-xs
+                    [&_.select\\_\\_value]:!text-xs
+                    [&_.select\\_\\_trigger]:!text-[12px]
+                    [&_.select\\_\\_value]:!text-[12px]
+                    [&_*]:!text-xs
+                    [&_*]:!text-[12px]
+                    [&_.select\\_\\_trigger]:!p-0
+                    [&_.select\\_\\_value]:!p-0
+                    [&_.select\\_\\_item]:!p-0
+                    [&_.select\\_\\_content]:!p-0
+                    [&_*]:!p-0
+                    [&_.select\\_\\_trigger]:!w-[150px]
+                    [&_.select\\_\\_trigger]:!max-w-[150px]
+                    [&_.select\\_\\_value]:!w-[150px]
+                    [&_.select\\_\\_value]:!max-w-[150px]
+                    [&_.select\\_\\_value]:!truncate
+                  `}
+                contentClassName={String.raw`
+                    [&_.select\\_\\_content]:!w-fit
+                    [&_.select\\_\\_content]:!min-w-[150px]
+                    [&_.select\\_\\_content]:!max-w-[500px]
+                    [&_.select\\_\\_content]:!bg-white
+                    [&_.select\\_\\_content]:!border
+                    [&_.select\\_\\_content]:!border-[0.5px]
+                    [&_.select\\_\\_content]:!border-gray-300
+                    [&_.select\\_\\_content]:!rounded-md
+                    [&_.select\\_\\_list-item]:!text-xs
+                    [&_.select\\_\\_content]:!text-[12px]
+                    [&_.select\\_\\_list-item]:!text-[12px]
+                    [&_*]:!text-xs
+                    [&_*]:!text-[12px]
+                    [&_.select\\_\\_list-item]:!whitespace-nowrap
+                    [&_.select\\_\\_list-item]:!overflow-visible
+                    [&_.select\\_\\_list-item]:!text-ellipsis-none
+                    [&_.select\\_\\_list-item]:bg-white
+                    [&_.select\\_\\_list-item]:hover:bg-gray-100
+                    [&_.select\\_\\_content]:bg-white
+                    [&_.select\\_\\_item]:bg-white
+                  `}
                 options={
                   stateProjects?.map((project) => ({
                     label: project.title,
@@ -322,8 +461,11 @@ const Deliverables: React.FC<ProjectsProps> = ({
         align: "center" as ColumnAlignment,
         renderCell: (value: any, context: any) => {
           if (!context.row.latestActivity) return "";
-          const activityText = parseLatestActivity(context.row.latestActivity, currentTime);
-          const [activity, time] = activityText.split('\n');
+          const activityText = parseLatestActivity(
+            context.row.latestActivity,
+            currentTime
+          );
+          const [activity, time] = activityText.split("\n");
           return (
             <div className="text-xs">
               <div>{activity}</div>
