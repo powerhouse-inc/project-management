@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Project } from "../../../document-models/scope-of-work/gen/types.js";
+import { Agent, Project } from "../../../document-models/scope-of-work/gen/types.js";
 import {
   TextInput,
   ObjectSetTable,
@@ -9,17 +9,20 @@ import {
 import { Icon } from "@powerhousedao/design-system";
 import { actions } from "../../../document-models/scope-of-work/index.js";
 import { generateId } from "document-model";
+import ProgressBar from "../components/progressBar.js";
 
 interface ProjectsProps {
   projects: Project[] | undefined;
   dispatch: any;
   setActiveNodeId: (id: string) => void;
+  contributors: Agent[] | undefined;
 }
 
 const Projects: React.FC<ProjectsProps> = ({
   projects,
   dispatch,
   setActiveNodeId,
+  contributors,
 }) => {
   const columns = useMemo<Array<ColumnDef<any>>>(
     () => [
@@ -65,16 +68,29 @@ const Projects: React.FC<ProjectsProps> = ({
         },
       },
       {
+        field: "progress",
+        title: "Progress",
+        align: "left" as ColumnAlignment,
+        renderCell: (value: any, context: any) => {
+          if (!context.row.scope) return null;
+          return <ProgressBar progress={context.row.scope?.progress} />;
+        },
+      },
+      {
         field: "projectOwner",
         title: "Owner",
         editable: true,
-        align: "center" as ColumnAlignment,
+        align: "left" as ColumnAlignment,
+        renderCell: (value: any, context: any) => {
+          if (!context.row.projectOwner) return null;
+          return <div className="text-left">{contributors?.find((c) => c.id === context.row.projectOwner)?.name ?? context.row.projectOwner}</div>;
+        },
       },
       {
         field: "budget",
         title: "Budget",
         editable: true,
-        align: "center" as ColumnAlignment,
+        align: "left" as ColumnAlignment,
         renderCell: (value: any, context: any) => {
           if (value == 0) return null;
           return (

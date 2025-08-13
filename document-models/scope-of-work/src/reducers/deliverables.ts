@@ -197,6 +197,8 @@ export const reducer: ScopeOfWorkDeliverablesOperations = {
     } catch (error) {
       console.error(error);
     }
+    // Only apply budget and progress invariants, not margin invariant when setting margin
+    // This prevents the margin from being recalculated and overriding user input
     applyInvariants(state, ['budget', 'progress']);
   },
 };

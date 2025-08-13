@@ -13,6 +13,7 @@ import {
   ScopeOfWorkStatusInput,
 } from "../../../document-models/scope-of-work/index.js";
 import { generateId } from "document-model";
+import ProgressBar from "../components/progressBar.js";
 
 interface ScopeOfWorkProps {
   setSelectedRoadmapId: (id: string) => void;
@@ -121,6 +122,15 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
         },
         renderCell: (value: any, context: any) => {
           return <div className="text-left">{value}</div>;
+        },
+      },
+      {
+        field: "progress",
+        title: "Progress",
+        align: "left" as ColumnAlignment,
+        renderCell: (value: any, context: any) => {
+          if (!context.row.scope) return null;
+          return <ProgressBar progress={context.row.scope?.progress} />;
         },
       },
     ],

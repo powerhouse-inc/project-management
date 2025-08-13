@@ -206,6 +206,7 @@ export default function SidebarMenu(props: any) {
             dispatch={dispatch}
             projects={projects}
             setActiveNodeId={setActiveNodeId}
+            contributors={contributors}
           />
         );
       case "project":

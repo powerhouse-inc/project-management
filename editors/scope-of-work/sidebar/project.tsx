@@ -126,6 +126,15 @@ const Project: React.FC<ProjectProps> = ({
           }
           return false;
         },
+        renderCell: (value: any, context: any) => {
+          if (!context.row.owner) return null;
+          return (
+            <div className="text-center">
+              {contributors.find((c) => c.id === context.row.owner)?.name ??
+                context.row.owner}
+            </div>
+          );
+        },
       },
       {
         field: "workProgress",
