@@ -1,4 +1,4 @@
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, useRef } from "react";
 import { Icon } from "@powerhousedao/design-system";
 import {
   Project,
@@ -31,17 +31,34 @@ const BudgetCalculator = ({
   const [budget, setBudget] = useState(0);
   const [margin, setMargin] = useState(0);
   const [totalBudget, setTotalBudget] = useState(0);
+  const skipMarginUpdateRef = useRef(false);
 
   useEffect(() => {
-    const margin = deliverables?.map(
-      (deliverable) => deliverable.budgetAnchor?.margin
-    );
-    if (margin && margin.every((m) => m === margin[0])) {
-      setMargin((margin[0] ?? 0));
-    } else {
-      setMargin(0);
+    // Only update margin from deliverables if we're not skipping updates
+    if (!skipMarginUpdateRef.current) {
+      const margin = deliverables?.map(
+        (deliverable) => deliverable.budgetAnchor?.margin
+      );
+      if (margin && margin.every((m) => m === margin[0])) {
+        setMargin(margin[0] ?? 0);
+      } else {
+        setMargin(0);
+      }
     }
   }, [deliverables]);
+
+  const richDeliverables = useMemo(
+    () =>
+      deliverables?.map((deliverable) => ({
+        ...deliverable,
+        quantity: deliverable.budgetAnchor?.quantity ?? 0,
+        unitCost: deliverable.budgetAnchor?.unitCost ?? 0,
+        subtotal:
+          (deliverable.budgetAnchor?.quantity ?? 0) *
+          (deliverable.budgetAnchor?.unitCost ?? 0),
+      })),
+    [deliverables]
+  );
 
   useEffect(() => {
     const getTotalBudget = () => {
@@ -53,16 +70,7 @@ const BudgetCalculator = ({
       return isNaN(total) ? "0" : total.toFixed(2);
     };
     setTotalBudget(parseFloat(getTotalBudget()));
-  }, [deliverables, margin]);
-
-  const richDeliverables = deliverables?.map((deliverable) => ({
-    ...deliverable,
-    quantity: deliverable.budgetAnchor?.quantity ?? 0,
-    unitCost: deliverable.budgetAnchor?.unitCost ?? 0,
-    subtotal:
-      (deliverable.budgetAnchor?.quantity ?? 0) *
-      (deliverable.budgetAnchor?.unitCost ?? 0),
-  }));
+  }, [richDeliverables, margin]);
 
   const columns = useMemo<Array<ColumnDef<any>>>(
     () => [
@@ -179,10 +187,9 @@ const BudgetCalculator = ({
       <div className="flex justify-end items-center gap-4">
         <span>Total Cost:</span>
         <div className="w-[100px] h-8 bg-gray-100 border border-gray-300 rounded px-2 flex items-center justify-center">
-          {richDeliverables?.reduce(
-            (acc, deliverable) => acc + deliverable.subtotal,
-            0
-          ).toFixed(2) || 0}
+          {richDeliverables
+            ?.reduce((acc, deliverable) => acc + deliverable.subtotal, 0)
+            .toFixed(2) || 0}
         </div>
       </div>
       <div className="flex justify-end items-center gap-4">
@@ -192,19 +199,30 @@ const BudgetCalculator = ({
             type="number"
             className="w-[100px] h-8 border border-gray-300 rounded px-2 text-center"
             value={margin}
+            onFocus={() => {
+              skipMarginUpdateRef.current = true;
+            }}
             onChange={(e) => {
-              setMargin(parseFloat(e.target.value));
+              const value = parseFloat(e.target.value);
+              const newMargin = isNaN(value) ? 0 : value;
+              setMargin(newMargin);
             }}
             onBlur={() => {
-              if (margin) {
+              // Set margin for all deliverables in the project
+              richDeliverables?.forEach((deliverable) => {
                 dispatch(
                   actions.setDeliverableBudgetAnchorProject({
-                    deliverableId: richDeliverables?.[0]?.id ?? "",
+                    deliverableId: deliverable.id,
                     project: project?.id ?? "",
                     margin: margin,
                   })
                 );
-              }
+              });
+
+              // Reset the skip flag after a delay to allow the action to complete
+              setTimeout(() => {
+                skipMarginUpdateRef.current = false;
+              }, 100);
             }}
           />
         </div>
