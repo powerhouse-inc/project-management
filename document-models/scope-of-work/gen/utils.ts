@@ -18,10 +18,11 @@ import { reducer } from "./reducer.js";
 export const initialGlobalState: ScopeOfWorkState = {
   title: "",
   description: "",
+  status: "DRAFT",
   deliverables: [],
   projects: [],
   roadmaps: [],
-  agents: [],
+  contributors: [],
 };
 export const initialLocalState: ScopeOfWorkLocalState = {};
 

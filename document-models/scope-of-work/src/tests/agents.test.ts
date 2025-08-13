@@ -36,8 +36,8 @@ describe("Agents Operations", () => {
     expect(updatedDocument.operations.global[0].type).toBe("ADD_AGENT");
     expect(updatedDocument.operations.global[0].input).toStrictEqual(input);
     expect(updatedDocument.operations.global[0].index).toEqual(0);
-    expect(updatedDocument.state.global.agents).toHaveLength(1);
-    expect(updatedDocument.state.global.agents[0]).toStrictEqual(input);
+    expect(updatedDocument.state.global.contributors).toHaveLength(1);
+    expect(updatedDocument.state.global.contributors[0]).toStrictEqual(input);
   });
   it("should handle removeAgent operation", () => {
     // First, add an agent to the document
@@ -62,7 +62,7 @@ describe("Agents Operations", () => {
     expect(updatedDocument.operations.global[1].type).toBe("REMOVE_AGENT");
     expect(updatedDocument.operations.global[1].input).toStrictEqual(removeInput);
     expect(updatedDocument.operations.global[1].index).toEqual(1);
-    expect(updatedDocument.state.global.agents).toHaveLength(0);
+    expect(updatedDocument.state.global.contributors).toHaveLength(0);
   });
   
   it("should handle editAgent operation", () => {
@@ -92,8 +92,8 @@ describe("Agents Operations", () => {
     expect(updatedDocument.operations.global[1].type).toBe("EDIT_AGENT");
     expect(updatedDocument.operations.global[1].input).toStrictEqual(editInput);
     expect(updatedDocument.operations.global[1].index).toEqual(1);
-    expect(updatedDocument.state.global.agents).toHaveLength(1);
-    expect(updatedDocument.state.global.agents[0]).toStrictEqual({
+    expect(updatedDocument.state.global.contributors).toHaveLength(1);
+    expect(updatedDocument.state.global.contributors[0]).toStrictEqual({
       id: "agent-2",
       name: "Updated Name",
       agentType: "AI",
