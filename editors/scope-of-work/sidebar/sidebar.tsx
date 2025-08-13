@@ -236,7 +236,7 @@ export default function SidebarMenu(props: any) {
         <Sidebar
           // nodes={nodes}
           sidebarTitle="Scope of Work"
-          sidebarIcon={<Icon name="BrickGlobe" />}
+          sidebarIcon={<Icon name="Globe" />}
           enableMacros={3}
           allowPinning={true}
           resizable={true}
