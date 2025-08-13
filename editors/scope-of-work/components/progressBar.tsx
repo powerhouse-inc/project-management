@@ -10,18 +10,27 @@ export const ProgressBar = ({ progress }: { progress: any }) => {
     );
   }
 
-  // Case 1: Binary progress {completed: boolean}
-  if ("completed" in progress && typeof progress.completed === "boolean") {
-    const percentage = progress.completed ? 100 : 0;
-    const bgColor = progress.completed ? "bg-green-500" : "bg-gray-300";
-    return (
-      <div className="w-full bg-gray-200 rounded-full h-2">
-        <div
-          className={`${bgColor} h-2 rounded-full transition-all duration-300`}
-          style={{ width: `${percentage}%` }}
-        ></div>
-      </div>
-    );
+  // Case 1: Binary progress {done: boolean}
+  if ("done" in progress && typeof progress.done === "boolean") {
+    if (progress.done === false) {
+      return (
+        <div className="w-full bg-gray-200 rounded-full h-2">
+          <div
+            className="bg-yellow-500 h-2 rounded-full transition-all duration-300"
+            style={{ width: "50%" }}
+          ></div>
+        </div>
+      );
+    } else {
+      return (
+        <div className="w-full bg-gray-200 rounded-full h-2">
+          <div
+            className={`bg-green-500 h-2 rounded-full transition-all duration-300`}
+            style={{ width: `100%` }}
+          ></div>
+        </div>
+      );
+    }
   }
 
   // Case 2: Percentage progress {value: number}
