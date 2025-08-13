@@ -20,7 +20,6 @@ export const reducer: ScopeOfWorkContributorsOperations = {
         name: action.input.name,
         agentType: action.input.agentType as AgentType || 'HUMAN',
         code: action.input.code || "",
-        imageUrl: action.input.imageUrl || "",
       };
 
       state.contributors.push(agent);
