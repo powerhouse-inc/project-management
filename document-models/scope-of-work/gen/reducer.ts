@@ -10,7 +10,7 @@ import { reducer as DeliverablesReducer } from "../src/reducers/deliverables.js"
 import { reducer as RoadmapsReducer } from "../src/reducers/roadmaps.js";
 import { reducer as MilestonesReducer } from "../src/reducers/milestones.js";
 import { reducer as DeliverablesSetReducer } from "../src/reducers/deliverables-set.js";
-import { reducer as AgentsReducer } from "../src/reducers/agents.js";
+import { reducer as ContributorsReducer } from "../src/reducers/contributors.js";
 import { reducer as ProjectsReducer } from "../src/reducers/projects.js";
 
 const stateReducer: StateReducer<ScopeOfWorkDocument> = (
@@ -223,17 +223,29 @@ const stateReducer: StateReducer<ScopeOfWorkDocument> = (
 
     case "ADD_AGENT":
       z.AddAgentInputSchema().parse(action.input);
-      AgentsReducer.addAgentOperation(state[action.scope], action, dispatch);
+      ContributorsReducer.addAgentOperation(
+        state[action.scope],
+        action,
+        dispatch,
+      );
       break;
 
     case "REMOVE_AGENT":
       z.RemoveAgentInputSchema().parse(action.input);
-      AgentsReducer.removeAgentOperation(state[action.scope], action, dispatch);
+      ContributorsReducer.removeAgentOperation(
+        state[action.scope],
+        action,
+        dispatch,
+      );
       break;
 
     case "EDIT_AGENT":
       z.EditAgentInputSchema().parse(action.input);
-      AgentsReducer.editAgentOperation(state[action.scope], action, dispatch);
+      ContributorsReducer.editAgentOperation(
+        state[action.scope],
+        action,
+        dispatch,
+      );
       break;
 
     case "ADD_PROJECT":

@@ -14,7 +14,7 @@ import ScopeOfWork_Deliverables from "./deliverables/object.js";
 import ScopeOfWork_Roadmaps from "./roadmaps/object.js";
 import ScopeOfWork_Milestones from "./milestones/object.js";
 import ScopeOfWork_DeliverablesSet from "./deliverables-set/object.js";
-import ScopeOfWork_Agents from "./agents/object.js";
+import ScopeOfWork_Contributors from "./contributors/object.js";
 import ScopeOfWork_Projects from "./projects/object.js";
 
 export * from "./scope-of-work/object.js";
@@ -22,7 +22,7 @@ export * from "./deliverables/object.js";
 export * from "./roadmaps/object.js";
 export * from "./milestones/object.js";
 export * from "./deliverables-set/object.js";
-export * from "./agents/object.js";
+export * from "./contributors/object.js";
 export * from "./projects/object.js";
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
@@ -32,7 +32,7 @@ interface ScopeOfWork
     ScopeOfWork_Roadmaps,
     ScopeOfWork_Milestones,
     ScopeOfWork_DeliverablesSet,
-    ScopeOfWork_Agents,
+    ScopeOfWork_Contributors,
     ScopeOfWork_Projects {}
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
@@ -76,7 +76,7 @@ applyMixins(ScopeOfWork, [
   ScopeOfWork_Roadmaps,
   ScopeOfWork_Milestones,
   ScopeOfWork_DeliverablesSet,
-  ScopeOfWork_Agents,
+  ScopeOfWork_Contributors,
   ScopeOfWork_Projects,
 ]);
 

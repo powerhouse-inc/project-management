@@ -436,7 +436,7 @@ export const documentModel: DocumentModelState = {
         },
         {
           id: "7f2db8cf-9fe9-4095-91f0-cfd61b43fc02",
-          name: "agents",
+          name: "contributors",
           description: "",
           operations: [
             {

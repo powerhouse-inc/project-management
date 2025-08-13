@@ -541,7 +541,7 @@ export const schema: DocumentNode = gql`
   }
 
   """
-  Module: Agents
+  Module: Contributors
   """
   input ScopeOfWork_AddAgentInput {
     id: ID!

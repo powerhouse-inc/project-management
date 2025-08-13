@@ -6,7 +6,7 @@ import {
 } from "./actions.js";
 import { type ScopeOfWorkState } from "../types.js";
 
-export interface ScopeOfWorkAgentsOperations {
+export interface ScopeOfWorkContributorsOperations {
   addAgentOperation: (
     state: ScopeOfWorkState,
     action: AddAgentAction,

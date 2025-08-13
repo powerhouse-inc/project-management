@@ -9,7 +9,7 @@ import {
 import { addAgent, removeAgent, editAgent } from "./creators.js";
 import { type ScopeOfWorkAction } from "../actions.js";
 
-export default class ScopeOfWork_Agents extends BaseDocumentClass<
+export default class ScopeOfWork_Contributors extends BaseDocumentClass<
   ScopeOfWorkState,
   ScopeOfWorkLocalState,
   ScopeOfWorkAction

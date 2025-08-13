@@ -4,10 +4,10 @@
  * - delete the file and run the code generator again to have it reset
  */
 
-import type { ScopeOfWorkAgentsOperations } from "../../gen/agents/operations.js";
+import type { ScopeOfWorkContributorsOperations } from "../../gen/contributors/operations.js";
 import type { AgentType } from "../../gen/types.js";
 
-export const reducer: ScopeOfWorkAgentsOperations = {
+export const reducer: ScopeOfWorkContributorsOperations = {
   addAgentOperation(state, action, dispatch) {
     try {
 

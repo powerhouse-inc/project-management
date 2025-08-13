@@ -11,8 +11,6 @@ export type ErrorCode =
 export interface ReducerError {
   errorCode: ErrorCode;
 }
-
-
 export class InvalidStatusTransition extends Error implements ReducerError {
   errorCode = "InvalidStatusTransition" as ErrorCode;
   constructor(message = "InvalidStatusTransition") {

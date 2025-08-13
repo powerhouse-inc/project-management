@@ -17,7 +17,7 @@ export type EditAgentAction = BaseAction<
   "global"
 >;
 
-export type ScopeOfWorkAgentsAction =
+export type ScopeOfWorkContributorsAction =
   | AddAgentAction
   | RemoveAgentAction
   | EditAgentAction;
