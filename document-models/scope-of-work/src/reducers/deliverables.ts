@@ -61,7 +61,7 @@ export const reducer: ScopeOfWorkDeliverablesOperations = {
 
 
       state.deliverables = state.deliverables.filter((deliverable) => String(deliverable.id) !== String(action.input.id));
-      applyInvariants(state, ["budget", "margin"]);
+      applyInvariants(state, ["budget", "margin", "progress"]);
     } catch (error) {
       console.error(error);
     }
@@ -84,7 +84,7 @@ export const reducer: ScopeOfWorkDeliverablesOperations = {
       }
 
       state.deliverables = state.deliverables.map((deliverable) => String(deliverable.id) === String(action.input.id) ? updatedDeliverable : deliverable);
-
+      applyInvariants(state, ["progress"]);
     } catch (error) {
       console.error(error);
     }
@@ -116,7 +116,7 @@ export const reducer: ScopeOfWorkDeliverablesOperations = {
       }
 
       state.deliverables = state.deliverables.map((deliverable) => String(deliverable.id) === String(action.input.id) ? updatedDeliverable : deliverable);
-
+      applyInvariants(state, ["progress"]);
 
     } catch (error) {
       console.error(error);
@@ -197,7 +197,7 @@ export const reducer: ScopeOfWorkDeliverablesOperations = {
     } catch (error) {
       console.error(error);
     }
-    applyInvariants(state, ['budget']);
+    applyInvariants(state, ['budget', 'progress']);
   },
 };
 

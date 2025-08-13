@@ -5,6 +5,7 @@
  */
 
 import type { ScopeOfWorkDeliverablesSetOperations } from "../../gen/deliverables-set/operations.js";
+import { applyInvariants } from "./projects.js";
 
 export const reducer: ScopeOfWorkDeliverablesSetOperations = {
   editDeliverablesSetOperation(state, action, dispatch) {
@@ -32,6 +33,7 @@ export const reducer: ScopeOfWorkDeliverablesSetOperations = {
         state.roadmaps = state.roadmaps.map((roadmap) => {
           return String(roadmap.id) === String(foundRoadmap.id) ? foundRoadmap : roadmap;
         });
+        applyInvariants(state, ["progress"]);
       } else if (action.input.projectId && !action.input.milestoneId) {
 
         // update project set
@@ -52,6 +54,7 @@ export const reducer: ScopeOfWorkDeliverablesSetOperations = {
         state.projects = state.projects.map((project) => {
           return String(project.id) === String(action.input.projectId) ? updatedProject : project;
         });
+        applyInvariants(state, ["progress"]);
       }
 
     } catch (error) {
@@ -98,6 +101,7 @@ export const reducer: ScopeOfWorkDeliverablesSetOperations = {
         state.roadmaps = state.roadmaps.map((roadmap) => {
           return String(roadmap.id) === String(foundRoadmap.id) ? foundRoadmap : roadmap;
         });
+        applyInvariants(state, ["progress"]);
       } else if (action.input.projectId && !action.input.milestoneId) {
         // check if project exists
         const foundProject = state.projects.find((project) => String(project.id) === String(action.input.projectId));
@@ -124,6 +128,7 @@ export const reducer: ScopeOfWorkDeliverablesSetOperations = {
         state.projects = state.projects.map((project) => {
           return String(project.id) === String(action.input.projectId) ? foundProject : project;
         });
+        applyInvariants(state, ["progress"]);
       }
     } catch (error) {
       console.error(error);
@@ -153,6 +158,7 @@ export const reducer: ScopeOfWorkDeliverablesSetOperations = {
         state.roadmaps = state.roadmaps.map((roadmap) => {
           return String(roadmap.id) === String(foundRoadmap.id) ? foundRoadmap : roadmap;
         });
+        applyInvariants(state, ["progress"]);
       } else if (action.input.projectId) {
         const foundProject = state.projects.find((project) => String(project.id) === String(action.input.projectId));
         if (!foundProject) {
@@ -168,6 +174,7 @@ export const reducer: ScopeOfWorkDeliverablesSetOperations = {
         state.projects = state.projects.map((project) => {
           return String(project.id) === String(action.input.projectId) ? foundProject : project;
         });
+        applyInvariants(state, ["progress"]);
       }
     } catch (error) {
       console.error(error);

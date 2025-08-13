@@ -230,7 +230,7 @@ export const applyInvariants = (state: ScopeOfWorkState, updates: String[]) => {
 
 
   // another invariant: deliverableSet.progress = function of deliverableSet.deliverables.progress
-  if(updates.includes("progress")) {
+  if (updates.includes("progress")) {
     calculateDeliverableSetsProgress(state);
   }
 
@@ -267,9 +267,115 @@ const calculateTotalBudget = (state: ScopeOfWorkState, deliverableSet: Deliverab
   return totalBudget === 0 ? 0 : Number(totalBudget.toFixed(2));
 }
 
+// Helper function to determine if a deliverable uses story points
+const isStoryPointsProgress = (progress: any): progress is { total: number; completed: number } => {
+  return progress && typeof progress.total === 'number' && typeof progress.completed === 'number';
+};
+
+// Helper function to determine if a deliverable uses percentage progress
+const isPercentageProgress = (progress: any): progress is { value: number } => {
+  return progress && typeof progress.value === 'number';
+};
+
+// Helper function to determine if a deliverable uses binary progress
+const isBinaryProgress = (progress: any): progress is { done: boolean } => {
+  return progress && typeof progress.done === 'boolean';
+};
+
+// Helper function to calculate percentage equivalent for any progress type
+const getPercentageEquivalent = (deliverable: any): number => {
+  if (!deliverable.workProgress) {
+    return 0;
+  }
+
+  const progress = deliverable.workProgress;
+
+  if (isPercentageProgress(progress)) {
+    return progress.value;
+  }
+
+  if (isStoryPointsProgress(progress)) {
+    return progress.total > 0 ? (progress.completed / progress.total) * 100 : 0;
+  }
+
+  if (isBinaryProgress(progress)) {
+    if (deliverable.status === 'IN_PROGRESS') {
+      return 50;
+    }
+    return progress.done ? 100 : 0;
+  }
+
+  return 0;
+};
+
+// Helper function to check if deliverable should be ignored
+const shouldIgnoreDeliverable = (deliverable: any): boolean => {
+  return deliverable.status === 'CANCELED' || deliverable.status === 'WONT_DO';
+};
+
+// Helper function to calculate progress for a single deliverable set
+const calculateDeliverableSetProgress = (state: ScopeOfWorkState, deliverableSet: any) => {
+  // Get all deliverables in this set, filtering out ignored ones
+  const deliverables = deliverableSet.deliverables
+    .map((id: string) => state.deliverables.find(d => d.id === id))
+    .filter((deliverable: any) => deliverable && !shouldIgnoreDeliverable(deliverable));
+
+  if (deliverables.length === 0) {
+    // No valid deliverables, set default progress
+    deliverableSet.progress = { value: 0 };
+    deliverableSet.deliverablesCompleted = { total: 0, completed: 0 };
+    return;
+  }
+
+  // Determine if ALL deliverables use story points
+  const allUseStoryPoints = deliverables.every((d: any) => 
+    d.workProgress && isStoryPointsProgress(d.workProgress)
+  );
+
+  if (allUseStoryPoints) {
+    // 3.a) If StoryPoints only => deliverableSet.progress.completed = Sum (completed[i]), deliverableSet.progress.total = Sum (total[i])
+    let totalStoryPoints = 0;
+    let completedStoryPoints = 0;
+
+    deliverables.forEach((deliverable: any) => {
+      if (isStoryPointsProgress(deliverable.workProgress)) {
+        totalStoryPoints += deliverable.workProgress.total;
+        completedStoryPoints += deliverable.workProgress.completed;
+      }
+    });
+
+    deliverableSet.progress = {
+      total: totalStoryPoints,
+      completed: completedStoryPoints
+    };
+  } else {
+    // 3.b) If !storyPointsOnly => AVERAGE (percentageCompletedEquivalent[i])
+    const percentages = deliverables.map((d: any) => getPercentageEquivalent(d));
+    const averagePercentage = percentages.length > 0 
+      ? percentages.reduce((sum: number, p: number) => sum + p, 0) / percentages.length 
+      : 0;
+
+    deliverableSet.progress = {
+      value: Math.round(averagePercentage * 100) / 100 // Round to 2 decimal places
+    };
+  }
+
+  // Update deliverablesCompleted count
+  const completedDeliverables = deliverables.filter((d: any) => 
+    d.status === 'DELIVERED' || 
+    (d.workProgress && isBinaryProgress(d.workProgress) && d.workProgress.done)
+  );
+
+  deliverableSet.deliverablesCompleted = {
+    total: deliverables.length,
+    completed: completedDeliverables.length
+  };
+};
+
 const calculateDeliverableSetsProgress = (state: ScopeOfWorkState) => {
 
   // run through all deliverable sets in milestones, projects and calculate the progress from each deliverable
+  // The progress has to be calculated for each deliverableSet inside a milestone or project
   /* For every set
     1) Remove / ignore CANCELLED or WONT_DO deliverables
     2) Determine storyPointsOnly = true or false
@@ -284,6 +390,20 @@ const calculateDeliverableSetsProgress = (state: ScopeOfWorkState) => {
     Progress.binary ? (status = IN_PROGESS ) : 50% : ( completed ? 100 : 0 ))
 
   */
-  
 
-}
+  // Process all deliverable sets in projects
+  state.projects.forEach((project) => {
+    if (project.scope) {
+      calculateDeliverableSetProgress(state, project.scope);
+    }
+  });
+
+  // Process all deliverable sets in milestones
+  state.roadmaps.forEach((roadmap) => {
+    roadmap.milestones.forEach((milestone) => {
+      if (milestone.scope) {
+        calculateDeliverableSetProgress(state, milestone.scope);
+      }
+    });
+  });
+};
