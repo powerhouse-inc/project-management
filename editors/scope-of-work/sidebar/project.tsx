@@ -3,6 +3,7 @@ import {
   type Project,
   type PmBudgetTypeInput,
   PmCurrencyInput,
+  Agent,
 } from "../../../document-models/scope-of-work/gen/types.js";
 import { useMemo, useState, useEffect } from "react";
 import {
@@ -27,6 +28,7 @@ interface ProjectProps {
   dispatch: any;
   deliverables: Deliverable[];
   setActiveNodeId: (id: string) => void;
+  contributors: Agent[];
 }
 
 const Project: React.FC<ProjectProps> = ({
@@ -34,6 +36,7 @@ const Project: React.FC<ProjectProps> = ({
   dispatch,
   deliverables,
   setActiveNodeId,
+  contributors,
 }) => {
   const [code, setCode] = useState(project?.code);
   const [title, setTitle] = useState(project?.title);
@@ -222,7 +225,19 @@ const Project: React.FC<ProjectProps> = ({
                   label="Project Owner"
                   name="projectOwner"
                   value={projectOwner}
+                  initialOptions={contributors.map((c) => ({
+                    value: c.id,
+                    title: c.name,
+                    agentType: c.agentType,
+                    path: {
+                      text: "Link",
+                      url: "https://powerhouse.inc",
+                    },
+                    description: " ",
+                    icon: "Person",
+                  }))}
                   onChange={(e) => setProjectOwner(e)}
+                  variant="withValueAndTitle"
                   onBlur={(e) => {
                     if (!project) return;
                     if (e.target.value === project.projectOwner) return;
@@ -234,7 +249,40 @@ const Project: React.FC<ProjectProps> = ({
                     );
                   }}
                   fetchOptionsCallback={async (userInput: string) => {
-                    return [];
+                    const contributorsFilter = contributors.filter((c) =>
+                      c.name.toLowerCase().includes(userInput.toLowerCase())
+                    );
+                    console.log("contributorsFilter", contributorsFilter);
+                    if(contributorsFilter.length === 0) {
+                      return Promise.reject(new Error("No contributors found"));
+                    }
+                    return contributorsFilter.map((c) => ({
+                      value: c.id,
+                      title: c.name,
+                      agentType: c.agentType,
+                      path: {
+                        text: 'Link',
+                        url: "https://powerhouse.inc",
+                      },
+                      description: " ",
+                      icon: "Person",
+                    }));
+                  }}
+                  fetchSelectedOptionCallback={async (agentId) => {
+                    console.log("agentId", agentId);
+                    const agent = contributors.find((c) => c.id === agentId);
+                    if (!agent) return Promise.reject(new Error("Agent not found"));
+                    return {
+                      value: agent.id,
+                      title: agent.name,
+                      agentType: agent.agentType,
+                      description: " ",
+                      icon: "Person",
+                      path: {
+                        text: "Link",
+                        url: "https://powerhouse.inc",
+                      },
+                    };
                   }}
                 />
               </Form>

@@ -28,8 +28,6 @@ const Contributors: React.FC<ContributorsProps> = ({
     }));
   }, [contributors]);
 
-  console.log(richContributors)
-
   const columns = useMemo<Array<ColumnDef<any>>>(
     () => [
       {

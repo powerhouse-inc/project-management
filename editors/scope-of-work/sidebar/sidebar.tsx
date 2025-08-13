@@ -197,6 +197,7 @@ export default function SidebarMenu(props: any) {
             dispatch={dispatch}
             deliverables={deliverables.filter((d: any) => d.id === id)}
             projects={projects}
+            contributors={contributors}
           />
         );
       case "projects":
@@ -214,6 +215,7 @@ export default function SidebarMenu(props: any) {
             project={projects.find((p: any) => p.id === id)}
             deliverables={deliverables}
             setActiveNodeId={setActiveNodeId}
+            contributors={contributors}
           />
         );
       case "contributors":

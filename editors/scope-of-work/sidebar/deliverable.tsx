@@ -8,6 +8,8 @@ import {
   Checkbox,
   NumberInput,
   Icon,
+  AIDField,
+  Form,
 } from "@powerhousedao/document-engineering";
 import {
   Milestone,
@@ -15,6 +17,7 @@ import {
   type Deliverable,
   PmDeliverableStatusInput,
   Project,
+  Agent,
 } from "../../../document-models/scope-of-work/index.js";
 import { actions } from "../../../document-models/scope-of-work/index.js";
 import { useEffect, useMemo, useState } from "react";
@@ -24,6 +27,7 @@ interface DeliverablesProps {
   deliverables: Deliverable[];
   dispatch: any;
   projects: Project[];
+  contributors: Agent[];
 }
 
 export const statusOptions = [
@@ -40,6 +44,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
   deliverables,
   dispatch,
   projects,
+  contributors,
 }) => {
   const currentDeliverable = deliverables[0];
   const [stateDeliverable, setStateDeliverable] = useState(currentDeliverable);
@@ -196,26 +201,11 @@ const Deliverable: React.FC<DeliverablesProps> = ({
           {/* Coordinators and Delivery Target */}
           <div className="mt-8 grid grid-cols-8 gap-2">
             <div className="col-span-4">
-              <TextInput
-                className="w-full"
-                label="Deliverable Owner"
-                value={stateDeliverable.owner || ""}
-                onChange={(e) =>
-                  setStateDeliverable({
-                    ...stateDeliverable,
-                    owner: e.target.value,
-                  })
-                }
-                onBlur={(e) => {
-                  if (e.target.value === "") {
-                    dispatch(
-                      actions.editDeliverable({
-                        id: currentDeliverable.id,
-                        owner: " ",
-                      })
-                    );
-                  }
-                  if (e.target.value === currentDeliverable.owner) return;
+              <Form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (!stateDeliverable) return;
+                  if (e.target.value === stateDeliverable.owner) return;
                   dispatch(
                     actions.editDeliverable({
                       id: currentDeliverable.id,
@@ -223,7 +213,77 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                     })
                   );
                 }}
-              />
+              >
+                <AIDField
+                  className="w-full mt-2"
+                  label="Deliverable Owner"
+                  name="owner"
+                  value={stateDeliverable.owner || ""}
+                  initialOptions={contributors.map((c) => ({
+                    value: c.id,
+                    title: c.name,
+                    agentType: c.agentType,
+                    path: {
+                      text: "Link",
+                      url: "https://powerhouse.inc",
+                    },
+                    description: " ",
+                    icon: "Person",
+                  }))}
+                  onChange={(e) =>
+                    setStateDeliverable({
+                      ...stateDeliverable,
+                      owner: e,
+                    })
+                  }
+                  variant="withValueAndTitle"
+                  onBlur={(e) => {
+                    if (!stateDeliverable) return;
+                    if (e.target.value === stateDeliverable.owner) return;
+                    dispatch(
+                      actions.editDeliverable({
+                        id: currentDeliverable.id,
+                        owner: e.target.value,
+                      })
+                    );
+                  }}
+                  fetchOptionsCallback={async (userInput: string) => {
+                    const contributorsFilter = contributors.filter((c) =>
+                      c.name.toLowerCase().includes(userInput.toLowerCase())
+                    );
+                    if (contributorsFilter.length === 0) {
+                      return Promise.reject(new Error("No contributors found"));
+                    }
+                    return contributorsFilter.map((c) => ({
+                      value: c.id,
+                      title: c.name,
+                      agentType: c.agentType,
+                      path: {
+                        text: "Link",
+                        url: "https://powerhouse.inc",
+                      },
+                      description: " ",
+                      icon: "Person",
+                    }));
+                  }}
+                  fetchSelectedOptionCallback={async (agentId) => {
+                    const agent = contributors.find((c) => c.id === agentId);
+                    if (!agent)
+                      return Promise.reject(new Error("Agent not found"));
+                    return {
+                      value: agent.id,
+                      title: agent.name,
+                      agentType: agent.agentType,
+                      description: " ",
+                      icon: "Person",
+                      path: {
+                        text: "Link",
+                        url: "https://powerhouse.inc",
+                      },
+                    };
+                  }}
+                />
+              </Form>
             </div>
           </div>
           {/* Description */}
