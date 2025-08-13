@@ -289,11 +289,20 @@ const Milestone: React.FC<MilestonesProps> = ({
           }}
         />
       </div>
-      <div>
-        <label>Budget</label>
-        <p className="text-sm rounded-md border border-gray-300 p-2 bg-gray-100 w-32 text-right">
-          {milestone.budget?.toFixed(2) || 0}
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <label>Budget</label>
+          <p className="text-sm rounded-md border border-gray-300 p-2 bg-gray-100 w-32 text-right">
+            {milestone.budget?.toFixed(2) || 0}
+          </p>
+        </div>
+        {/* Progress Bar */}
+        <div className="mt-8 mb-4 w-80">
+          <label>Progress</label>
+          <div className="border border-gray-300 rounded-md px-2 pt-4 pb-8 ">
+            <ProgressBar progress={milestone?.scope?.progress} />
+          </div>
+        </div>
       </div>
       <div className="mt-2">
         <label className="text-sm font-medium text-gray-700 mb-2">

@@ -253,7 +253,7 @@ const Project: React.FC<ProjectProps> = ({
                       c.name.toLowerCase().includes(userInput.toLowerCase())
                     );
                     console.log("contributorsFilter", contributorsFilter);
-                    if(contributorsFilter.length === 0) {
+                    if (contributorsFilter.length === 0) {
                       return Promise.reject(new Error("No contributors found"));
                     }
                     return contributorsFilter.map((c) => ({
@@ -261,7 +261,7 @@ const Project: React.FC<ProjectProps> = ({
                       title: c.name,
                       agentType: c.agentType,
                       path: {
-                        text: 'Link',
+                        text: "Link",
                         url: "https://powerhouse.inc",
                       },
                       description: " ",
@@ -271,7 +271,8 @@ const Project: React.FC<ProjectProps> = ({
                   fetchSelectedOptionCallback={async (agentId) => {
                     console.log("agentId", agentId);
                     const agent = contributors.find((c) => c.id === agentId);
-                    if (!agent) return Promise.reject(new Error("Agent not found"));
+                    if (!agent)
+                      return Promise.reject(new Error("Agent not found"));
                     return {
                       value: agent.id,
                       title: agent.name,
@@ -420,6 +421,13 @@ const Project: React.FC<ProjectProps> = ({
                   setBudgetCalculatorOpen(true);
                 }}
               />
+            </div>
+          </div>
+          {/* Progress Bar */}
+          <div className="mt-8 mb-4 w-80">
+            <label>Progress</label>
+            <div className="border border-gray-300 rounded-md px-2 pt-4 pb-8 ">
+              <ProgressBar progress={project?.scope?.progress} />
             </div>
           </div>
           <div className="mt-8">
