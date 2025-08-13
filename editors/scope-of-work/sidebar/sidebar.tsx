@@ -14,6 +14,7 @@ import Projects from "./projects.js";
 import Project from "./project.js";
 import Deliverables from "./deliverables.js";
 import Roadmaps from "./roadmaps.js";
+import Contributors from "./contributors.js";
 
 type SidebarNode = {
   id: string;
@@ -82,7 +83,7 @@ const useSidebarWidth = () => {
 
 export default function SidebarMenu(props: any) {
   const { document, state = document.state.global, dispatch } = props;
-  const { roadmaps, deliverables, projects } = state;
+  const { roadmaps, deliverables, projects, contributors } = state;
   const milestones = state.roadmaps.flatMap((r: any) => r.milestones);
   const [activeNodeId, setActiveNodeId] = useState<string | undefined>(
     undefined
@@ -127,6 +128,11 @@ export default function SidebarMenu(props: any) {
           title: deliverable.title,
           children: [],
         })),
+      },
+      {
+        id: "contributors",
+        title: "Contributors",
+        children: [],
       },
     ],
     [roadmaps, deliverables, state]
@@ -208,6 +214,13 @@ export default function SidebarMenu(props: any) {
             project={projects.find((p: any) => p.id === id)}
             deliverables={deliverables}
             setActiveNodeId={setActiveNodeId}
+          />
+        );
+      case "contributors":
+        return (
+          <Contributors
+            dispatch={dispatch}
+            contributors={contributors}
           />
         );
     }
