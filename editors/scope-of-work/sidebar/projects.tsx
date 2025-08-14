@@ -79,7 +79,7 @@ const Projects: React.FC<ProjectsProps> = ({
       {
         field: "projectOwner",
         title: "Owner",
-        editable: true,
+        editable: false,
         align: "left" as ColumnAlignment,
         renderCell: (value: any, context: any) => {
           if (!context.row.projectOwner) return null;
@@ -89,7 +89,7 @@ const Projects: React.FC<ProjectsProps> = ({
       {
         field: "budget",
         title: "Budget",
-        editable: true,
+        editable: false,
         align: "left" as ColumnAlignment,
         renderCell: (value: any, context: any) => {
           if (value == 0) return null;

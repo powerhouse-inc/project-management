@@ -90,7 +90,7 @@ const Milestone: React.FC<MilestonesProps> = ({
       },
       {
         field: "owner",
-        editable: true,
+        editable: false,
         align: "center" as ColumnAlignment,
         onSave: (newValue: any, context: any) => {
           if (newValue !== context.row.title) {
@@ -108,7 +108,7 @@ const Milestone: React.FC<MilestonesProps> = ({
       {
         field: "workProgress",
         title: "Progress",
-        editable: true,
+        editable: false,
         align: "center" as ColumnAlignment,
         width: 200,
         renderCell: (value: any, context: any) => {
@@ -120,7 +120,7 @@ const Milestone: React.FC<MilestonesProps> = ({
       {
         field: "status",
         title: "Status",
-        editable: true,
+        editable: false,
         align: "center" as ColumnAlignment,
         width: 200,
         renderCell: (value: any, context: any) => {

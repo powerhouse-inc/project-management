@@ -112,7 +112,7 @@ const Project: React.FC<ProjectProps> = ({
       },
       {
         field: "owner",
-        editable: true,
+        editable: false,
         align: "center" as ColumnAlignment,
         onSave: (newValue: any, context: any) => {
           if (newValue !== context.row.title) {
@@ -139,7 +139,7 @@ const Project: React.FC<ProjectProps> = ({
       {
         field: "workProgress",
         title: "Progress",
-        editable: true,
+        editable: false,
         align: "center" as ColumnAlignment,
         width: 200,
         renderCell: (value: any, context: any) => {
@@ -151,7 +151,7 @@ const Project: React.FC<ProjectProps> = ({
       {
         field: "status",
         title: "Status",
-        editable: true,
+        editable: false,
         align: "center" as ColumnAlignment,
         width: 200,
         renderCell: (value: any, context: any) => {
