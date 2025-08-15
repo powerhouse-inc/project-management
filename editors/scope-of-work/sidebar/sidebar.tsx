@@ -178,6 +178,7 @@ export default function SidebarMenu(props: any) {
             roadmaps={roadmaps}
             deliverables={deliverables}
             setActiveNodeId={setActiveNodeId}
+            contributors={contributors}
           />
         );
       case "deliverables":

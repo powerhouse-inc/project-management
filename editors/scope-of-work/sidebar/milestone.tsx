@@ -13,6 +13,7 @@ import {
   Roadmap,
   Deliverable,
   DeliverableSetStatusInput,
+  Agent,
 } from "../../../document-models/scope-of-work/index.js";
 import { actions } from "../../../document-models/scope-of-work/index.js";
 import { useEffect, useMemo, useState } from "react";
@@ -26,6 +27,7 @@ interface MilestonesProps {
   dispatch: any;
   deliverables: Deliverable[];
   setActiveNodeId: (id: string) => void;
+  contributors: Agent[];
 }
 
 const Milestone: React.FC<MilestonesProps> = ({
@@ -34,6 +36,7 @@ const Milestone: React.FC<MilestonesProps> = ({
   dispatch,
   deliverables,
   setActiveNodeId,
+  contributors,
 }) => {
   const milestone = milestones[0];
   const roadmap = roadmaps.find((r: any) => {
@@ -103,6 +106,14 @@ const Milestone: React.FC<MilestonesProps> = ({
             return true;
           }
           return false;
+        },
+        renderCell: (value: any, context: any) => {
+          const contributor = contributors.find((c: any) => c.id === value);
+          return (
+            <div className="text-center">
+              {contributor?.name ?? context.row.owner}
+            </div>
+          );
         },
       },
       {
