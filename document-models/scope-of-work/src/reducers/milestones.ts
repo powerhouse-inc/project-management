@@ -217,6 +217,20 @@ export const reducer: ScopeOfWorkMilestonesOperations = {
         throw new Error("Milestone deliverable set not found");
       }
       foundMilestone.scope.deliverables = foundMilestone.scope.deliverables.filter((deliverableId) => deliverableId !== action.input.deliverableId);
+
+      state.deliverables = state.deliverables.map((deliverable) => {
+        return String(deliverable.id) === String(action.input.deliverableId) ? {
+          ...deliverable,
+          budgetAnchor: {
+            project: "",
+            unit: deliverable.budgetAnchor?.unit || "Hours",
+            unitCost: deliverable.budgetAnchor?.unitCost || 0,
+            quantity: deliverable.budgetAnchor?.quantity || 0,
+            margin: deliverable.budgetAnchor?.margin || 0,
+          },
+        } : deliverable;
+      });
+
     } catch (error) {
       console.error(error);
     }

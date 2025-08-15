@@ -180,6 +180,19 @@ export const reducer: ScopeOfWorkProjectsOperations = {
       project.scope.deliverables = project.scope.deliverables.filter((d) => d !== action.input.deliverableId);
       applyInvariants(state, ["budget", "margin"]);
 
+      state.deliverables = state.deliverables.map((deliverable) => {
+        return String(deliverable.id) === String(action.input.deliverableId) ? {
+          ...deliverable,
+          budgetAnchor: {
+            project: "",
+            unit: deliverable.budgetAnchor?.unit || "Hours",
+            unitCost: deliverable.budgetAnchor?.unitCost || 0,
+            quantity: deliverable.budgetAnchor?.quantity || 0,
+            margin: deliverable.budgetAnchor?.margin || 0,
+          },
+        } : deliverable;
+      });
+
     } catch (error) {
       console.error(error);
     }
