@@ -128,6 +128,20 @@ export const reducer: ScopeOfWorkDeliverablesSetOperations = {
         state.projects = state.projects.map((project) => {
           return String(project.id) === String(action.input.projectId) ? foundProject : project;
         });
+
+        state.deliverables = state.deliverables.map((deliverable) => {
+          return String(deliverable.id) === String(action.input.deliverableId) ? {
+            ...deliverable,
+            budgetAnchor: {
+              project: action.input.projectId || "",
+              unit: deliverable.budgetAnchor?.unit || "Hours",
+              unitCost: deliverable.budgetAnchor?.unitCost || 0,
+              quantity: deliverable.budgetAnchor?.quantity || 0,
+              margin: deliverable.budgetAnchor?.margin || 0,
+            },
+          } : deliverable;
+        });
+
         applyInvariants(state, ["progress"]);
       }
     } catch (error) {
@@ -173,6 +187,19 @@ export const reducer: ScopeOfWorkDeliverablesSetOperations = {
 
         state.projects = state.projects.map((project) => {
           return String(project.id) === String(action.input.projectId) ? foundProject : project;
+        });
+
+        state.deliverables = state.deliverables.map((deliverable) => {
+          return String(deliverable.id) === String(action.input.deliverableId) ? {
+            ...deliverable,
+            budgetAnchor: {
+              project: "",
+              unit: deliverable.budgetAnchor?.unit || "Hours",
+              unitCost: deliverable.budgetAnchor?.unitCost || 0,
+              quantity: deliverable.budgetAnchor?.quantity || 0,
+              margin: deliverable.budgetAnchor?.margin || 0,
+            },
+          } : deliverable;
         });
         applyInvariants(state, ["progress"]);
       }

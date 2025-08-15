@@ -123,6 +123,9 @@ const Deliverable: React.FC<DeliverablesProps> = ({
     ];
   }, [currentDeliverable, dispatch]);
 
+  console.log("stateDeliverable", stateDeliverable);
+  console.log("projects", projects);
+
   return (
     <div>
       {budgetCalculatorOpen ? (
