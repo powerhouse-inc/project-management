@@ -178,7 +178,6 @@ export const reducer: ScopeOfWorkProjectsOperations = {
         throw new Error("Project deliverable set not found");
       }
       project.scope.deliverables = project.scope.deliverables.filter((d) => d !== action.input.deliverableId);
-      state.deliverables = state.deliverables.filter((d) => d.id !== action.input.deliverableId);
       applyInvariants(state, ["budget", "margin"]);
 
     } catch (error) {
