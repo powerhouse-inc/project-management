@@ -15,6 +15,7 @@ import Project from "./project.js";
 import Deliverables from "./deliverables.js";
 import Roadmaps from "./roadmaps.js";
 import Contributors from "./contributors.js";
+import BreadCrumbs from "../components/breadCrumbs.js";
 
 type SidebarNode = {
   id: string;
@@ -24,6 +25,14 @@ type SidebarNode = {
   expandedIcon?: IconName | ReactElement;
   status?: NodeStatus;
 };
+
+type BreadcrumbItem = {
+  id: string;
+  title: string;
+  type: 'root' | 'roadmaps' | 'roadmap' | 'milestone' | 'projects' | 'project' | 'deliverables' | 'deliverable' | 'contributors';
+  isActive: boolean;
+};
+
 enum NodeStatus {
   CREATED = "CREATED",
   MODIFIED = "MODIFIED",
@@ -90,6 +99,165 @@ export default function SidebarMenu(props: any) {
   );
 
   const { sidebarWidth, isSidebarOpen } = useSidebarWidth();
+
+  // Generate breadcrumbs based on activeNodeId
+  const generateBreadcrumbs = (activeNodeId: string | undefined): BreadcrumbItem[] => {
+    const breadcrumbs: BreadcrumbItem[] = [
+      {
+        id: "root",
+        title: state.title || "Scope of Work",
+        type: "root",
+        isActive: !activeNodeId,
+      },
+    ];
+
+    if (!activeNodeId) {
+      return breadcrumbs;
+    }
+
+    const parts = activeNodeId.split(".");
+    const type = parts[0];
+    const id = parts[1];
+
+    switch (type) {
+      case "roadmaps":
+        breadcrumbs.push({
+          id: "roadmaps",
+          title: "Roadmaps",
+          type: "roadmaps",
+          isActive: true,
+        });
+        break;
+
+      case "roadmap":
+        breadcrumbs.push(
+          {
+            id: "roadmaps",
+            title: "Roadmaps",
+            type: "roadmaps",
+            isActive: false,
+          },
+          {
+            id: `roadmap.${id}`,
+            title: roadmaps.find((r: any) => r.id === id)?.title || "Unknown Roadmap",
+            type: "roadmap",
+            isActive: true,
+          }
+        );
+        break;
+
+      case "milestone":
+        const milestone = milestones.find((m: any) => m.id === id);
+        const roadmap = roadmaps.find((r: any) => 
+          r.milestones.some((m: any) => m.id === id)
+        );
+        
+        breadcrumbs.push(
+          {
+            id: "roadmaps",
+            title: "Roadmaps",
+            type: "roadmaps",
+            isActive: false,
+          },
+          {
+            id: `roadmap.${roadmap?.id}`,
+            title: roadmap?.title || "Unknown Roadmap",
+            type: "roadmap",
+            isActive: false,
+          },
+          {
+            id: `milestone.${id}`,
+            title: milestone?.sequenceCode 
+              ? `${milestone.sequenceCode} - ${milestone.title}`
+              : milestone?.title || "Unknown Milestone",
+            type: "milestone",
+            isActive: true,
+          }
+        );
+        break;
+
+      case "projects":
+        breadcrumbs.push({
+          id: "projects",
+          title: "Projects",
+          type: "projects",
+          isActive: true,
+        });
+        break;
+
+      case "project":
+        const project = projects.find((p: any) => p.id === id);
+        breadcrumbs.push(
+          {
+            id: "projects",
+            title: "Projects",
+            type: "projects",
+            isActive: false,
+          },
+          {
+            id: `project.${id}`,
+            title: project?.code 
+              ? `${project.code} - ${project.title}`
+              : project?.title || "Unknown Project",
+            type: "project",
+            isActive: true,
+          }
+        );
+        break;
+
+      case "deliverables":
+        breadcrumbs.push({
+          id: "deliverables",
+          title: "Deliverables",
+          type: "deliverables",
+          isActive: true,
+        });
+        break;
+
+      case "deliverable":
+        const deliverable = deliverables.find((d: any) => d.id === id);
+        breadcrumbs.push(
+          {
+            id: "deliverables",
+            title: "Deliverables",
+            type: "deliverables",
+            isActive: false,
+          },
+          {
+            id: `deliverable.${id}`,
+            title: deliverable?.title || "Unknown Deliverable",
+            type: "deliverable",
+            isActive: true,
+          }
+        );
+        break;
+
+      case "contributors":
+        breadcrumbs.push({
+          id: "contributors",
+          title: "Contributors",
+          type: "contributors",
+          isActive: true,
+        });
+        break;
+    }
+
+    return breadcrumbs;
+  };
+
+  // Generate breadcrumbs based on current state
+  const breadcrumbs = useMemo(() => {
+    return generateBreadcrumbs(activeNodeId);
+  }, [activeNodeId, roadmaps, milestones, projects, deliverables]);
+
+  // Handle breadcrumb clicks
+  const handleBreadcrumbClick = (id: string) => {
+    if (id === "root") {
+      setActiveNodeId(undefined);
+    } else {
+      setActiveNodeId(id);
+    }
+  };
 
   // Use useMemo to recalculate nodes whenever the state changes
   const nodes: SidebarNode[] = useMemo(
@@ -221,12 +389,7 @@ export default function SidebarMenu(props: any) {
           />
         );
       case "contributors":
-        return (
-          <Contributors
-            dispatch={dispatch}
-            contributors={contributors}
-          />
-        );
+        return <Contributors dispatch={dispatch} contributors={contributors} />;
     }
   };
 
@@ -235,7 +398,6 @@ export default function SidebarMenu(props: any) {
       <SidebarProvider nodes={nodes}>
         <SidebarUpdater nodes={nodes} />
         <Sidebar
-          // nodes={nodes}
           sidebarTitle="Scope of Work"
           sidebarIcon={<Icon name="Globe" />}
           enableMacros={3}
@@ -262,9 +424,15 @@ export default function SidebarMenu(props: any) {
         }}
       >
         {activeNodeId ? (
-          displayActiveNode(activeNodeId)
+          <>
+            <BreadCrumbs breadcrumbs={breadcrumbs} onBreadcrumbClick={handleBreadcrumbClick} />
+            {displayActiveNode(activeNodeId)}
+          </>
         ) : (
-          <ScopeOfWork {...props} setActiveNodeId={setActiveNodeId} />
+          <>
+            <BreadCrumbs breadcrumbs={breadcrumbs} onBreadcrumbClick={handleBreadcrumbClick} />
+            <ScopeOfWork {...props} setActiveNodeId={setActiveNodeId} />
+          </>
         )}
       </div>
     </div>

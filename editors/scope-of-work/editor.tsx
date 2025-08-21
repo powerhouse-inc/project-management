@@ -12,7 +12,6 @@ export default function Editor(props: IProps) {
   return (
     <div className="html-defaults-container">
       <SidebarMenu {...props} />
-      {/* <Sidebar {...props} /> */}
     </div>
   );
 }
