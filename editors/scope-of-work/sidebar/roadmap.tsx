@@ -49,7 +49,7 @@ const Roadmap: React.FC<RoadmapsProps> = ({
         width: 20,
         align: "center" as ColumnAlignment,
         renderCell: (value: any, context: any) => {
-          if (!context.row?.id) return null;
+          if (!context.row?.id) return <div className="w-2"></div>;
           return (
             <div className="text-center">
               <Icon
@@ -83,6 +83,14 @@ const Roadmap: React.FC<RoadmapsProps> = ({
           return false;
         },
         renderCell: (value: any, context: any) => {
+          if (value === "") {
+            return (
+              <div className="font-light italic text-left text-gray-500">
+                + Double-click to add new milestone (enter or click outside to
+                save)
+              </div>
+            );
+          }
           return <div className="text-left">{value}</div>;
         },
       },
@@ -171,7 +179,16 @@ const Roadmap: React.FC<RoadmapsProps> = ({
           return false;
         },
         renderCell: (value: any, context: any) => {
-          return <div className="text-center">{value}</div>;
+          if (!value) return null
+          return (
+            <div className="text-center">
+              {new Date(value).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </div>
+          );
         },
       },
     ],

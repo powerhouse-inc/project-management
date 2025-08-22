@@ -1,5 +1,8 @@
 import { useMemo } from "react";
-import { Agent, Project } from "../../../document-models/scope-of-work/gen/types.js";
+import {
+  Agent,
+  Project,
+} from "../../../document-models/scope-of-work/gen/types.js";
 import {
   TextInput,
   ObjectSetTable,
@@ -31,7 +34,7 @@ const Projects: React.FC<ProjectsProps> = ({
         width: 20,
         align: "center" as ColumnAlignment,
         renderCell: (value: any, context: any) => {
-          if (!context.row?.id) return null;
+          if (!context.row?.id) return <div className="w-2"></div>;
           return (
             <div className="text-center">
               <Icon
@@ -64,13 +67,22 @@ const Projects: React.FC<ProjectsProps> = ({
           return false;
         },
         renderCell: (value: any, context: any) => {
+          if (value === "") {
+            return (
+              <div className="font-light italic text-left text-gray-500">
+                + Double-click to add new project (enter or click outside to
+                save)
+              </div>
+            );
+          }
           return <div className="text-left">{value}</div>;
         },
       },
       {
         field: "progress",
         title: "Progress",
-        align: "left" as ColumnAlignment,
+        align: "center" as ColumnAlignment,
+        width: 150,
         renderCell: (value: any, context: any) => {
           if (!context.row.scope) return null;
           return <ProgressBar progress={context.row.scope?.progress} />;
@@ -83,19 +95,24 @@ const Projects: React.FC<ProjectsProps> = ({
         align: "left" as ColumnAlignment,
         renderCell: (value: any, context: any) => {
           if (!context.row.projectOwner) return null;
-          return <div className="text-left">{contributors?.find((c) => c.id === context.row.projectOwner)?.name ?? context.row.projectOwner}</div>;
+          return (
+            <div className="text-left">
+              {contributors?.find((c) => c.id === context.row.projectOwner)
+                ?.name ?? context.row.projectOwner}
+            </div>
+          );
         },
       },
       {
         field: "budget",
         title: "Budget",
         editable: false,
-        align: "left" as ColumnAlignment,
+        align: "center" as ColumnAlignment,
         renderCell: (value: any, context: any) => {
           if (value == 0) return null;
           return (
             <div className="text-center">
-              {context.row.currency} {value}
+              {context.row.currency} {Intl.NumberFormat("en-US").format(value)}
             </div>
           );
         },

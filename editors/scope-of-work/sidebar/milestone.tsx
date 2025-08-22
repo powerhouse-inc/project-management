@@ -60,7 +60,7 @@ const Milestone: React.FC<MilestonesProps> = ({
         width: 20,
         align: "center" as ColumnAlignment,
         renderCell: (value: any, context: any) => {
-          if (!context.row?.id) return null;
+          if (!context.row?.id) return <div className="w-2"></div>;
           return (
             <div className="text-center">
               <Icon
@@ -89,6 +89,17 @@ const Milestone: React.FC<MilestonesProps> = ({
             return true;
           }
           return false;
+        },
+        renderCell: (value: any, context: any) => {
+          if (value === "") {
+            return (
+              <div className="font-light italic text-left text-gray-500">
+                + Double-click to add new deliverable (enter or click outside to
+                save)
+              </div>
+            );
+          }
+          return <div className="text-left">{value}</div>;
         },
       },
       {
@@ -133,7 +144,7 @@ const Milestone: React.FC<MilestonesProps> = ({
         title: "Status",
         editable: false,
         align: "center" as ColumnAlignment,
-        width: 200,
+        width: 100,
         renderCell: (value: any, context: any) => {
           return (
             <span className="flex items-center justify-center">{value}</span>
@@ -301,10 +312,10 @@ const Milestone: React.FC<MilestonesProps> = ({
         />
       </div>
       <div className="flex items-center justify-between">
-        <div>
+        <div className="min-w-[100px]">
           <label>Budget</label>
           <p className="text-sm rounded-md border border-gray-300 p-2 bg-gray-100 w-32 text-right">
-            {milestone.budget?.toFixed(2) || 0}
+            {Intl.NumberFormat("en-US").format(milestone.budget || 0)}
           </p>
         </div>
         {/* Progress Bar */}

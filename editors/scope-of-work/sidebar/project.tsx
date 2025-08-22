@@ -79,7 +79,7 @@ const Project: React.FC<ProjectProps> = ({
         width: 20,
         align: "center" as ColumnAlignment,
         renderCell: (value: any, context: any) => {
-          if (!context.row?.id) return null;
+          if (!context.row?.id) return <div className="w-2"></div>;
           return (
             <div className="text-center">
               <Icon
@@ -108,6 +108,17 @@ const Project: React.FC<ProjectProps> = ({
             return true;
           }
           return false;
+        },
+        renderCell: (value: any, context: any) => {
+          if (value === "") {
+            return (
+              <div className="font-light italic text-left text-gray-500">
+                + Double-click to add new deliverable (enter or click outside to
+                save)
+              </div>
+            );
+          }
+          return <div className="text-left">{value}</div>;
         },
       },
       {
@@ -153,7 +164,7 @@ const Project: React.FC<ProjectProps> = ({
         title: "Status",
         editable: false,
         align: "center" as ColumnAlignment,
-        width: 200,
+        width: 100,
         renderCell: (value: any, context: any) => {
           return (
             <span className="flex items-center justify-center">{value}</span>
@@ -261,7 +272,6 @@ const Project: React.FC<ProjectProps> = ({
                     const contributorsFilter = contributors.filter((c) =>
                       c.name.toLowerCase().includes(userInput.toLowerCase())
                     );
-                    console.log("contributorsFilter", contributorsFilter);
                     if (contributorsFilter.length === 0) {
                       return Promise.reject(new Error("No contributors found"));
                     }
@@ -278,7 +288,6 @@ const Project: React.FC<ProjectProps> = ({
                     }));
                   }}
                   fetchSelectedOptionCallback={async (agentId) => {
-                    console.log("agentId", agentId);
                     const agent = contributors.find((c) => c.id === agentId);
                     if (!agent)
                       return Promise.reject(new Error("Agent not found"));
@@ -402,22 +411,14 @@ const Project: React.FC<ProjectProps> = ({
               />
             </div>
             <div>
-              <NumberInput
+              <TextInput
                 name="budget"
                 label="Budget"
-                value={parseFloat(budget.toFixed(2))}
+                value={Intl.NumberFormat("en-US").format(
+                  parseFloat(budget.toFixed(2))
+                )}
                 disabled={true}
                 onChange={(e) => setBudget(e.target.value as any)}
-                numericType="NonNegativeFloat"
-                onBlur={(e) => {
-                  if (!project) return;
-                  dispatch(
-                    actions.updateProject({
-                      id: project.id,
-                      budget: parseFloat(e.target.value),
-                    })
-                  );
-                }}
               />
             </div>
             <div className="flex items-center gap-2 col-span-1 align-center">

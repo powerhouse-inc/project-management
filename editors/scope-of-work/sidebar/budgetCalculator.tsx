@@ -128,12 +128,26 @@ const BudgetCalculator = ({
           }
           return false;
         },
+        renderCell: (value: any, context: any) => {
+          return (
+            <div className="text-center">
+              {project?.currency} {Intl.NumberFormat("en-US").format(value)}
+            </div>
+          );
+        },
       },
       {
         field: "subtotal",
         title: "Subtotal",
         editable: false,
         align: "center" as ColumnAlignment,
+        renderCell: (value: any, context: any) => {
+          return (
+            <div className="text-center">
+              {project?.currency} {Intl.NumberFormat("en-US").format(value)}
+            </div>
+          );
+        },
       },
     ],
     []
@@ -161,6 +175,7 @@ const BudgetCalculator = ({
             ]}
             defaultValue={project?.currency ?? "DAI"}
             onChange={(value) => {
+              if (!project) return;
               dispatch(
                 actions.updateProject({
                   id: project!.id,
@@ -186,10 +201,12 @@ const BudgetCalculator = ({
       {/* <div className="flex justify-end items-center gap-2"> */}
       <div className="flex justify-end items-center gap-4">
         <span>Total Cost:</span>
-        <div className="w-[100px] h-8 bg-gray-100 border border-gray-300 rounded px-2 flex items-center justify-center">
-          {richDeliverables
-            ?.reduce((acc, deliverable) => acc + deliverable.subtotal, 0)
-            .toFixed(2) || 0}
+        <div className="min-w-[100px] h-8 bg-gray-100 border border-gray-300 rounded px-2 flex items-center justify-center">
+          {project?.currency} {Intl.NumberFormat("en-US").format(
+            richDeliverables
+              ?.reduce((acc, deliverable) => acc + deliverable.subtotal, 0)
+              || 0
+          )}
         </div>
       </div>
       <div className="flex justify-end items-center gap-4">
@@ -229,8 +246,8 @@ const BudgetCalculator = ({
       </div>
       <div className="flex justify-end items-center gap-4">
         <span>Total Budget:</span>
-        <div className="w-[100px] h-8 border border-gray-300 rounded px-2 flex items-center justify-center">
-          {totalBudget.toFixed(2)}
+        <div className="min-w-[100px] h-8 border border-gray-300 rounded px-2 flex items-center justify-center">
+          {project?.currency} {Intl.NumberFormat("en-US").format(totalBudget)}
         </div>
       </div>
     </div>

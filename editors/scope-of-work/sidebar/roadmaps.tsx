@@ -27,7 +27,7 @@ const Roadmaps: React.FC<ProjectsProps> = ({
         width: 20,
         align: "center" as ColumnAlignment,
         renderCell: (value: any, context: any) => {
-          if (!context.row?.id) return null;
+          if (!context.row?.id) return <div className="w-2"></div>;
           return (
             <div className="text-center">
               <Icon
@@ -49,18 +49,25 @@ const Roadmaps: React.FC<ProjectsProps> = ({
         align: "left" as ColumnAlignment,
         onSave: (newValue: any, context: any) => {
           if (newValue !== context.row.title) {
-            // dispatch(
-            //   actions.editMilestone({
-            //     id: context.row.id,
-            //     roadmapId: roadmap.id,
-            //     title: newValue as string,
-            //   })
-            // );
+            dispatch(
+              actions.editRoadmap({
+                id: context.row.id,
+                title: newValue as string,
+              })
+            );
             return true;
           }
           return false;
         },
         renderCell: (value: any, context: any) => {
+          if (value === "") {
+            return (
+              <div className="font-light italic text-left text-gray-500">
+                + Double-click to add new roadmap (enter or click outside to
+                save)
+              </div>
+            );
+          }
           return <div className="text-left">{value}</div>;
         },
       },

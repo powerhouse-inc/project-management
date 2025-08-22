@@ -35,6 +35,7 @@ const Contributors: React.FC<ContributorsProps> = ({
         title: "Contributor",
         editable: true,
         align: "center" as ColumnAlignment,
+        width: 200,
         onSave: (newValue: any, context: any) => {
           if (newValue !== context.row.title) {
             dispatch(
@@ -46,6 +47,17 @@ const Contributors: React.FC<ContributorsProps> = ({
             return true;
           }
           return false;
+        },
+        renderCell: (value: any, context: any) => {
+          if (value === "") {
+            return (
+              <div className="font-light italic text-gray-500 text-center">
+                + Double-click to add new contributor (enter or click outside to
+                save)
+              </div>
+            );
+          }
+          return <div className="text-center">{value}</div>;
         },
       },
       {

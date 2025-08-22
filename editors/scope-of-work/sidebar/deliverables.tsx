@@ -166,7 +166,7 @@ const Deliverables: React.FC<ProjectsProps> = ({
         width: 20,
         align: "center" as ColumnAlignment,
         renderCell: (value: any, context: any) => {
-          if (!context.row?.id) return null;
+          if (!context.row?.id) return <div className="w-2"></div>;
           return (
             <div className="text-center">
               <Icon
@@ -197,6 +197,17 @@ const Deliverables: React.FC<ProjectsProps> = ({
             return true;
           }
           return false;
+        },
+        renderCell: (value: any, context: any) => {
+          if (value === "") {
+            return (
+              <div className="font-light italic text-left text-gray-500">
+                + Double-click to add new deliverable (enter or click outside to
+                save)
+              </div>
+            );
+          }
+          return <div className="text-left">{value}</div>;
         },
       },
       {
