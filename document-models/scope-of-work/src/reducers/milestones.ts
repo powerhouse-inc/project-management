@@ -230,6 +230,7 @@ export const reducer: ScopeOfWorkMilestonesOperations = {
           },
         } : deliverable;
       });
+      applyInvariants(state, ["budget", "margin", "progress"]);
 
     } catch (error) {
       console.error(error);
