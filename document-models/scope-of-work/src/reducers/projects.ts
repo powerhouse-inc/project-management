@@ -178,7 +178,7 @@ export const reducer: ScopeOfWorkProjectsOperations = {
         throw new Error("Project deliverable set not found");
       }
       project.scope.deliverables = project.scope.deliverables.filter((d) => d !== action.input.deliverableId);
-      applyInvariants(state, ["budget", "margin"]);
+
 
       state.deliverables = state.deliverables.map((deliverable) => {
         return String(deliverable.id) === String(action.input.deliverableId) ? {
@@ -192,7 +192,7 @@ export const reducer: ScopeOfWorkProjectsOperations = {
           },
         } : deliverable;
       });
-
+      applyInvariants(state, ["budget", "margin", "progress"]);
     } catch (error) {
       console.error(error);
     }
@@ -340,7 +340,7 @@ const calculateDeliverableSetProgress = (state: ScopeOfWorkState, deliverableSet
   }
 
   // Determine if ALL deliverables use story points
-  const allUseStoryPoints = deliverables.every((d: any) => 
+  const allUseStoryPoints = deliverables.every((d: any) =>
     d.workProgress && isStoryPointsProgress(d.workProgress)
   );
 
@@ -363,8 +363,8 @@ const calculateDeliverableSetProgress = (state: ScopeOfWorkState, deliverableSet
   } else {
     // 3.b) If !storyPointsOnly => AVERAGE (percentageCompletedEquivalent[i])
     const percentages = deliverables.map((d: any) => getPercentageEquivalent(d));
-    const averagePercentage = percentages.length > 0 
-      ? percentages.reduce((sum: number, p: number) => sum + p, 0) / percentages.length 
+    const averagePercentage = percentages.length > 0
+      ? percentages.reduce((sum: number, p: number) => sum + p, 0) / percentages.length
       : 0;
 
     deliverableSet.progress = {
@@ -373,8 +373,8 @@ const calculateDeliverableSetProgress = (state: ScopeOfWorkState, deliverableSet
   }
 
   // Update deliverablesCompleted count
-  const completedDeliverables = deliverables.filter((d: any) => 
-    d.status === 'DELIVERED' || 
+  const completedDeliverables = deliverables.filter((d: any) =>
+    d.status === 'DELIVERED' ||
     (d.workProgress && isBinaryProgress(d.workProgress) && d.workProgress.done)
   );
 
