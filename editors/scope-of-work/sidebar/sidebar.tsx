@@ -16,6 +16,7 @@ import Deliverables from "./deliverables.js";
 import Roadmaps from "./roadmaps.js";
 import Contributors from "./contributors.js";
 import BreadCrumbs from "../components/breadCrumbs.js";
+import { useSelectedDocument } from "@powerhousedao/reactor-browser";
 
 type SidebarNode = {
   id: string;
@@ -29,7 +30,16 @@ type SidebarNode = {
 type BreadcrumbItem = {
   id: string;
   title: string;
-  type: 'root' | 'roadmaps' | 'roadmap' | 'milestone' | 'projects' | 'project' | 'deliverables' | 'deliverable' | 'contributors';
+  type:
+    | "root"
+    | "roadmaps"
+    | "roadmap"
+    | "milestone"
+    | "projects"
+    | "project"
+    | "deliverables"
+    | "deliverable"
+    | "contributors";
   isActive: boolean;
 };
 
@@ -91,7 +101,15 @@ const useSidebarWidth = () => {
 };
 
 export default function SidebarMenu(props: any) {
-  const { document, state = document.state.global, dispatch } = props;
+  const { document, state = document.state.global } = props;
+  // Getting dispatch from props or selected document
+  let dispatch: any;
+  if (props.dispatch) {
+    dispatch = props.dispatch;
+  } else {
+    const selectedDocument = useSelectedDocument();
+    dispatch = selectedDocument[1];
+  }
   const { roadmaps, deliverables, projects, contributors } = state;
   const milestones = state.roadmaps.flatMap((r: any) => r.milestones);
   const [activeNodeId, setActiveNodeId] = useState<string | undefined>(
@@ -101,7 +119,9 @@ export default function SidebarMenu(props: any) {
   const { sidebarWidth, isSidebarOpen } = useSidebarWidth();
 
   // Generate breadcrumbs based on activeNodeId
-  const generateBreadcrumbs = (activeNodeId: string | undefined): BreadcrumbItem[] => {
+  const generateBreadcrumbs = (
+    activeNodeId: string | undefined
+  ): BreadcrumbItem[] => {
     const breadcrumbs: BreadcrumbItem[] = [
       {
         id: "root",
@@ -139,7 +159,9 @@ export default function SidebarMenu(props: any) {
           },
           {
             id: `roadmap.${id}`,
-            title: roadmaps.find((r: any) => r.id === id)?.title || "Unknown Roadmap",
+            title:
+              roadmaps.find((r: any) => r.id === id)?.title ||
+              "Unknown Roadmap",
             type: "roadmap",
             isActive: true,
           }
@@ -148,10 +170,10 @@ export default function SidebarMenu(props: any) {
 
       case "milestone":
         const milestone = milestones.find((m: any) => m.id === id);
-        const roadmap = roadmaps.find((r: any) => 
+        const roadmap = roadmaps.find((r: any) =>
           r.milestones.some((m: any) => m.id === id)
         );
-        
+
         breadcrumbs.push(
           {
             id: "roadmaps",
@@ -167,7 +189,7 @@ export default function SidebarMenu(props: any) {
           },
           {
             id: `milestone.${id}`,
-            title: milestone?.sequenceCode 
+            title: milestone?.sequenceCode
               ? `${milestone.sequenceCode} - ${milestone.title}`
               : milestone?.title || "Unknown Milestone",
             type: "milestone",
@@ -196,7 +218,7 @@ export default function SidebarMenu(props: any) {
           },
           {
             id: `project.${id}`,
-            title: project?.code 
+            title: project?.code
               ? `${project.code} - ${project.title}`
               : project?.title || "Unknown Project",
             type: "project",
@@ -425,12 +447,18 @@ export default function SidebarMenu(props: any) {
       >
         {activeNodeId ? (
           <>
-            <BreadCrumbs breadcrumbs={breadcrumbs} onBreadcrumbClick={handleBreadcrumbClick} />
+            <BreadCrumbs
+              breadcrumbs={breadcrumbs}
+              onBreadcrumbClick={handleBreadcrumbClick}
+            />
             {displayActiveNode(activeNodeId)}
           </>
         ) : (
           <>
-            <BreadCrumbs breadcrumbs={breadcrumbs} onBreadcrumbClick={handleBreadcrumbClick} />
+            <BreadCrumbs
+              breadcrumbs={breadcrumbs}
+              onBreadcrumbClick={handleBreadcrumbClick}
+            />
             <ScopeOfWork {...props} setActiveNodeId={setActiveNodeId} />
           </>
         )}
