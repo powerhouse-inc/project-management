@@ -110,7 +110,6 @@ export const reducer: ScopeOfWorkDeliverablesOperations = {
       }
 
       updatedDeliverable.status = 'IN_PROGRESS';
-
       if (deliverableIsCompleted(updatedDeliverable) && !["WONT_DO", "DELIVERED", "CANCELED"].includes(updatedDeliverable.status)) {
         updatedDeliverable.status = "DELIVERED";
       }
@@ -206,7 +205,7 @@ export const reducer: ScopeOfWorkDeliverablesOperations = {
 
 const deliverableIsCompleted = (deliverable: any) => {
 
-  if (deliverable.workProgress?.completed === true) {
+  if (deliverable.workProgress?.done === true) {
     return true;
   }
 
