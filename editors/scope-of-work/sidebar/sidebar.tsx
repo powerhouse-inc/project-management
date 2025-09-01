@@ -413,6 +413,9 @@ export default function SidebarMenu(props: any) {
       <SidebarProvider nodes={nodes}>
         <SidebarUpdater nodes={nodes} />
         <Sidebar
+          className={String.raw`
+            [&_.sidebar\\_\\_item--active]:text-black
+          `}
           sidebarTitle="Scope of Work"
           sidebarIcon={<Icon name="Globe" />}
           enableMacros={3}
