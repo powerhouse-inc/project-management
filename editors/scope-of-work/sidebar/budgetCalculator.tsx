@@ -30,6 +30,7 @@ const BudgetCalculator = ({
 }: BudgetCalculatorProps) => {
   const [budget, setBudget] = useState(0);
   const [margin, setMargin] = useState(0);
+  const [marginInputValue, setMarginInputValue] = useState(margin.toString());
   const [totalBudget, setTotalBudget] = useState(0);
   const skipMarginUpdateRef = useRef(false);
 
@@ -41,8 +42,10 @@ const BudgetCalculator = ({
       );
       if (margin && margin.every((m) => m === margin[0])) {
         setMargin(margin[0] ?? 0);
+        setMarginInputValue((margin[0] ?? 0).toString());
       } else {
         setMargin(0);
+        setMarginInputValue('0');
       }
     }
   }, [deliverables]);
@@ -215,16 +218,32 @@ const BudgetCalculator = ({
           <input
             type="number"
             className="w-[100px] h-8 border border-gray-300 rounded px-2 text-center"
-            value={margin}
+            value={marginInputValue}
+            placeholder=""
             onFocus={() => {
               skipMarginUpdateRef.current = true;
             }}
             onChange={(e) => {
-              const value = parseFloat(e.target.value);
-              const newMargin = isNaN(value) ? 0 : value;
+              const value = e.target.value;
+              setMarginInputValue(value);
+              if (value === '') {
+                // Allow empty input during editing
+                return;
+              }
+              const numValue = parseFloat(value);
+              const newMargin = isNaN(numValue) ? 0 : numValue;
               setMargin(newMargin);
             }}
             onBlur={() => {
+              // If input is empty, set margin to 0
+              if (marginInputValue === '') {
+                setMargin(0);
+                setMarginInputValue('0');
+              } else {
+                // Ensure input value matches the actual margin
+                setMarginInputValue(margin.toString());
+              }
+
               // Set margin for all deliverables in the project
               richDeliverables?.forEach((deliverable) => {
                 dispatch(
