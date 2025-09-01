@@ -162,7 +162,7 @@ const BudgetCalculator = ({
         <h3 className="text-2xl font-bold">Budget Calculator</h3>
         <div>
           Project:{" "}
-          <span className="border border-gray-300 rounded-md p-2 bg-white">
+          <span className="font-bold rounded-md p-2">
             {project?.title}
           </span>
         </div>
