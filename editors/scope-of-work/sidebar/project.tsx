@@ -435,7 +435,25 @@ const Project: React.FC<ProjectProps> = ({
           </div>
           {/* Progress Bar */}
           <div className="mt-8 mb-4 w-80">
-            <label>Progress</label>
+            <div className="flex items-center gap-2 mb-2">
+              <label>
+                Progress
+                <div className="relative inline-block ml-2">
+                  <div className="group">
+                    <Icon
+                      name="CircleInfo"
+                      size={12}
+                      className="text-gray-500 hover:text-gray-700 cursor-help"
+                    />
+                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10 pointer-events-none">
+                      Set every deliverable to story points to get a more
+                      accurate estimate
+                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800"></div>
+                    </div>
+                  </div>
+                </div>
+              </label>
+            </div>
             <div className="border border-gray-300 rounded-md px-2 pt-4 pb-8 ">
               <ProgressBar progress={project?.scope?.progress} />
             </div>
