@@ -204,9 +204,22 @@ const Roadmap: React.FC<RoadmapsProps> = ({
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           onBlur={(e) => {
+            const newTitle = e.target.value;
+            const newSlug = newTitle
+              .toLowerCase()
+              .replace(/ /g, "-")
+              .concat(`-${roadmap.id.substring(roadmap.id.length - 8)}`);
+            
             dispatch(
-              actions.editRoadmap({ id: roadmap.id, title: e.target.value })
+              actions.editRoadmap({ 
+                id: roadmap.id, 
+                title: newTitle,
+                slug: newSlug
+              })
             );
+            
+            // Update local state for slug
+            setSlug(newSlug);
           }}
         />
       </div>
