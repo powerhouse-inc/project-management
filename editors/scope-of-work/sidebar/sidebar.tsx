@@ -102,14 +102,16 @@ const useSidebarWidth = () => {
 
 export default function SidebarMenu(props: any) {
   const { document, state = document.state.global } = props;
+  
   // Getting dispatch from props or selected document
   let dispatch: any;
   if (props.dispatch) {
     dispatch = props.dispatch;
   } else {
     const selectedDocument = useSelectedDocument();
-    dispatch = selectedDocument[1];
+    dispatch = selectedDocument ? selectedDocument[1] : null;
   }
+
   const { roadmaps, deliverables, projects, contributors } = state;
   const milestones = state.roadmaps.flatMap((r: any) => r.milestones);
   const [activeNodeId, setActiveNodeId] = useState<string | undefined>(
@@ -459,7 +461,11 @@ export default function SidebarMenu(props: any) {
               breadcrumbs={breadcrumbs}
               onBreadcrumbClick={handleBreadcrumbClick}
             />
-            <ScopeOfWork {...props} setActiveNodeId={setActiveNodeId} />
+            <ScopeOfWork 
+              {...props} 
+              dispatch={dispatch}
+              setActiveNodeId={setActiveNodeId} 
+            />
           </>
         )}
       </div>

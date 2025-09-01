@@ -1,11 +1,15 @@
 import {
   BaseDocumentClass,
-  type ExtendedState,
+  type BaseStateFromDocument,
   type PartialState,
   applyMixins,
   type SignalDispatch,
 } from "document-model";
-import { type ScopeOfWorkState, type ScopeOfWorkLocalState } from "./types.js";
+import {
+  type ScopeOfWorkState,
+  type ScopeOfWorkLocalState,
+  type ScopeOfWorkDocument,
+} from "./types.js";
 import { type ScopeOfWorkAction } from "./actions.js";
 import { reducer } from "./reducer.js";
 import utils from "./utils.js";
@@ -44,12 +48,7 @@ class ScopeOfWork extends BaseDocumentClass<
   static fileExtension = ".phdm";
 
   constructor(
-    initialState?: Partial<
-      ExtendedState<
-        PartialState<ScopeOfWorkState>,
-        PartialState<ScopeOfWorkLocalState>
-      >
-    >,
+    initialState?: Partial<BaseStateFromDocument<ScopeOfWorkDocument>>,
     dispatch?: SignalDispatch,
   ) {
     super(reducer, utils.createDocument(initialState), dispatch);

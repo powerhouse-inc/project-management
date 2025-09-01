@@ -37,8 +37,8 @@ describe("Projects Operations", () => {
     const updatedDocument = reducer(document, creators.addProject(input));
 
     expect(updatedDocument.operations.global).toHaveLength(1);
-    expect(updatedDocument.operations.global[0].type).toBe("ADD_PROJECT");
-    expect(updatedDocument.operations.global[0].input).toStrictEqual(input);
+    expect(updatedDocument.operations.global[0].action.type).toBe("ADD_PROJECT");
+    expect(updatedDocument.operations.global[0].action.input).toStrictEqual(input);
     expect(updatedDocument.operations.global[0].index).toEqual(0);
     expect(updatedDocument.state.global.projects).toHaveLength(1);
     expect(updatedDocument.state.global.projects[0].id).toStrictEqual(input.id);
@@ -66,8 +66,8 @@ describe("Projects Operations", () => {
     updatedDocument = reducer(updatedDocument, creators.updateProject(input));
 
     expect(updatedDocument.operations.global).toHaveLength(2);
-    expect(updatedDocument.operations.global[1].type).toBe("UPDATE_PROJECT");
-    expect(updatedDocument.operations.global[1].input).toStrictEqual(input);
+    expect(updatedDocument.operations.global[1].action.type).toBe("UPDATE_PROJECT");
+    expect(updatedDocument.operations.global[1].action.input).toStrictEqual(input);
     expect(updatedDocument.operations.global[1].index).toEqual(1);
     expect(updatedDocument.state.global.projects).toHaveLength(1);
     expect(updatedDocument.state.global.projects[0].title).toStrictEqual(input.title);
@@ -93,10 +93,10 @@ describe("Projects Operations", () => {
     );
 
     expect(updatedDocument.operations.global).toHaveLength(2);
-    expect(updatedDocument.operations.global[1].type).toBe(
+    expect(updatedDocument.operations.global[1].action.type).toBe(
       "UPDATE_PROJECT_OWNER",
     );
-    expect(updatedDocument.operations.global[1].input).toStrictEqual(input);
+    expect(updatedDocument.operations.global[1].action.input).toStrictEqual(input);
     expect(updatedDocument.operations.global[1].index).toEqual(1);
     expect(updatedDocument.state.global.projects).toHaveLength(1);
     expect(updatedDocument.state.global.projects[0]).toStrictEqual({
@@ -117,8 +117,8 @@ describe("Projects Operations", () => {
     updatedDocument = reducer(updatedDocument, creators.removeProject({ projectId: "1" }));
 
     expect(updatedDocument.operations.global).toHaveLength(2);
-    expect(updatedDocument.operations.global[1].type).toBe("REMOVE_PROJECT");
-    expect(updatedDocument.operations.global[1].input).toStrictEqual({ projectId: "1" });
+    expect(updatedDocument.operations.global[1].action.type).toBe("REMOVE_PROJECT");
+    expect(updatedDocument.operations.global[1].action.input).toStrictEqual({ projectId: "1" });
     expect(updatedDocument.operations.global[1].index).toEqual(1);
     expect(updatedDocument.state.global.projects).toHaveLength(0);
   });

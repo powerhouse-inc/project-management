@@ -1,25 +1,22 @@
-import { type BaseAction } from "document-model";
+import { type Action } from "document-model";
 import type {
   EditDeliverablesSetInput,
   AddDeliverableInSetInput,
   RemoveDeliverableInSetInput,
 } from "../types.js";
 
-export type EditDeliverablesSetAction = BaseAction<
-  "EDIT_DELIVERABLES_SET",
-  EditDeliverablesSetInput,
-  "global"
->;
-export type AddDeliverableInSetAction = BaseAction<
-  "ADD_DELIVERABLE_IN_SET",
-  AddDeliverableInSetInput,
-  "global"
->;
-export type RemoveDeliverableInSetAction = BaseAction<
-  "REMOVE_DELIVERABLE_IN_SET",
-  RemoveDeliverableInSetInput,
-  "global"
->;
+export type EditDeliverablesSetAction = Action & {
+  type: "EDIT_DELIVERABLES_SET";
+  input: EditDeliverablesSetInput;
+};
+export type AddDeliverableInSetAction = Action & {
+  type: "ADD_DELIVERABLE_IN_SET";
+  input: AddDeliverableInSetInput;
+};
+export type RemoveDeliverableInSetAction = Action & {
+  type: "REMOVE_DELIVERABLE_IN_SET";
+  input: RemoveDeliverableInSetInput;
+};
 
 export type ScopeOfWorkDeliverablesSetAction =
   | EditDeliverablesSetAction

@@ -56,8 +56,8 @@ describe("DeliverablesSet Operations", () => {
     updatedDocument = reducer(updatedDocument, creators.editDeliverablesSet(input));
 
     expect(updatedDocument.operations.global).toHaveLength(3);
-    expect(updatedDocument.operations.global[2].type).toBe("EDIT_DELIVERABLES_SET");
-    expect(updatedDocument.operations.global[2].input).toStrictEqual(input);
+    expect(updatedDocument.operations.global[2].action.type).toBe("EDIT_DELIVERABLES_SET");
+    expect(updatedDocument.operations.global[2].action.input).toStrictEqual(input);
     expect(updatedDocument.operations.global[2].index).toEqual(2);
     
     const roadmap = updatedDocument.state.global.roadmaps.find(r => r.id === roadmapId);
@@ -98,8 +98,8 @@ describe("DeliverablesSet Operations", () => {
     updatedDocument = reducer(updatedDocument, creators.addDeliverableInSet(input));
 
     expect(updatedDocument.operations.global).toHaveLength(3);
-    expect(updatedDocument.operations.global[2].type).toBe("ADD_DELIVERABLE_IN_SET");
-    expect(updatedDocument.operations.global[2].input).toStrictEqual(input);
+    expect(updatedDocument.operations.global[2].action.type).toBe("ADD_DELIVERABLE_IN_SET");
+    expect(updatedDocument.operations.global[2].action.input).toStrictEqual(input);
     expect(updatedDocument.operations.global[2].index).toEqual(2);
     
     const roadmap = updatedDocument.state.global.roadmaps.find(r => r.id === roadmapId);
@@ -147,8 +147,8 @@ describe("DeliverablesSet Operations", () => {
     updatedDocument = reducer(updatedDocument, creators.removeDeliverableInSet(input));
 
     expect(updatedDocument.operations.global).toHaveLength(4);
-    expect(updatedDocument.operations.global[3].type).toBe("REMOVE_DELIVERABLE_IN_SET");
-    expect(updatedDocument.operations.global[3].input).toStrictEqual(input);
+    expect(updatedDocument.operations.global[3].action.type).toBe("REMOVE_DELIVERABLE_IN_SET");
+    expect(updatedDocument.operations.global[3].action.input).toStrictEqual(input);
     expect(updatedDocument.operations.global[3].index).toEqual(3);
     
     const roadmap = updatedDocument.state.global.roadmaps.find(r => r.id === roadmapId);

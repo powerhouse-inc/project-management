@@ -32,8 +32,8 @@ describe("Roadmaps Operations", () => {
     const updatedDocument = reducer(document, creators.addRoadmap(input));
 
     expect(updatedDocument.operations.global).toHaveLength(1);
-    expect(updatedDocument.operations.global[0].type).toBe("ADD_ROADMAP");
-    expect(updatedDocument.operations.global[0].input).toStrictEqual(input);
+    expect(updatedDocument.operations.global[0].action.type).toBe("ADD_ROADMAP");
+    expect(updatedDocument.operations.global[0].action.input).toStrictEqual(input);
     expect(updatedDocument.operations.global[0].index).toEqual(0);
     expect(updatedDocument.state.global.roadmaps).toHaveLength(1);
     expect(updatedDocument.state.global.roadmaps[0].id).toBe(input.id);
@@ -62,8 +62,8 @@ describe("Roadmaps Operations", () => {
     updatedDocument = reducer(updatedDocument, creators.removeRoadmap(removeInput));
 
     expect(updatedDocument.operations.global).toHaveLength(2);
-    expect(updatedDocument.operations.global[1].type).toBe("REMOVE_ROADMAP");
-    expect(updatedDocument.operations.global[1].input).toStrictEqual(removeInput);
+    expect(updatedDocument.operations.global[1].action.type).toBe("REMOVE_ROADMAP");
+    expect(updatedDocument.operations.global[1].action.input).toStrictEqual(removeInput);
     expect(updatedDocument.operations.global[1].index).toEqual(1);
     expect(updatedDocument.state.global.roadmaps).toHaveLength(0);
   });
@@ -90,8 +90,8 @@ describe("Roadmaps Operations", () => {
     updatedDocument = reducer(updatedDocument, creators.editRoadmap(editInput));
 
     expect(updatedDocument.operations.global).toHaveLength(2);
-    expect(updatedDocument.operations.global[1].type).toBe("EDIT_ROADMAP");
-    expect(updatedDocument.operations.global[1].input).toStrictEqual(editInput);
+    expect(updatedDocument.operations.global[1].action.type).toBe("EDIT_ROADMAP");
+    expect(updatedDocument.operations.global[1].action.input).toStrictEqual(editInput);
     expect(updatedDocument.operations.global[1].index).toEqual(1);
     expect(updatedDocument.state.global.roadmaps).toHaveLength(1);
     expect(updatedDocument.state.global.roadmaps[0].id).toBe("roadmap-2");

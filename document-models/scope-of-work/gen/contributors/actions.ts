@@ -1,21 +1,22 @@
-import { type BaseAction } from "document-model";
+import { type Action } from "document-model";
 import type {
   AddAgentInput,
   RemoveAgentInput,
   EditAgentInput,
 } from "../types.js";
 
-export type AddAgentAction = BaseAction<"ADD_AGENT", AddAgentInput, "global">;
-export type RemoveAgentAction = BaseAction<
-  "REMOVE_AGENT",
-  RemoveAgentInput,
-  "global"
->;
-export type EditAgentAction = BaseAction<
-  "EDIT_AGENT",
-  EditAgentInput,
-  "global"
->;
+export type AddAgentAction = Action & {
+  type: "ADD_AGENT";
+  input: AddAgentInput;
+};
+export type RemoveAgentAction = Action & {
+  type: "REMOVE_AGENT";
+  input: RemoveAgentInput;
+};
+export type EditAgentAction = Action & {
+  type: "EDIT_AGENT";
+  input: EditAgentInput;
+};
 
 export type ScopeOfWorkContributorsAction =
   | AddAgentAction
