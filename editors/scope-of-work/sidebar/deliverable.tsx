@@ -578,6 +578,13 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                     );
                   }
                 }}
+                onDelete={(data) => {
+                  if (data.length > 0) {
+                    data.forEach((d: any) => {
+                      dispatch(actions.removeKeyResult({ id: d.id, deliverableId: currentDeliverable.id }));
+                    });
+                  }
+                }}
               />
             )}
           </div>
