@@ -14,9 +14,8 @@ export class DeliverableNotFound extends Error implements ReducerError {
 export const errors = {
   EditDeliverable: {
     DeliverableNotFound,
-
   },
   AddKeyResult: {
     DeliverableNotFound,
-  }
+  },
 };
