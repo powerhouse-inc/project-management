@@ -16,9 +16,8 @@ export const errors = {
     ProjectIdAlreadyExists,
   },
   UpdateProject: {
-  
   },
   UpdateProjectOwner: {
- 
+
   },
 };

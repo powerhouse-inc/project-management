@@ -1,4 +1,5 @@
 import { BaseDocumentClass } from "document-model";
+import { ScopeOfWorkPHState } from "../ph-factories.js";
 import {
   type AddDeliverableInput,
   type RemoveDeliverableInput,
@@ -8,8 +9,6 @@ import {
   type RemoveKeyResultInput,
   type EditKeyResultInput,
   type SetDeliverableBudgetAnchorProjectInput,
-  type ScopeOfWorkState,
-  type ScopeOfWorkLocalState,
 } from "../types.js";
 import {
   addDeliverable,
@@ -23,11 +22,7 @@ import {
 } from "./creators.js";
 import { type ScopeOfWorkAction } from "../actions.js";
 
-export default class ScopeOfWork_Deliverables extends BaseDocumentClass<
-  ScopeOfWorkState,
-  ScopeOfWorkLocalState,
-  ScopeOfWorkAction
-> {
+export default class ScopeOfWork_Deliverables extends BaseDocumentClass<ScopeOfWorkPHState> {
   public addDeliverable(input: AddDeliverableInput) {
     return this.dispatch(addDeliverable(input));
   }

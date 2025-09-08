@@ -1,18 +1,12 @@
 import {
   BaseDocumentClass,
-  type BaseStateFromDocument,
-  type PartialState,
   applyMixins,
   type SignalDispatch,
 } from "document-model";
-import {
-  type ScopeOfWorkState,
-  type ScopeOfWorkLocalState,
-  type ScopeOfWorkDocument,
-} from "./types.js";
+import { ScopeOfWorkPHState } from "./ph-factories.js";
 import { type ScopeOfWorkAction } from "./actions.js";
 import { reducer } from "./reducer.js";
-import utils from "./utils.js";
+import { createDocument } from "./utils.js";
 import ScopeOfWork_ScopeOfWork from "./scope-of-work/object.js";
 import ScopeOfWork_Deliverables from "./deliverables/object.js";
 import ScopeOfWork_Roadmaps from "./roadmaps/object.js";
@@ -40,18 +34,14 @@ interface ScopeOfWork
     ScopeOfWork_Projects {}
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
-class ScopeOfWork extends BaseDocumentClass<
-  ScopeOfWorkState,
-  ScopeOfWorkLocalState,
-  ScopeOfWorkAction
-> {
+class ScopeOfWork extends BaseDocumentClass<ScopeOfWorkPHState> {
   static fileExtension = ".phdm";
 
   constructor(
-    initialState?: Partial<BaseStateFromDocument<ScopeOfWorkDocument>>,
+    initialState?: Partial<ScopeOfWorkPHState>,
     dispatch?: SignalDispatch,
   ) {
-    super(reducer, utils.createDocument(initialState), dispatch);
+    super(reducer, createDocument(initialState), dispatch);
   }
 
   public saveToFile(path: string, name?: string) {

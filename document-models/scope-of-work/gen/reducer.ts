@@ -6,7 +6,8 @@ import {
   isDocumentAction,
   createReducer,
 } from "document-model";
-import { type ScopeOfWorkDocument, z } from "./types.js";
+import { ScopeOfWorkPHState } from "./ph-factories.js";
+import { z } from "./types.js";
 
 import { reducer as ScopeOfWorkReducer } from "../src/reducers/scope-of-work.js";
 import { reducer as DeliverablesReducer } from "../src/reducers/deliverables.js";
@@ -16,7 +17,7 @@ import { reducer as DeliverablesSetReducer } from "../src/reducers/deliverables-
 import { reducer as ContributorsReducer } from "../src/reducers/contributors.js";
 import { reducer as ProjectsReducer } from "../src/reducers/projects.js";
 
-const stateReducer: StateReducer<ScopeOfWorkDocument> = (
+export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
   state,
   action,
   dispatch,
@@ -328,4 +329,4 @@ const stateReducer: StateReducer<ScopeOfWorkDocument> = (
   }
 };
 
-export const reducer = createReducer<ScopeOfWorkDocument>(stateReducer);
+export const reducer = createReducer<ScopeOfWorkPHState>(stateReducer);

@@ -1,4 +1,5 @@
 import { BaseDocumentClass } from "document-model";
+import { ScopeOfWorkPHState } from "../ph-factories.js";
 import {
   type AddMilestoneInput,
   type RemoveMilestoneInput,
@@ -7,8 +8,6 @@ import {
   type RemoveCoordinatorInput,
   type AddMilestoneDeliverableInput,
   type RemoveMilestoneDeliverableInput,
-  type ScopeOfWorkState,
-  type ScopeOfWorkLocalState,
 } from "../types.js";
 import {
   addMilestone,
@@ -21,11 +20,7 @@ import {
 } from "./creators.js";
 import { type ScopeOfWorkAction } from "../actions.js";
 
-export default class ScopeOfWork_Milestones extends BaseDocumentClass<
-  ScopeOfWorkState,
-  ScopeOfWorkLocalState,
-  ScopeOfWorkAction
-> {
+export default class ScopeOfWork_Milestones extends BaseDocumentClass<ScopeOfWorkPHState> {
   public addMilestone(input: AddMilestoneInput) {
     return this.dispatch(addMilestone(input));
   }
