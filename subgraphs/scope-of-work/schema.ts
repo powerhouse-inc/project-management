@@ -171,8 +171,8 @@ export const schema: DocumentNode = gql`
   Queries: ScopeOfWork
   """
   type ScopeOfWorkQueries {
-    getDocument(driveId: String, docId: PHID): ScopeOfWork
-    getDocuments: [ScopeOfWork!]
+    getDocument(docId: PHID!, driveId: PHID): ScopeOfWork
+    getDocuments(driveId: String!): [ScopeOfWork!]
   }
 
   type Query {
@@ -183,7 +183,7 @@ export const schema: DocumentNode = gql`
   Mutations: ScopeOfWork
   """
   type Mutation {
-    ScopeOfWork_createDocument(driveId: String, name: String): String
+    ScopeOfWork_createDocument(name: String!, driveId: String): String
 
     ScopeOfWork_editScopeOfWork(
       driveId: String

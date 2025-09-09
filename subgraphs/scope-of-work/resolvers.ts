@@ -1,46 +1,95 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { type Subgraph } from "@powerhousedao/reactor-api";
 import { addFile } from "document-drive";
-import { actions } from "../../document-models/scope-of-work/index.js";
-import { generateId } from "document-model";
+import {
+  actions,
+  type EditScopeOfWorkInput,
+  type AddDeliverableInput,
+  type RemoveDeliverableInput,
+  type EditDeliverableInput,
+  type SetDeliverableProgressInput,
+  type AddKeyResultInput,
+  type RemoveKeyResultInput,
+  type EditKeyResultInput,
+  type SetDeliverableBudgetAnchorProjectInput,
+  type AddRoadmapInput,
+  type RemoveRoadmapInput,
+  type EditRoadmapInput,
+  type AddMilestoneInput,
+  type RemoveMilestoneInput,
+  type EditMilestoneInput,
+  type AddCoordinatorInput,
+  type RemoveCoordinatorInput,
+  type AddMilestoneDeliverableInput,
+  type RemoveMilestoneDeliverableInput,
+  type EditDeliverablesSetInput,
+  type AddDeliverableInSetInput,
+  type RemoveDeliverableInSetInput,
+  type AddAgentInput,
+  type RemoveAgentInput,
+  type EditAgentInput,
+  type AddProjectInput,
+  type UpdateProjectInput,
+  type UpdateProjectOwnerInput,
+  type RemoveProjectInput,
+  type SetProjectMarginInput,
+  type SetProjectTotalBudgetInput,
+  type AddProjectDeliverableInput,
+  type RemoveProjectDeliverableInput,
+  type ScopeOfWorkDocument,
+} from "../../document-models/scope-of-work/index.js";
+import { setName } from "document-model";
 
-const DEFAULT_DRIVE_ID = "powerhouse";
-
-export const getResolvers = (subgraph: Subgraph): Record<string, any> => {
+export const getResolvers = (subgraph: Subgraph): Record<string, unknown> => {
   const reactor = subgraph.reactor;
 
   return {
     Query: {
-      ScopeOfWork: async (_: any, args: any, ctx: any) => {
+      ScopeOfWork: async () => {
         return {
-          getDocument: async (args: any) => {
-            const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-            const docId: string = args.docId || "";
-            const doc = await reactor.getDocument(docId);
+          getDocument: async (args: { docId: string; driveId: string }) => {
+            const { docId, driveId } = args;
+
+            if (!docId) {
+              throw new Error("Document id is required");
+            }
+
+            if (driveId) {
+              const docIds = await reactor.getDocuments(driveId);
+              if (!docIds.includes(docId)) {
+                throw new Error(
+                  `Document with id ${docId} is not part of ${driveId}`,
+                );
+              }
+            }
+
+            const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
             return {
               driveId: driveId,
               ...doc,
               ...doc.header,
-              state: doc.state,
-              stateJSON: doc.state,
-              revision: doc.header.revision["global"] ?? 0,
+              created: doc.header.createdAtUtcIso,
+              lastModified: doc.header.lastModifiedAtUtcIso,
+              state: doc.state.global,
+              stateJSON: doc.state.global,
+              revision: doc.header?.revision?.global ?? 0,
             };
           },
-          getDocuments: async (args: any) => {
-            const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
+          getDocuments: async (args: { driveId: string }) => {
+            const { driveId } = args;
             const docsIds = await reactor.getDocuments(driveId);
             const docs = await Promise.all(
               docsIds.map(async (docId) => {
-                const doc = await reactor.getDocument(docId);
+                const doc =
+                  await reactor.getDocument<ScopeOfWorkDocument>(docId);
                 return {
                   driveId: driveId,
                   ...doc,
                   ...doc.header,
-                  state: doc.state,
-                  stateJSON: doc.state,
-                  revision: doc.header.revision["global"] ?? 0,
+                  created: doc.header.createdAtUtcIso,
+                  lastModified: doc.header.lastModifiedAtUtcIso,
+                  state: doc.state.global,
+                  stateJSON: doc.state.global,
+                  revision: doc.header?.revision?.global ?? 0,
                 };
               }),
             );
@@ -53,497 +102,778 @@ export const getResolvers = (subgraph: Subgraph): Record<string, any> => {
       },
     },
     Mutation: {
-      ScopeOfWork_createDocument: async (_: any, args: any) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId = generateId();
+      ScopeOfWork_createDocument: async (
+        _: unknown,
+        args: { name: string; driveId?: string },
+      ) => {
+        const { driveId, name } = args;
+        const document = await reactor.addDocument("powerhouse/scopeofwork");
 
-        await reactor.addDriveAction(
-          driveId,
-          addFile({
-            id: docId,
-            name: args.name,
-            documentType: "powerhouse/scopeofwork",
-            synchronizationUnits: [
-              {
-                branch: "main",
-                scope: "global",
-                syncId: generateId(),
-              },
-              {
-                branch: "main",
-                scope: "local",
-                syncId: generateId(),
-              },
-            ],
-          }),
-        );
+        if (driveId) {
+          await reactor.addAction(
+            driveId,
+            addFile({
+              name,
+              id: document.header.id,
+              documentType: "powerhouse/scopeofwork",
+            }),
+          );
+        }
 
-        return docId;
+        if (name) {
+          await reactor.addAction(document.header.id, setName(name));
+        }
+
+        return document.header.id;
       },
 
-      ScopeOfWork_editScopeOfWork: async (_: any, args: any) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId: string = args.docId || "";
-        const doc = await reactor.getDocument(driveId, docId);
+      ScopeOfWork_editScopeOfWork: async (
+        _: unknown,
+        args: { docId: string; input: EditScopeOfWorkInput },
+      ) => {
+        const { docId, input } = args;
+        const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
 
-        await reactor.addAction(
-          driveId,
+        const result = await reactor.addAction(
           docId,
-          actions.editScopeOfWork({ ...args.input }),
+          actions.editScopeOfWork(input),
         );
 
-        return (doc.header.revision["global"] ?? 0) + 1;
+        if (result.status !== "SUCCESS") {
+          throw new Error(result.error?.message ?? "Failed to editScopeOfWork");
+        }
+
+        return true;
       },
 
-      ScopeOfWork_addDeliverable: async (_: any, args: any) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId: string = args.docId || "";
-        const doc = await reactor.getDocument(driveId, docId);
+      ScopeOfWork_addDeliverable: async (
+        _: unknown,
+        args: { docId: string; input: AddDeliverableInput },
+      ) => {
+        const { docId, input } = args;
+        const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
 
-        await reactor.addAction(
-          driveId,
+        const result = await reactor.addAction(
           docId,
-          actions.addDeliverable({ ...args.input }),
+          actions.addDeliverable(input),
         );
 
-        return (doc.header.revision["global"] ?? 0) + 1;
+        if (result.status !== "SUCCESS") {
+          throw new Error(result.error?.message ?? "Failed to addDeliverable");
+        }
+
+        return true;
       },
 
-      ScopeOfWork_removeDeliverable: async (_: any, args: any) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId: string = args.docId || "";
-        const doc = await reactor.getDocument(driveId, docId);
+      ScopeOfWork_removeDeliverable: async (
+        _: unknown,
+        args: { docId: string; input: RemoveDeliverableInput },
+      ) => {
+        const { docId, input } = args;
+        const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
 
-        await reactor.addAction(
-          driveId,
+        const result = await reactor.addAction(
           docId,
-          actions.removeDeliverable({ ...args.input }),
+          actions.removeDeliverable(input),
         );
 
-        return (doc.header.revision["global"] ?? 0) + 1;
+        if (result.status !== "SUCCESS") {
+          throw new Error(
+            result.error?.message ?? "Failed to removeDeliverable",
+          );
+        }
+
+        return true;
       },
 
-      ScopeOfWork_editDeliverable: async (_: any, args: any) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId: string = args.docId || "";
-        const doc = await reactor.getDocument(driveId, docId);
+      ScopeOfWork_editDeliverable: async (
+        _: unknown,
+        args: { docId: string; input: EditDeliverableInput },
+      ) => {
+        const { docId, input } = args;
+        const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
 
-        await reactor.addAction(
-          driveId,
+        const result = await reactor.addAction(
           docId,
-          actions.editDeliverable({ ...args.input }),
+          actions.editDeliverable(input),
         );
 
-        return (doc.header.revision["global"] ?? 0) + 1;
+        if (result.status !== "SUCCESS") {
+          throw new Error(result.error?.message ?? "Failed to editDeliverable");
+        }
+
+        return true;
       },
 
-      ScopeOfWork_setDeliverableProgress: async (_: any, args: any) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId: string = args.docId || "";
-        const doc = await reactor.getDocument(driveId, docId);
+      ScopeOfWork_setDeliverableProgress: async (
+        _: unknown,
+        args: { docId: string; input: SetDeliverableProgressInput },
+      ) => {
+        const { docId, input } = args;
+        const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
 
-        await reactor.addAction(
-          driveId,
+        const result = await reactor.addAction(
           docId,
-          actions.setDeliverableProgress({ ...args.input }),
+          actions.setDeliverableProgress(input),
         );
 
-        return (doc.header.revision["global"] ?? 0) + 1;
+        if (result.status !== "SUCCESS") {
+          throw new Error(
+            result.error?.message ?? "Failed to setDeliverableProgress",
+          );
+        }
+
+        return true;
       },
 
-      ScopeOfWork_addKeyResult: async (_: any, args: any) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId: string = args.docId || "";
-        const doc = await reactor.getDocument(driveId, docId);
+      ScopeOfWork_addKeyResult: async (
+        _: unknown,
+        args: { docId: string; input: AddKeyResultInput },
+      ) => {
+        const { docId, input } = args;
+        const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
 
-        await reactor.addAction(
-          driveId,
+        const result = await reactor.addAction(
           docId,
-          actions.addKeyResult({ ...args.input }),
+          actions.addKeyResult(input),
         );
 
-        return (doc.header.revision["global"] ?? 0) + 1;
+        if (result.status !== "SUCCESS") {
+          throw new Error(result.error?.message ?? "Failed to addKeyResult");
+        }
+
+        return true;
       },
 
-      ScopeOfWork_removeKeyResult: async (_: any, args: any) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId: string = args.docId || "";
-        const doc = await reactor.getDocument(driveId, docId);
+      ScopeOfWork_removeKeyResult: async (
+        _: unknown,
+        args: { docId: string; input: RemoveKeyResultInput },
+      ) => {
+        const { docId, input } = args;
+        const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
 
-        await reactor.addAction(
-          driveId,
+        const result = await reactor.addAction(
           docId,
-          actions.removeKeyResult({ ...args.input }),
+          actions.removeKeyResult(input),
         );
 
-        return (doc.header.revision["global"] ?? 0) + 1;
+        if (result.status !== "SUCCESS") {
+          throw new Error(result.error?.message ?? "Failed to removeKeyResult");
+        }
+
+        return true;
       },
 
-      ScopeOfWork_editKeyResult: async (_: any, args: any) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId: string = args.docId || "";
-        const doc = await reactor.getDocument(driveId, docId);
+      ScopeOfWork_editKeyResult: async (
+        _: unknown,
+        args: { docId: string; input: EditKeyResultInput },
+      ) => {
+        const { docId, input } = args;
+        const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
 
-        await reactor.addAction(
-          driveId,
+        const result = await reactor.addAction(
           docId,
-          actions.editKeyResult({ ...args.input }),
+          actions.editKeyResult(input),
         );
 
-        return (doc.header.revision["global"] ?? 0) + 1;
+        if (result.status !== "SUCCESS") {
+          throw new Error(result.error?.message ?? "Failed to editKeyResult");
+        }
+
+        return true;
       },
 
       ScopeOfWork_setDeliverableBudgetAnchorProject: async (
-        _: any,
-        args: any,
+        _: unknown,
+        args: { docId: string; input: SetDeliverableBudgetAnchorProjectInput },
       ) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId: string = args.docId || "";
-        const doc = await reactor.getDocument(driveId, docId);
+        const { docId, input } = args;
+        const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
 
-        await reactor.addAction(
-          driveId,
+        const result = await reactor.addAction(
           docId,
-          actions.setDeliverableBudgetAnchorProject({ ...args.input }),
+          actions.setDeliverableBudgetAnchorProject(input),
         );
 
-        return (doc.header.revision["global"] ?? 0) + 1;
+        if (result.status !== "SUCCESS") {
+          throw new Error(
+            result.error?.message ??
+              "Failed to setDeliverableBudgetAnchorProject",
+          );
+        }
+
+        return true;
       },
 
-      ScopeOfWork_addRoadmap: async (_: any, args: any) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId: string = args.docId || "";
-        const doc = await reactor.getDocument(driveId, docId);
+      ScopeOfWork_addRoadmap: async (
+        _: unknown,
+        args: { docId: string; input: AddRoadmapInput },
+      ) => {
+        const { docId, input } = args;
+        const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
 
-        await reactor.addAction(
-          driveId,
+        const result = await reactor.addAction(
           docId,
-          actions.addRoadmap({ ...args.input }),
+          actions.addRoadmap(input),
         );
 
-        return (doc.header.revision["global"] ?? 0) + 1;
+        if (result.status !== "SUCCESS") {
+          throw new Error(result.error?.message ?? "Failed to addRoadmap");
+        }
+
+        return true;
       },
 
-      ScopeOfWork_removeRoadmap: async (_: any, args: any) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId: string = args.docId || "";
-        const doc = await reactor.getDocument(driveId, docId);
+      ScopeOfWork_removeRoadmap: async (
+        _: unknown,
+        args: { docId: string; input: RemoveRoadmapInput },
+      ) => {
+        const { docId, input } = args;
+        const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
 
-        await reactor.addAction(
-          driveId,
+        const result = await reactor.addAction(
           docId,
-          actions.removeRoadmap({ ...args.input }),
+          actions.removeRoadmap(input),
         );
 
-        return (doc.header.revision["global"] ?? 0) + 1;
+        if (result.status !== "SUCCESS") {
+          throw new Error(result.error?.message ?? "Failed to removeRoadmap");
+        }
+
+        return true;
       },
 
-      ScopeOfWork_editRoadmap: async (_: any, args: any) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId: string = args.docId || "";
-        const doc = await reactor.getDocument(driveId, docId);
+      ScopeOfWork_editRoadmap: async (
+        _: unknown,
+        args: { docId: string; input: EditRoadmapInput },
+      ) => {
+        const { docId, input } = args;
+        const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
 
-        await reactor.addAction(
-          driveId,
+        const result = await reactor.addAction(
           docId,
-          actions.editRoadmap({ ...args.input }),
+          actions.editRoadmap(input),
         );
 
-        return (doc.header.revision["global"] ?? 0) + 1;
+        if (result.status !== "SUCCESS") {
+          throw new Error(result.error?.message ?? "Failed to editRoadmap");
+        }
+
+        return true;
       },
 
-      ScopeOfWork_addMilestone: async (_: any, args: any) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId: string = args.docId || "";
-        const doc = await reactor.getDocument(driveId, docId);
+      ScopeOfWork_addMilestone: async (
+        _: unknown,
+        args: { docId: string; input: AddMilestoneInput },
+      ) => {
+        const { docId, input } = args;
+        const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
 
-        await reactor.addAction(
-          driveId,
+        const result = await reactor.addAction(
           docId,
-          actions.addMilestone({ ...args.input }),
+          actions.addMilestone(input),
         );
 
-        return (doc.header.revision["global"] ?? 0) + 1;
+        if (result.status !== "SUCCESS") {
+          throw new Error(result.error?.message ?? "Failed to addMilestone");
+        }
+
+        return true;
       },
 
-      ScopeOfWork_removeMilestone: async (_: any, args: any) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId: string = args.docId || "";
-        const doc = await reactor.getDocument(driveId, docId);
+      ScopeOfWork_removeMilestone: async (
+        _: unknown,
+        args: { docId: string; input: RemoveMilestoneInput },
+      ) => {
+        const { docId, input } = args;
+        const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
 
-        await reactor.addAction(
-          driveId,
+        const result = await reactor.addAction(
           docId,
-          actions.removeMilestone({ ...args.input }),
+          actions.removeMilestone(input),
         );
 
-        return (doc.header.revision["global"] ?? 0) + 1;
+        if (result.status !== "SUCCESS") {
+          throw new Error(result.error?.message ?? "Failed to removeMilestone");
+        }
+
+        return true;
       },
 
-      ScopeOfWork_editMilestone: async (_: any, args: any) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId: string = args.docId || "";
-        const doc = await reactor.getDocument(driveId, docId);
+      ScopeOfWork_editMilestone: async (
+        _: unknown,
+        args: { docId: string; input: EditMilestoneInput },
+      ) => {
+        const { docId, input } = args;
+        const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
 
-        await reactor.addAction(
-          driveId,
+        const result = await reactor.addAction(
           docId,
-          actions.editMilestone({ ...args.input }),
+          actions.editMilestone(input),
         );
 
-        return (doc.header.revision["global"] ?? 0) + 1;
+        if (result.status !== "SUCCESS") {
+          throw new Error(result.error?.message ?? "Failed to editMilestone");
+        }
+
+        return true;
       },
 
-      ScopeOfWork_addCoordinator: async (_: any, args: any) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId: string = args.docId || "";
-        const doc = await reactor.getDocument(driveId, docId);
+      ScopeOfWork_addCoordinator: async (
+        _: unknown,
+        args: { docId: string; input: AddCoordinatorInput },
+      ) => {
+        const { docId, input } = args;
+        const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
 
-        await reactor.addAction(
-          driveId,
+        const result = await reactor.addAction(
           docId,
-          actions.addCoordinator({ ...args.input }),
+          actions.addCoordinator(input),
         );
 
-        return (doc.header.revision["global"] ?? 0) + 1;
+        if (result.status !== "SUCCESS") {
+          throw new Error(result.error?.message ?? "Failed to addCoordinator");
+        }
+
+        return true;
       },
 
-      ScopeOfWork_removeCoordinator: async (_: any, args: any) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId: string = args.docId || "";
-        const doc = await reactor.getDocument(driveId, docId);
+      ScopeOfWork_removeCoordinator: async (
+        _: unknown,
+        args: { docId: string; input: RemoveCoordinatorInput },
+      ) => {
+        const { docId, input } = args;
+        const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
 
-        await reactor.addAction(
-          driveId,
+        const result = await reactor.addAction(
           docId,
-          actions.removeCoordinator({ ...args.input }),
+          actions.removeCoordinator(input),
         );
 
-        return (doc.header.revision["global"] ?? 0) + 1;
+        if (result.status !== "SUCCESS") {
+          throw new Error(
+            result.error?.message ?? "Failed to removeCoordinator",
+          );
+        }
+
+        return true;
       },
 
-      ScopeOfWork_addMilestoneDeliverable: async (_: any, args: any) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId: string = args.docId || "";
-        const doc = await reactor.getDocument(driveId, docId);
+      ScopeOfWork_addMilestoneDeliverable: async (
+        _: unknown,
+        args: { docId: string; input: AddMilestoneDeliverableInput },
+      ) => {
+        const { docId, input } = args;
+        const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
 
-        await reactor.addAction(
-          driveId,
+        const result = await reactor.addAction(
           docId,
-          actions.addMilestoneDeliverable({ ...args.input }),
+          actions.addMilestoneDeliverable(input),
         );
 
-        return (doc.header.revision["global"] ?? 0) + 1;
+        if (result.status !== "SUCCESS") {
+          throw new Error(
+            result.error?.message ?? "Failed to addMilestoneDeliverable",
+          );
+        }
+
+        return true;
       },
 
-      ScopeOfWork_removeMilestoneDeliverable: async (_: any, args: any) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId: string = args.docId || "";
-        const doc = await reactor.getDocument(driveId, docId);
+      ScopeOfWork_removeMilestoneDeliverable: async (
+        _: unknown,
+        args: { docId: string; input: RemoveMilestoneDeliverableInput },
+      ) => {
+        const { docId, input } = args;
+        const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
 
-        await reactor.addAction(
-          driveId,
+        const result = await reactor.addAction(
           docId,
-          actions.removeMilestoneDeliverable({ ...args.input }),
+          actions.removeMilestoneDeliverable(input),
         );
 
-        return (doc.header.revision["global"] ?? 0) + 1;
+        if (result.status !== "SUCCESS") {
+          throw new Error(
+            result.error?.message ?? "Failed to removeMilestoneDeliverable",
+          );
+        }
+
+        return true;
       },
 
-      ScopeOfWork_editDeliverablesSet: async (_: any, args: any) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId: string = args.docId || "";
-        const doc = await reactor.getDocument(driveId, docId);
+      ScopeOfWork_editDeliverablesSet: async (
+        _: unknown,
+        args: { docId: string; input: EditDeliverablesSetInput },
+      ) => {
+        const { docId, input } = args;
+        const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
 
-        await reactor.addAction(
-          driveId,
+        const result = await reactor.addAction(
           docId,
-          actions.editDeliverablesSet({ ...args.input }),
+          actions.editDeliverablesSet(input),
         );
 
-        return (doc.header.revision["global"] ?? 0) + 1;
+        if (result.status !== "SUCCESS") {
+          throw new Error(
+            result.error?.message ?? "Failed to editDeliverablesSet",
+          );
+        }
+
+        return true;
       },
 
-      ScopeOfWork_addDeliverableInSet: async (_: any, args: any) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId: string = args.docId || "";
-        const doc = await reactor.getDocument(driveId, docId);
+      ScopeOfWork_addDeliverableInSet: async (
+        _: unknown,
+        args: { docId: string; input: AddDeliverableInSetInput },
+      ) => {
+        const { docId, input } = args;
+        const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
 
-        await reactor.addAction(
-          driveId,
+        const result = await reactor.addAction(
           docId,
-          actions.addDeliverableInSet({ ...args.input }),
+          actions.addDeliverableInSet(input),
         );
 
-        return (doc.header.revision["global"] ?? 0) + 1;
+        if (result.status !== "SUCCESS") {
+          throw new Error(
+            result.error?.message ?? "Failed to addDeliverableInSet",
+          );
+        }
+
+        return true;
       },
 
-      ScopeOfWork_removeDeliverableInSet: async (_: any, args: any) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId: string = args.docId || "";
-        const doc = await reactor.getDocument(driveId, docId);
+      ScopeOfWork_removeDeliverableInSet: async (
+        _: unknown,
+        args: { docId: string; input: RemoveDeliverableInSetInput },
+      ) => {
+        const { docId, input } = args;
+        const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
 
-        await reactor.addAction(
-          driveId,
+        const result = await reactor.addAction(
           docId,
-          actions.removeDeliverableInSet({ ...args.input }),
+          actions.removeDeliverableInSet(input),
         );
 
-        return (doc.header.revision["global"] ?? 0) + 1;
+        if (result.status !== "SUCCESS") {
+          throw new Error(
+            result.error?.message ?? "Failed to removeDeliverableInSet",
+          );
+        }
+
+        return true;
       },
 
-      ScopeOfWork_addAgent: async (_: any, args: any) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId: string = args.docId || "";
-        const doc = await reactor.getDocument(driveId, docId);
+      ScopeOfWork_addAgent: async (
+        _: unknown,
+        args: { docId: string; input: AddAgentInput },
+      ) => {
+        const { docId, input } = args;
+        const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
 
-        await reactor.addAction(
-          driveId,
-          docId,
-          actions.addAgent({ ...args.input }),
-        );
+        const result = await reactor.addAction(docId, actions.addAgent(input));
 
-        return (doc.header.revision["global"] ?? 0) + 1;
+        if (result.status !== "SUCCESS") {
+          throw new Error(result.error?.message ?? "Failed to addAgent");
+        }
+
+        return true;
       },
 
-      ScopeOfWork_removeAgent: async (_: any, args: any) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId: string = args.docId || "";
-        const doc = await reactor.getDocument(driveId, docId);
+      ScopeOfWork_removeAgent: async (
+        _: unknown,
+        args: { docId: string; input: RemoveAgentInput },
+      ) => {
+        const { docId, input } = args;
+        const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
 
-        await reactor.addAction(
-          driveId,
+        const result = await reactor.addAction(
           docId,
-          actions.removeAgent({ ...args.input }),
+          actions.removeAgent(input),
         );
 
-        return (doc.header.revision["global"] ?? 0) + 1;
+        if (result.status !== "SUCCESS") {
+          throw new Error(result.error?.message ?? "Failed to removeAgent");
+        }
+
+        return true;
       },
 
-      ScopeOfWork_editAgent: async (_: any, args: any) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId: string = args.docId || "";
-        const doc = await reactor.getDocument(driveId, docId);
+      ScopeOfWork_editAgent: async (
+        _: unknown,
+        args: { docId: string; input: EditAgentInput },
+      ) => {
+        const { docId, input } = args;
+        const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
 
-        await reactor.addAction(
-          driveId,
-          docId,
-          actions.editAgent({ ...args.input }),
-        );
+        const result = await reactor.addAction(docId, actions.editAgent(input));
 
-        return (doc.header.revision["global"] ?? 0) + 1;
+        if (result.status !== "SUCCESS") {
+          throw new Error(result.error?.message ?? "Failed to editAgent");
+        }
+
+        return true;
       },
 
-      ScopeOfWork_addProject: async (_: any, args: any) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId: string = args.docId || "";
-        const doc = await reactor.getDocument(driveId, docId);
+      ScopeOfWork_addProject: async (
+        _: unknown,
+        args: { docId: string; input: AddProjectInput },
+      ) => {
+        const { docId, input } = args;
+        const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
 
-        await reactor.addAction(
-          driveId,
+        const result = await reactor.addAction(
           docId,
-          actions.addProject({ ...args.input }),
+          actions.addProject(input),
         );
 
-        return (doc.header.revision["global"] ?? 0) + 1;
+        if (result.status !== "SUCCESS") {
+          throw new Error(result.error?.message ?? "Failed to addProject");
+        }
+
+        return true;
       },
 
-      ScopeOfWork_updateProject: async (_: any, args: any) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId: string = args.docId || "";
-        const doc = await reactor.getDocument(driveId, docId);
+      ScopeOfWork_updateProject: async (
+        _: unknown,
+        args: { docId: string; input: UpdateProjectInput },
+      ) => {
+        const { docId, input } = args;
+        const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
 
-        await reactor.addAction(
-          driveId,
+        const result = await reactor.addAction(
           docId,
-          actions.updateProject({ ...args.input }),
+          actions.updateProject(input),
         );
 
-        return (doc.header.revision["global"] ?? 0) + 1;
+        if (result.status !== "SUCCESS") {
+          throw new Error(result.error?.message ?? "Failed to updateProject");
+        }
+
+        return true;
       },
 
-      ScopeOfWork_updateProjectOwner: async (_: any, args: any) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId: string = args.docId || "";
-        const doc = await reactor.getDocument(driveId, docId);
+      ScopeOfWork_updateProjectOwner: async (
+        _: unknown,
+        args: { docId: string; input: UpdateProjectOwnerInput },
+      ) => {
+        const { docId, input } = args;
+        const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
 
-        await reactor.addAction(
-          driveId,
+        const result = await reactor.addAction(
           docId,
-          actions.updateProjectOwner({ ...args.input }),
+          actions.updateProjectOwner(input),
         );
 
-        return (doc.header.revision["global"] ?? 0) + 1;
+        if (result.status !== "SUCCESS") {
+          throw new Error(
+            result.error?.message ?? "Failed to updateProjectOwner",
+          );
+        }
+
+        return true;
       },
 
-      ScopeOfWork_removeProject: async (_: any, args: any) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId: string = args.docId || "";
-        const doc = await reactor.getDocument(driveId, docId);
+      ScopeOfWork_removeProject: async (
+        _: unknown,
+        args: { docId: string; input: RemoveProjectInput },
+      ) => {
+        const { docId, input } = args;
+        const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
 
-        await reactor.addAction(
-          driveId,
+        const result = await reactor.addAction(
           docId,
-          actions.removeProject({ ...args.input }),
+          actions.removeProject(input),
         );
 
-        return (doc.header.revision["global"] ?? 0) + 1;
+        if (result.status !== "SUCCESS") {
+          throw new Error(result.error?.message ?? "Failed to removeProject");
+        }
+
+        return true;
       },
 
-      ScopeOfWork_setProjectMargin: async (_: any, args: any) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId: string = args.docId || "";
-        const doc = await reactor.getDocument(driveId, docId);
+      ScopeOfWork_setProjectMargin: async (
+        _: unknown,
+        args: { docId: string; input: SetProjectMarginInput },
+      ) => {
+        const { docId, input } = args;
+        const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
 
-        await reactor.addAction(
-          driveId,
+        const result = await reactor.addAction(
           docId,
-          actions.setProjectMargin({ ...args.input }),
+          actions.setProjectMargin(input),
         );
 
-        return (doc.header.revision["global"] ?? 0) + 1;
+        if (result.status !== "SUCCESS") {
+          throw new Error(
+            result.error?.message ?? "Failed to setProjectMargin",
+          );
+        }
+
+        return true;
       },
 
-      ScopeOfWork_setProjectTotalBudget: async (_: any, args: any) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId: string = args.docId || "";
-        const doc = await reactor.getDocument(driveId, docId);
+      ScopeOfWork_setProjectTotalBudget: async (
+        _: unknown,
+        args: { docId: string; input: SetProjectTotalBudgetInput },
+      ) => {
+        const { docId, input } = args;
+        const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
 
-        await reactor.addAction(
-          driveId,
+        const result = await reactor.addAction(
           docId,
-          actions.setProjectTotalBudget({ ...args.input }),
+          actions.setProjectTotalBudget(input),
         );
 
-        return (doc.header.revision["global"] ?? 0) + 1;
+        if (result.status !== "SUCCESS") {
+          throw new Error(
+            result.error?.message ?? "Failed to setProjectTotalBudget",
+          );
+        }
+
+        return true;
       },
 
-      ScopeOfWork_addProjectDeliverable: async (_: any, args: any) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId: string = args.docId || "";
-        const doc = await reactor.getDocument(driveId, docId);
+      ScopeOfWork_addProjectDeliverable: async (
+        _: unknown,
+        args: { docId: string; input: AddProjectDeliverableInput },
+      ) => {
+        const { docId, input } = args;
+        const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
 
-        await reactor.addAction(
-          driveId,
+        const result = await reactor.addAction(
           docId,
-          actions.addProjectDeliverable({ ...args.input }),
+          actions.addProjectDeliverable(input),
         );
 
-        return (doc.header.revision["global"] ?? 0) + 1;
+        if (result.status !== "SUCCESS") {
+          throw new Error(
+            result.error?.message ?? "Failed to addProjectDeliverable",
+          );
+        }
+
+        return true;
       },
 
-      ScopeOfWork_removeProjectDeliverable: async (_: any, args: any) => {
-        const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
-        const docId: string = args.docId || "";
-        const doc = await reactor.getDocument(driveId, docId);
+      ScopeOfWork_removeProjectDeliverable: async (
+        _: unknown,
+        args: { docId: string; input: RemoveProjectDeliverableInput },
+      ) => {
+        const { docId, input } = args;
+        const doc = await reactor.getDocument<ScopeOfWorkDocument>(docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
 
-        await reactor.addAction(
-          driveId,
+        const result = await reactor.addAction(
           docId,
-          actions.removeProjectDeliverable({ ...args.input }),
+          actions.removeProjectDeliverable(input),
         );
 
-        return (doc.header.revision["global"] ?? 0) + 1;
+        if (result.status !== "SUCCESS") {
+          throw new Error(
+            result.error?.message ?? "Failed to removeProjectDeliverable",
+          );
+        }
+
+        return true;
       },
     },
   };
