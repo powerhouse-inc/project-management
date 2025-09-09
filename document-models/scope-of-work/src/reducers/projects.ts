@@ -124,7 +124,7 @@ export const reducer: ScopeOfWorkProjectsOperations = {
         throw new Error("Project not found");
       }
       project.budget = action.input.totalBudget;
-      return applyInvariants(state, ["margin"]);
+      applyInvariants(state, ["margin"]);
     } catch (error) {
       console.error(error);
     }

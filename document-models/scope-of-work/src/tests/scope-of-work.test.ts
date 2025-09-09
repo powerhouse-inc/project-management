@@ -31,10 +31,10 @@ describe("ScopeOfWork Operations", () => {
     const updatedDocument = reducer(document, creators.editScopeOfWork(input));
 
     expect(updatedDocument.operations.global).toHaveLength(1);
-    expect(updatedDocument.operations.global[0].type).toBe(
+    expect(updatedDocument.operations.global[0].action.type).toBe(
       "EDIT_SCOPE_OF_WORK",
     );
-    expect(updatedDocument.operations.global[0].input).toStrictEqual(input);
+    expect(updatedDocument.operations.global[0].action.input).toStrictEqual(input);
     expect(updatedDocument.operations.global[0].index).toEqual(0);
     expect(updatedDocument.state.global.title).toBe(input.title);
     expect(updatedDocument.state.global.description).toBe(input.description);

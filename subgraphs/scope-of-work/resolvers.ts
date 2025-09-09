@@ -18,13 +18,13 @@ export const getResolvers = (subgraph: Subgraph): Record<string, any> => {
           getDocument: async (args: any) => {
             const driveId: string = args.driveId || DEFAULT_DRIVE_ID;
             const docId: string = args.docId || "";
-            const doc = await reactor.getDocument(driveId, docId);
+            const doc = await reactor.getDocument(docId);
             return {
               driveId: driveId,
               ...doc,
               ...doc.header,
-              state: doc.state.global,
-              stateJSON: doc.state.global,
+              state: doc.state,
+              stateJSON: doc.state,
               revision: doc.header.revision["global"] ?? 0,
             };
           },
@@ -33,13 +33,13 @@ export const getResolvers = (subgraph: Subgraph): Record<string, any> => {
             const docsIds = await reactor.getDocuments(driveId);
             const docs = await Promise.all(
               docsIds.map(async (docId) => {
-                const doc = await reactor.getDocument(driveId, docId);
+                const doc = await reactor.getDocument(docId);
                 return {
                   driveId: driveId,
                   ...doc,
                   ...doc.header,
-                  state: doc.state.global,
-                  stateJSON: doc.state.global,
+                  state: doc.state,
+                  stateJSON: doc.state,
                   revision: doc.header.revision["global"] ?? 0,
                 };
               }),

@@ -16,6 +16,7 @@ import Deliverables from "./deliverables.js";
 import Roadmaps from "./roadmaps.js";
 import Contributors from "./contributors.js";
 import BreadCrumbs from "../components/breadCrumbs.js";
+import { useSelectedDocument } from "@powerhousedao/reactor-browser";
 
 type SidebarNode = {
   id: string;
@@ -100,7 +101,17 @@ const useSidebarWidth = () => {
 };
 
 export default function SidebarMenu(props: any) {
-  const { document, state = document.state.global, dispatch } = props;
+  const { document, state = document.state.global } = props;
+  
+  // Getting dispatch from props or selected document
+  let dispatch: any;
+  if (props.dispatch) {
+    dispatch = props.dispatch;
+  } else {
+    const selectedDocument = useSelectedDocument();
+    dispatch = selectedDocument ? selectedDocument[1] : null;
+  }
+
   const { roadmaps, deliverables, projects, contributors } = state;
   const milestones = state.roadmaps.flatMap((r: any) => r.milestones);
   const [activeNodeId, setActiveNodeId] = useState<string | undefined>(
@@ -455,7 +466,11 @@ export default function SidebarMenu(props: any) {
               breadcrumbs={breadcrumbs}
               onBreadcrumbClick={handleBreadcrumbClick}
             />
-            <ScopeOfWork {...props} setActiveNodeId={setActiveNodeId} />
+            <ScopeOfWork 
+              {...props} 
+              dispatch={dispatch}
+              setActiveNodeId={setActiveNodeId} 
+            />
           </>
         )}
       </div>

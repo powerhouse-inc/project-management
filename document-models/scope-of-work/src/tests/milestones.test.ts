@@ -46,8 +46,8 @@ describe("Milestones Operations", () => {
     const updatedDocument = reducer(document, creators.addMilestone(input));
 
     expect(updatedDocument.operations.global).toHaveLength(1);
-    expect(updatedDocument.operations.global[0].type).toBe("ADD_MILESTONE");
-    expect(updatedDocument.operations.global[0].input).toStrictEqual(input);
+    expect(updatedDocument.operations.global[0].action.type).toBe("ADD_MILESTONE");
+    expect(updatedDocument.operations.global[0].action.input).toStrictEqual(input);
     expect(updatedDocument.operations.global[0].index).toEqual(0);
     const roadmap = updatedDocument.state.global.roadmaps.find(r => r.id === roadmapId);
     expect(roadmap).toBeDefined();
@@ -89,8 +89,8 @@ describe("Milestones Operations", () => {
     updatedDocument = reducer(updatedDocument, creators.editMilestone(input));
 
     expect(updatedDocument.operations.global).toHaveLength(3);
-    expect(updatedDocument.operations.global[2].type).toBe("EDIT_MILESTONE");
-    expect(updatedDocument.operations.global[2].input).toStrictEqual(input);
+    expect(updatedDocument.operations.global[2].action.type).toBe("EDIT_MILESTONE");
+    expect(updatedDocument.operations.global[2].action.input).toStrictEqual(input);
     expect(updatedDocument.operations.global[2].index).toEqual(2);
     const roadmap = updatedDocument.state.global.roadmaps.find(r => r.id === roadmapId);
     expect(roadmap).toBeDefined();
@@ -131,8 +131,8 @@ describe("Milestones Operations", () => {
     updatedDocument = reducer(updatedDocument, creators.removeMilestone(input));
 
     expect(updatedDocument.operations.global).toHaveLength(3);
-    expect(updatedDocument.operations.global[2].type).toBe("REMOVE_MILESTONE");
-    expect(updatedDocument.operations.global[2].input).toStrictEqual(input);
+    expect(updatedDocument.operations.global[2].action.type).toBe("REMOVE_MILESTONE");
+    expect(updatedDocument.operations.global[2].action.input).toStrictEqual(input);
     expect(updatedDocument.operations.global[2].index).toEqual(2);
     const roadmap = updatedDocument.state.global.roadmaps.find(r => r.id === roadmapId);
     expect(roadmap).toBeDefined();
@@ -168,8 +168,8 @@ describe("Milestones Operations", () => {
     updatedDocument = reducer(updatedDocument, creators.addCoordinator(input));
 
     expect(updatedDocument.operations.global).toHaveLength(3);
-    expect(updatedDocument.operations.global[2].type).toBe("ADD_COORDINATOR");
-    expect(updatedDocument.operations.global[2].input).toStrictEqual(input);
+    expect(updatedDocument.operations.global[2].action.type).toBe("ADD_COORDINATOR");
+    expect(updatedDocument.operations.global[2].action.input).toStrictEqual(input);
     expect(updatedDocument.operations.global[2].index).toEqual(2);
     const roadmap = updatedDocument.state.global.roadmaps.find(r => r.id === roadmapId);
     expect(roadmap).toBeDefined();
@@ -214,8 +214,8 @@ describe("Milestones Operations", () => {
     updatedDocument = reducer(updatedDocument, creators.removeCoordinator(input));
 
     expect(updatedDocument.operations.global).toHaveLength(4);
-    expect(updatedDocument.operations.global[3].type).toBe("REMOVE_COORDINATOR");
-    expect(updatedDocument.operations.global[3].input).toStrictEqual(input);
+    expect(updatedDocument.operations.global[3].action.type).toBe("REMOVE_COORDINATOR");
+    expect(updatedDocument.operations.global[3].action.input).toStrictEqual(input);
     expect(updatedDocument.operations.global[3].index).toEqual(3);
     const roadmap = updatedDocument.state.global.roadmaps.find(r => r.id === roadmapId);
     expect(roadmap).toBeDefined();

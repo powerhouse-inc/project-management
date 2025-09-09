@@ -12,12 +12,12 @@ import { reducer } from "./gen/reducer.js";
 import { documentModel } from "./gen/document-model.js";
 import genUtils from "./gen/utils.js";
 import * as customUtils from "./src/utils.js";
-import { type ScopeOfWorkDocument } from "./gen/types.js";
+import type { ScopeOfWorkPHState } from "./gen/ph-factories.js";
 
 const utils = { ...genUtils, ...customUtils };
 const actions = { ...BaseActions, ...ScopeOfWorkActions };
 
-export const module: DocumentModelModule<ScopeOfWorkDocument> = {
+export const module: DocumentModelModule<ScopeOfWorkPHState> = {
   reducer,
   actions,
   utils,
