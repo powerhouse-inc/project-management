@@ -82,7 +82,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
     }
     setStateDeliverable(currentDeliverable);
     setWorkProgress(currentDeliverable.workProgress);
-  }, [deliverables]);
+  }, [deliverables, currentDeliverable.owner]);
 
   const columns = useMemo<Array<ColumnDef<any>>>(() => {
     return [
@@ -205,11 +205,21 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                 onSubmit={(e) => {
                   e.preventDefault();
                   if (!stateDeliverable) return;
-                  if (e.target.value === stateDeliverable.owner) return;
+                  // Get the current value from the AIDField
+                  const currentValue = typeof stateDeliverable.owner === 'string' 
+                    ? stateDeliverable.owner 
+                    : (stateDeliverable.owner as any)?.value || '';
+                  const originalValue = typeof currentDeliverable.owner === 'string' 
+                    ? currentDeliverable.owner 
+                    : (currentDeliverable.owner as any)?.value || '';
+                  const currentValueStr = typeof currentValue === 'string' 
+                    ? currentValue 
+                    : (currentValue as any)?.value || '';
+                  if (currentValueStr === originalValue) return;
                   dispatch(
                     actions.editDeliverable({
                       id: currentDeliverable.id,
-                      owner: e.target.value,
+                      owner: currentValueStr,
                     })
                   );
                 }}
@@ -230,20 +240,62 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                     description: " ",
                     icon: "Person",
                   }))}
-                  onChange={(e) =>
-                    setStateDeliverable({
-                      ...stateDeliverable,
-                      owner: e,
-                    })
-                  }
+                  onChange={(e) => {
+                    // Handle both object and string cases
+                    let ownerId = '';
+                    
+                    if (typeof e === 'object' && e !== null) {
+                      // Object case - extract the value
+                      ownerId = (e as any).value || '';
+                    } else if (typeof e === 'string') {
+                      // String case - could be typing or selection
+                      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(e);
+                      
+                      if (isUUID) {
+                        ownerId = e;
+                      } else {
+                        // This is just typing, don't update state or dispatch
+                        return;
+                      }
+                    }
+                    
+                    // If we have a valid owner ID, update state and dispatch
+                    if (ownerId) {
+                      setStateDeliverable({
+                        ...stateDeliverable,
+                        owner: ownerId,
+                      });
+                      
+                      // Check if this is different from the original value
+                      const originalValue = currentDeliverable.owner || '';
+                      
+                      if (ownerId !== originalValue) {
+                        dispatch(
+                          actions.editDeliverable({
+                            id: currentDeliverable.id,
+                            owner: ownerId,
+                          })
+                        );
+                      }
+                    }
+                  }}
                   variant="withValueAndTitle"
                   onBlur={(e) => {
                     if (!stateDeliverable) return;
-                    if (e.target.value === stateDeliverable.owner) return;
+                    
+                    const originalValue = currentDeliverable.owner || '';
+                    const targetValue = e.target.value;
+                    
+                    // Check if the input value is different from the original value
+                    if (targetValue === originalValue) {
+                      return;
+                    }
+                    
+                    // If user typed something new, dispatch with the typed value
                     dispatch(
                       actions.editDeliverable({
                         id: currentDeliverable.id,
-                        owner: e.target.value,
+                        owner: targetValue,
                       })
                     );
                   }}
@@ -581,7 +633,12 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                 onDelete={(data) => {
                   if (data.length > 0) {
                     data.forEach((d: any) => {
-                      dispatch(actions.removeKeyResult({ id: d.id, deliverableId: currentDeliverable.id }));
+                      dispatch(
+                        actions.removeKeyResult({
+                          id: d.id,
+                          deliverableId: currentDeliverable.id,
+                        })
+                      );
                     });
                   }
                 }}
