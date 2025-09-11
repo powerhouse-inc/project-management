@@ -33,18 +33,8 @@ const Deliverables: React.FC<ProjectsProps> = ({
   setActiveNodeId,
   document,
 }) => {
-  const [currentTime, setCurrentTime] = useState(new Date());
   const [stateMilestones, setStateMilestones] = useState(milestones);
   const [stateProjects, setStateProjects] = useState(projects);
-
-  // Update current time every second for live timestamps
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
 
   useEffect(() => {
     setStateMilestones(milestones);
@@ -57,7 +47,9 @@ const Deliverables: React.FC<ProjectsProps> = ({
       operation.type === "ADD_DELIVERABLE" ||
       operation.type === "REMOVE_DELIVERABLE" ||
       operation.type === "ADD_PROJECT_DELIVERABLE" ||
-      operation.type === "ADD_MILESTONE_DELIVERABLE"
+      operation.type === "ADD_MILESTONE_DELIVERABLE" ||
+      operation.type === "ADD_DELIVERABLE_IN_SET" ||
+      operation.type === "REMOVE_DELIVERABLE_IN_SET"
   );
 
   // Create a map of deliverable IDs to their latest activity
@@ -66,13 +58,13 @@ const Deliverables: React.FC<ProjectsProps> = ({
     if (activity.input?.id) {
       latestActivityMap.set(activity.input.id, {
         type: activity.type,
-        timestamp: activity.timestamp,
+        timestamp: activity.timestamp || activity.timestampUtcMs,
         input: activity.input,
       });
     } else if (activity.input?.deliverableId) {
       latestActivityMap.set(activity.input.deliverableId, {
         type: activity.type,
-        timestamp: activity.timestamp,
+        timestamp: activity.timestamp || activity.timestampUtcMs,
         input: activity.input,
       });
     }
@@ -472,10 +464,7 @@ const Deliverables: React.FC<ProjectsProps> = ({
         align: "center" as ColumnAlignment,
         renderCell: (value: any, context: any) => {
           if (!context.row.latestActivity) return "";
-          const activityText = parseLatestActivity(
-            context.row.latestActivity,
-            currentTime
-          );
+          const activityText = parseLatestActivity(context.row.latestActivity);
           const [activity, time] = activityText.split("\n");
           return (
             <div className="text-xs">
@@ -486,7 +475,7 @@ const Deliverables: React.FC<ProjectsProps> = ({
         },
       },
     ],
-    [currentTime]
+    []
   );
 
   return (
@@ -525,7 +514,7 @@ const Deliverables: React.FC<ProjectsProps> = ({
 
 export default Deliverables;
 
-const parseLatestActivity = (latestActivity: any, currentTime: Date) => {
+const parseLatestActivity = (latestActivity: any) => {
   if (!latestActivity) {
     return "";
   }
@@ -538,24 +527,69 @@ const parseLatestActivity = (latestActivity: any, currentTime: Date) => {
     latestActivity.type === "ADD_MILESTONE_DELIVERABLE"
   ) {
     activity = "Added Deliverable";
-  } else if (latestActivity.type === "EDIT_DELIVERABLE") {
+  } else if (
+    latestActivity.type === "EDIT_DELIVERABLE" ||
+    latestActivity.type === "ADD_DELIVERABLE_IN_SET" ||
+    latestActivity.type === "REMOVE_DELIVERABLE_IN_SET"
+  ) {
     activity = `Edited ${Object.keys(latestActivity.input)[1]}`;
   }
 
-  const timeSince =
-    currentTime.getTime() - new Date(latestActivity.timestamp).getTime();
-  const timeSinceInSeconds = Math.abs(timeSince / 1000);
-  const timeSinceInMinutes = timeSinceInSeconds / 60;
-  const timeSinceInHours = timeSinceInMinutes / 60;
-  const timeSinceInDays = timeSinceInHours / 24;
+  // Always show the activity, even if timestamp fails
+  let timeDisplay = "";
 
-  if (timeSinceInDays >= 1) {
-    return `${activity}\n${Math.round(timeSinceInDays)} days ago`;
-  } else if (timeSinceInHours >= 1) {
-    return `${activity}\n${Math.round(timeSinceInHours)} hours ago`;
-  } else if (timeSinceInMinutes >= 1) {
-    return `${activity}\n${Math.round(timeSinceInMinutes)} minutes ago`;
-  } else {
-    return `${activity}\n${Math.round(timeSinceInSeconds)} seconds ago`;
+  if (latestActivity.timestamp) {
+    const currentTime = new Date();
+    let activityTime;
+
+    // Try different timestamp parsing approaches
+    if (typeof latestActivity.timestamp === "string") {
+      // Handle string timestamps
+      activityTime = new Date(latestActivity.timestamp);
+    } else if (typeof latestActivity.timestamp === "number") {
+      // Handle numeric timestamps (could be milliseconds or seconds)
+      if (latestActivity.timestamp > 1e10) {
+        // Looks like milliseconds
+        activityTime = new Date(latestActivity.timestamp);
+      } else {
+        // Looks like seconds, convert to milliseconds
+        activityTime = new Date(latestActivity.timestamp * 1000);
+      }
+    } else if (latestActivity.timestamp instanceof Date) {
+      // Already a Date object
+      activityTime = latestActivity.timestamp;
+    } else {
+      // Try to convert anyway
+      activityTime = new Date(latestActivity.timestamp);
+    }
+
+    // Check if the date is valid
+    if (!isNaN(activityTime.getTime())) {
+      const timeSince = currentTime.getTime() - activityTime.getTime();
+      const timeSinceInMinutes = Math.abs(timeSince / (1000 * 60));
+      const timeSinceInHours = timeSinceInMinutes / 60;
+      const timeSinceInDays = timeSinceInHours / 24;
+
+      if (timeSinceInDays >= 1) {
+        timeDisplay = `${Math.round(timeSinceInDays)} days ago`;
+      } else if (timeSinceInHours >= 1) {
+        timeDisplay = `${Math.round(timeSinceInHours)} hours ago`;
+      } else if (timeSinceInMinutes >= 1) {
+        timeDisplay = `${Math.round(timeSinceInMinutes)} minutes ago`;
+      } else {
+        timeDisplay = "Just now";
+      }
+    } else {
+      // Debug: log the problematic timestamp with more details
+      console.log("Invalid timestamp format:", {
+        timestamp: latestActivity.timestamp,
+        type: typeof latestActivity.timestamp,
+        parsed: activityTime,
+        isValid: !isNaN(activityTime.getTime()),
+      });
+      timeDisplay = "Recently";
+    }
   }
+
+  return `${activity}\n${timeDisplay}`;
 };
