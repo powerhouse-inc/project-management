@@ -876,47 +876,5 @@ export const getResolvers = (subgraph: Subgraph): Record<string, unknown> => {
         return true;
       },
     },
-    Progress: {
-      _resolveType: (obj: any) => {
-        // Handle null/undefined objects
-        if (!obj) {
-          return null;
-        }
-        
-        // Determine the concrete type based on the object's properties
-        if (obj.total !== undefined && obj.completed !== undefined) {
-          return "StoryPoint";
-        }
-        if (obj.value !== undefined) {
-          return "Percentage";
-        }
-        if (obj.done !== undefined) {
-          return "Binary";
-        }
-        // Default fallback - this shouldn't happen in normal operation
-        return "Binary";
-      },
-    },
-    ScopeOfWork_Progress: {
-      _resolveType: (obj: any) => {
-        // Handle null/undefined objects
-        if (!obj) {
-          return null;
-        }
-        
-        // Determine the concrete type based on the object's properties
-        if (obj.total !== undefined && obj.completed !== undefined) {
-          return "ScopeOfWork_StoryPoint";
-        }
-        if (obj.value !== undefined) {
-          return "ScopeOfWork_Percentage";
-        }
-        if (obj.done !== undefined) {
-          return "ScopeOfWork_Binary";
-        }
-        // Default fallback - this shouldn't happen in normal operation
-        return "ScopeOfWork_Binary";
-      },
-    },
   };
 };
