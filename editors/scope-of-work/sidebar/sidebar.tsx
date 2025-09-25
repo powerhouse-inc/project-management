@@ -444,7 +444,7 @@ export default function SidebarMenu(props: any) {
 
       {/* Main content area that adjusts based on sidebar width */}
       <div
-        className="flex-1 transition-all duration-75 ease-linear"
+        className="flex-1 h-screen overflow-y-auto transition-all duration-75 ease-linear"
         style={{
           marginLeft: isSidebarOpen ? `0` : "8px",
           width: isSidebarOpen
