@@ -63,19 +63,19 @@ const Contributors: React.FC<ContributorsProps> = ({
       {
         field: "role",
         title: "Role",
-        editable: true,
+        editable: false,
         align: "center" as ColumnAlignment,
       },
       {
         field: "workload",
         title: "Workload",
-        editable: true,
+        editable: false,
         align: "center" as ColumnAlignment,
       },
       {
         field: "agentType",
         title: "Agent Type",
-        editable: true,
+        editable: false,
         align: "center" as ColumnAlignment,
         renderCell: (value: any, context: any) => {
           if (!context.row.agentType) return "";
