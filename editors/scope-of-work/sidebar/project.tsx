@@ -356,6 +356,7 @@ const Project: React.FC<ProjectProps> = ({
               className="w-full"
               label="Abstract"
               value={projectAbstract}
+              autoExpand={true}
               onChange={(e) => setProjectAbstract(e.target.value)}
               onBlur={(e) => {
                 if (!project) return;

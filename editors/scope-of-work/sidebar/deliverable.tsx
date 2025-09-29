@@ -344,6 +344,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
               className="w-full"
               label="Description"
               value={stateDeliverable.description}
+              autoExpand={true}
               onChange={(e) =>
                 setStateDeliverable({
                   ...stateDeliverable,

@@ -292,6 +292,7 @@ const Milestone: React.FC<MilestonesProps> = ({
           className="w-full"
           label="Description"
           value={stateMilestone.description}
+          autoExpand={true}
           onChange={(e) =>
             setStateMilestone((prevValue) => ({
               ...prevValue,

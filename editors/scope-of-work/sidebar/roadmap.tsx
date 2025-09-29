@@ -241,6 +241,7 @@ const Roadmap: React.FC<RoadmapsProps> = ({
           className="w-full"
           label="Description"
           value={description}
+          autoExpand={true}
           onChange={(e) => setDescription(e.target.value)}
           onBlur={(e) => {
             dispatch(
