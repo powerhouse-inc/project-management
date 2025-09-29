@@ -102,7 +102,7 @@ const useSidebarWidth = () => {
 
 export default function SidebarMenu(props: any) {
   const { document, state = document.state.global } = props;
-  
+
   // Getting dispatch from props or selected document
   let dispatch: any;
   if (props.dispatch) {
@@ -420,12 +420,21 @@ export default function SidebarMenu(props: any) {
   };
 
   return (
-    <div className="flex h-screen">
+    <div className="flex" style={{ height: 'calc(100vh - 80px)' }}>
+      <style>
+        {`
+          .sidebar-container {
+            height: calc(100vh - 80px) !important;
+            max-height: calc(100vh - 80px) !important;
+          }
+        `}
+      </style>
       <SidebarProvider nodes={nodes}>
         <SidebarUpdater nodes={nodes} />
         <Sidebar
           className={String.raw`
             [&_.sidebar\\_\\_item--active]:text-black
+            sidebar-container
           `}
           sidebarTitle="Scope of Work"
           sidebarIcon={<Icon name="Globe" />}
@@ -439,12 +448,12 @@ export default function SidebarMenu(props: any) {
           handleOnTitleClick={() => {
             setActiveNodeId(undefined);
           }}
-        />
-      </SidebarProvider>
+          />
+        </SidebarProvider>
 
       {/* Main content area that adjusts based on sidebar width */}
       <div
-        className="flex-1 h-screen overflow-y-auto transition-all duration-75 ease-linear"
+        className="flex-1 overflow-y-auto transition-all duration-75 ease-linear container"
         style={{
           marginLeft: isSidebarOpen ? `0` : "8px",
           width: isSidebarOpen
@@ -466,10 +475,10 @@ export default function SidebarMenu(props: any) {
               breadcrumbs={breadcrumbs}
               onBreadcrumbClick={handleBreadcrumbClick}
             />
-            <ScopeOfWork 
-              {...props} 
+            <ScopeOfWork
+              {...props}
               dispatch={dispatch}
-              setActiveNodeId={setActiveNodeId} 
+              setActiveNodeId={setActiveNodeId}
             />
           </>
         )}

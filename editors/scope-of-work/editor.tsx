@@ -10,7 +10,7 @@ export type IProps = EditorProps;
 export default function Editor(props: IProps) {
 
   return (
-    <div className="html-defaults-container">
+    <div>
       <SidebarMenu {...props} />
     </div>
   );
