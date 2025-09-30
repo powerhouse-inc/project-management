@@ -58,7 +58,7 @@
     "@powerhousedao/builder-tools": "^5.0.0-staging.19",
     "@powerhousedao/common": "^5.0.0-staging.19",
     "@powerhousedao/design-system": "^5.0.0-staging.19",
-    "@powerhousedao/document-engineering": "^1.37.0",
+    "@powerhousedao/document-engineering": "^1.38.0",
     "document-model": "^5.0.0-staging.19",
     "error": "^10.4.0",
     "graphql": "^16.10.0",
