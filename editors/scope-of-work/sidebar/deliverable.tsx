@@ -474,7 +474,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                   <label className="text-sm font-medium mb-1">Percentage</label>
                   <input
                     type="number"
-                    className="w-16 h-8 border border-gray-300 rounded px-2"
+                    className="w-16 h-8 border border-gray-300 rounded px-2 bg-white"
                     defaultValue={
                       workProgress && "value" in workProgress
                         ? (workProgress.value ?? 0)
@@ -499,7 +499,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                     <label>Completed</label>
                     <input
                       type="number"
-                      className="w-16 h-8 flex items-end"
+                      className="w-16 h-8 border border-gray-300 rounded px-2 flex items-end bg-white"
                       value={
                         workProgress && "completed" in workProgress
                           ? Number(workProgress.completed) || 0
@@ -540,7 +540,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                     <label>Total</label>
                     <input
                       type="number"
-                      className="w-16 h-8 flex items-end"
+                      className="w-16 h-8 border border-gray-300 rounded px-2 flex items-end bg-white"
                       value={
                         workProgress && "total" in workProgress
                           ? workProgress.total

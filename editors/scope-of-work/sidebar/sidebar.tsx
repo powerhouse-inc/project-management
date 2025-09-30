@@ -16,7 +16,11 @@ import Deliverables from "./deliverables.js";
 import Roadmaps from "./roadmaps.js";
 import Contributors from "./contributors.js";
 import BreadCrumbs from "../components/breadCrumbs.js";
-import { useSelectedDocument } from "@powerhousedao/reactor-browser";
+import { useDocumentById } from "@powerhousedao/reactor-browser";
+import {
+  ScopeOfWorkDocument,
+  ScopeOfWorkState,
+} from "document-models/scope-of-work/index.js";
 
 type SidebarNode = {
   id: string;
@@ -101,16 +105,12 @@ const useSidebarWidth = () => {
 };
 
 export default function SidebarMenu(props: any) {
-  const { document, state = document.state.global } = props;
+  const [doc, dispatch] = useDocumentById(props.documentId) as [
+    ScopeOfWorkDocument | undefined,
+    any,
+  ];
 
-  // Getting dispatch from props or selected document
-  let dispatch: any;
-  if (props.dispatch) {
-    dispatch = props.dispatch;
-  } else {
-    const selectedDocument = useSelectedDocument();
-    dispatch = selectedDocument ? selectedDocument[1] : null;
-  }
+  const state = doc?.state.global as ScopeOfWorkState;
 
   const { roadmaps, deliverables, projects, contributors } = state;
   const milestones = state.roadmaps.flatMap((r: any) => r.milestones);
@@ -383,7 +383,7 @@ export default function SidebarMenu(props: any) {
             milestones={milestones}
             projects={projects}
             setActiveNodeId={setActiveNodeId}
-            document={document}
+            document={doc}
           />
         );
       case "deliverable":
@@ -420,7 +420,7 @@ export default function SidebarMenu(props: any) {
   };
 
   return (
-    <div className="flex" style={{ height: 'calc(100vh - 80px)' }}>
+    <div className="flex" style={{ height: "calc(100vh - 80px)" }}>
       <style>
         {`
           .sidebar-container {
@@ -448,8 +448,8 @@ export default function SidebarMenu(props: any) {
           handleOnTitleClick={() => {
             setActiveNodeId(undefined);
           }}
-          />
-        </SidebarProvider>
+        />
+      </SidebarProvider>
 
       {/* Main content area that adjusts based on sidebar width */}
       <div
@@ -476,7 +476,7 @@ export default function SidebarMenu(props: any) {
               onBreadcrumbClick={handleBreadcrumbClick}
             />
             <ScopeOfWork
-              {...props}
+              document={doc}
               dispatch={dispatch}
               setActiveNodeId={setActiveNodeId}
             />

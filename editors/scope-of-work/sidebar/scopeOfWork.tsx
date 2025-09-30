@@ -14,24 +14,17 @@ import {
 } from "../../../document-models/scope-of-work/index.js";
 import { generateId } from "document-model";
 import ProgressBar from "../components/progressBar.js";
+import { ScopeOfWorkState } from "document-models/scope-of-work/index.js";
 
 interface ScopeOfWorkProps {
-  setSelectedRoadmapId: (id: string) => void;
-  setRoadmapsOpen: (open: boolean) => void;
   dispatch: any;
   document: any;
   setActiveNodeId: (id: string) => void;
 }
 
 const ScopeOfWork = (props: ScopeOfWorkProps) => {
-  const {
-    setSelectedRoadmapId,
-    setRoadmapsOpen,
-    dispatch,
-    document,
-    setActiveNodeId,
-  } = props;
-  const state = document.state.global;
+  const { dispatch, document, setActiveNodeId } = props;
+  const state = document.state.global as ScopeOfWorkState;
 
   const columns = useMemo<Array<ColumnDef<any>>>(
     () => [
@@ -274,56 +267,58 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
           }}
         />
       </div>
-      <label className="text-sm font-medium text-gray-700 mb-2 mt-4">
-        Roadmaps
-      </label>
-      <ObjectSetTable
-        columns={columns}
-        data={state.roadmaps || []}
-        allowRowSelection={true}
-        onDelete={(data) => {
-          if (!state.roadmaps) return;
-          dispatch(actions.removeRoadmap({ id: data[0].id }));
-        }}
-        onAdd={(data) => {
-          if (data.title) {
-            const newId = generateId();
-            dispatch(
-              actions.addRoadmap({
-                id: newId,
-                title: data.title as string,
-                slug: (data.title as string)
-                  .toLowerCase()
-                  .replace(/ /g, "-")
-                  .concat(`-${newId.substring(newId.length - 8)}`),
-              })
-            );
-          }
-        }}
-      />
-      <label className="text-sm font-medium text-gray-700 mb-2 mt-4">
-        Projects
-      </label>
-      <ObjectSetTable
-        columns={projectColumns}
-        data={state.projects || []}
-        allowRowSelection={true}
-        onDelete={(data) => {
-          if (!state.projects) return;
-          dispatch(actions.removeProject({ projectId: data[0].id }));
-        }}
-        onAdd={(data) => {
-          if (data.title) {
-            dispatch(
-              actions.addProject({
-                id: generateId(),
-                code: "",
-                title: data.title as string,
-              })
-            );
-          }
-        }}
-      />
+      <div className="mt-8">
+        <label className="text-sm font-medium text-gray-700 ">Roadmaps</label>
+        <ObjectSetTable
+          columns={columns}
+          data={state.roadmaps || []}
+          allowRowSelection={true}
+          onDelete={(data) => {
+            if (!state.roadmaps) return;
+            dispatch(actions.removeRoadmap({ id: data[0].id }));
+          }}
+          onAdd={(data) => {
+            if (data.title) {
+              const newId = generateId();
+              dispatch(
+                actions.addRoadmap({
+                  id: newId,
+                  title: data.title as string,
+                  slug: (data.title as string)
+                    .toLowerCase()
+                    .replace(/ /g, "-")
+                    .concat(`-${newId.substring(newId.length - 8)}`),
+                })
+              );
+            }
+          }}
+        />
+      </div>
+      <div className="mt-8">
+        <label className="text-sm font-medium text-gray-700 mb-2 mt-4">
+          Projects
+        </label>
+        <ObjectSetTable
+          columns={projectColumns}
+          data={state.projects || []}
+          allowRowSelection={true}
+          onDelete={(data) => {
+            if (!state.projects) return;
+            dispatch(actions.removeProject({ projectId: data[0].id }));
+          }}
+          onAdd={(data) => {
+            if (data.title) {
+              dispatch(
+                actions.addProject({
+                  id: generateId(),
+                  code: "",
+                  title: data.title as string,
+                })
+              );
+            }
+          }}
+        />
+      </div>
     </div>
   );
 };
