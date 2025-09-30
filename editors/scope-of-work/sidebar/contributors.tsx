@@ -4,6 +4,7 @@ import {
   ObjectSetTable,
   ColumnDef,
   ColumnAlignment,
+  buildEnumCellEditor,
 } from "@powerhousedao/document-engineering";
 import {
   Agent,
@@ -75,56 +76,32 @@ const Contributors: React.FC<ContributorsProps> = ({
       {
         field: "agentType",
         title: "Agent Type",
-        editable: false,
+        editable: true,
         align: "center" as ColumnAlignment,
+        valueGetter: (row: any) => row.agentType,
+        onSave: (newValue: any, context: any) => {
+          if (newValue !== context.row.agentType) {
+            dispatch(
+              actions.editAgent({
+                id: context.row.id,
+                agentType: newValue as AgentType,
+              })
+            );
+            return true;
+          }
+          return false;
+        },
+        renderCellEditor: buildEnumCellEditor({
+          className: "w-[130px]",
+          options: [
+            { label: "Human", value: "HUMAN" },
+            { label: "Group", value: "GROUP" },
+            { label: "AI", value: "AI" },
+          ],
+        }),
         renderCell: (value: any, context: any) => {
           if (!context.row.agentType) return "";
-          return (
-            <div>
-              <Select
-                className={String.raw`
-                  [&]:!pl-2
-                  [&]:!pt-0
-                  [&]:!pb-0
-                  [&_.select\\_\\_search]:!p-0
-                  [&_.select\\_\\_trigger]:!text-xs
-                  [&_.select\\_\\_value]:!text-xs
-                  [&_.select\\_\\_trigger]:!text-[12px]
-                  [&_.select\\_\\_value]:!text-[12px]
-                  [&_*]:!text-xs
-                  [&_*]:!text-[12px]
-                  [&_.select\\_\\_trigger]:!p-0
-                  [&_.select\\_\\_value]:!p-0
-                  [&_.select\\_\\_item]:!p-0
-                  [&_.select\\_\\_content]:!p-0
-                  [&_*]:!p-0
-                `}
-                contentClassName={String.raw`
-                  [&_.select\\_\\_content]:!w-full
-                  [&_.select\\_\\_list-item]:!text-xs
-                  [&_.select\\_\\_content]:!text-[12px]
-                  [&_.select\\_\\_list-item]:!text-[12px]
-                  [&_*]:!text-xs
-                  [&_*]:!text-[12px]
-                `}
-                options={[
-                  { label: "Human", value: "HUMAN" },
-                  { label: "Group", value: "GROUP" },
-                  { label: "AI", value: "AI" },
-                ]}
-                value={context.row.agentType}
-                onChange={(value) => {
-                  if (!value) return null;
-                  dispatch(
-                    actions.editAgent({
-                      id: context.row.id,
-                      agentType: value as AgentType,
-                    })
-                  );
-                }}
-              />
-            </div>
-          );
+          return <div className="text-center">{context.row.agentType}</div>;
         },
       },
     ],

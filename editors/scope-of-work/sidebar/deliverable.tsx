@@ -40,6 +40,18 @@ export const statusOptions = [
   { label: "Canceled", value: "CANCELED" },
 ];
 
+export const statusStyles = {
+  TODO: "bg-[#fcdfbd] text-[#ffa033] rounded px-2 py-1 font-semibold",
+  DRAFT: "bg-[#f0f0f0] text-[#999999] rounded px-2 py-1 font-semibold",
+  IN_PROGRESS: "bg-[#bfdffd] text-[#339cff] rounded px-2 py-1 font-semibold",
+  FINISHED: "bg-[#f0f0f0] text-[#999999] rounded px-2 py-1 font-semibold",
+  CANCELLED: "bg-[#f0f0f0] text-[#999999] rounded px-2 py-1 font-semibold",
+  BLOCKED: "bg-[#ffaea8] text-[#de3333] rounded px-2 py-1 font-semibold",
+  WONT_DO: "bg-[#f0f0f0] text-[#999999] rounded px-2 py-1 font-semibold",
+  DELIVERED: "bg-[#c8ecd1] text-[#4fc86f] rounded px-2 py-1 font-semibold",
+  CANCELED: "bg-[#f0f0f0] text-[#999999] rounded px-2 py-1 font-semibold",
+};
+
 const Deliverable: React.FC<DeliverablesProps> = ({
   deliverables,
   dispatch,

@@ -20,6 +20,7 @@ import { useEffect, useMemo, useState } from "react";
 import { generateId } from "document-model";
 import { Icon } from "@powerhousedao/design-system";
 import ProgressBar from "../components/progressBar.js";
+import { statusStyles } from "./deliverable.js";
 
 interface MilestonesProps {
   roadmaps: Roadmap[];
@@ -147,7 +148,7 @@ const Milestone: React.FC<MilestonesProps> = ({
         width: 100,
         renderCell: (value: any, context: any) => {
           return (
-            <span className="flex items-center justify-center">{value}</span>
+            <span className={`flex items-center justify-center ${statusStyles[value as keyof typeof statusStyles]}`}>{value}</span>
           );
         },
       },

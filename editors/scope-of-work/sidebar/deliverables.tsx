@@ -10,11 +10,12 @@ import {
   ObjectSetTable,
   ColumnDef,
   ColumnAlignment,
+  buildEnumCellEditor,
 } from "@powerhousedao/document-engineering";
 import { Icon } from "@powerhousedao/design-system";
 import { actions } from "../../../document-models/scope-of-work/index.js";
 import { generateId } from "document-model";
-import { statusOptions } from "./deliverable.js";
+import { statusOptions, statusStyles } from "./deliverable.js";
 
 interface ProjectsProps {
   deliverables: Deliverable[] | undefined;
@@ -177,6 +178,7 @@ const Deliverables: React.FC<ProjectsProps> = ({
         field: "title",
         title: "Title",
         editable: true,
+        sortable: true,
         align: "center" as ColumnAlignment,
         onSave: (newValue: any, context: any) => {
           if (newValue !== context.row.title) {
@@ -205,59 +207,73 @@ const Deliverables: React.FC<ProjectsProps> = ({
       {
         field: "status",
         title: "Status",
-        editable: false,
+        type: "enum",
+        editable: true,
+        sortable: true,
+        valueGetter: (row: any) => row.status,
         align: "center" as ColumnAlignment,
         renderCell: (value: any, context: any) => {
-          if (!context.row.status) return "";
+          if (!value) return "";
           return (
-            <div>
-              <Select
-                className={String.raw`
-                  [&]:!pl-2
-                  [&]:!pt-0
-                  [&]:!pb-0
-                  [&_.select\\_\\_search]:!p-0
-                  [&_.select\\_\\_trigger]:!text-xs
-                  [&_.select\\_\\_value]:!text-xs
-                  [&_.select\\_\\_trigger]:!text-[12px]
-                  [&_.select\\_\\_value]:!text-[12px]
-                  [&_*]:!text-xs
-                  [&_*]:!text-[12px]
-                  [&_.select\\_\\_trigger]:!p-0
-                  [&_.select\\_\\_value]:!p-0
-                  [&_.select\\_\\_item]:!p-0
-                  [&_.select\\_\\_content]:!p-0
-                  [&_*]:!p-0
-                `}
-                contentClassName={String.raw`
-                  [&_.select\\_\\_content]:!w-full
-                  [&_.select\\_\\_list-item]:!text-xs
-                  [&_.select\\_\\_content]:!text-[12px]
-                  [&_.select\\_\\_list-item]:!text-[12px]
-                  [&_*]:!text-xs
-                  [&_*]:!text-[12px]
-                `}
-                options={statusOptions}
-                value={context.row.status}
-                onChange={(value) => {
-                  if (!value) return null;
-                  dispatch(
-                    actions.editDeliverable({
-                      id: context.row.id,
-                      status: value as PmDeliverableStatusInput,
-                    })
-                  );
-                }}
-              />
+            <div
+              className={`text-center ${statusStyles[context.row.status as keyof typeof statusStyles]}`}
+            >
+              {statusOptions.find((option) => option.value === value)?.label}
             </div>
           );
+        },
+        renderCellEditor: buildEnumCellEditor({
+          className: "w-[130px]",
+          options: statusOptions,
+        }),
+        onSave: (newValue: any, context: any) => {
+          if (newValue !== context.row.status) {
+            dispatch(
+              actions.editDeliverable({
+                id: context.row.id,
+                status: newValue as PmDeliverableStatusInput,
+              })
+            );
+            return true;
+          }
+          return false;
         },
       },
       {
         field: "milestoneTitle",
         title: "Milestone",
-        editable: false,
+        editable: true,
+        sortable: true,
         align: "center" as ColumnAlignment,
+        valueGetter: (row: any) => row.milestoneId,
+        onSave: (newValue: any, context: any) => {
+          if (newValue !== context.row.milestoneId) {
+            if (context.row.milestoneId) {
+              dispatch(
+                actions.removeDeliverableInSet({
+                  deliverableId: context.row.id,
+                  milestoneId: context.row.milestoneId,
+                })
+              );
+            }
+            dispatch(
+              actions.addDeliverableInSet({
+                deliverableId: context.row.id,
+                milestoneId: newValue,
+              })
+            );
+            return true;
+          }
+          return false;
+        },
+        renderCellEditor: buildEnumCellEditor({
+          className: "w-[300px]",
+          options:
+            stateMilestones?.map((milestone) => ({
+              label: milestone.title,
+              value: milestone.id,
+            })) || [],
+        }),
         renderCell: (value: any, context: any) => {
           if (!context.row.title) return "";
           return (
@@ -274,83 +290,9 @@ const Deliverables: React.FC<ProjectsProps> = ({
                   />
                 </span>
               )}
-              <Select
-                className={String.raw`
-                ${context.row.milestoneId ? "ml-2" : ""}
-                  [&]:!pl-2
-                  [&]:!pt-0
-                  [&]:!pb-0
-                  [&]:!w-[120px]
-                  [&]:!max-w-[120px]
-                  [&_.select\\_\\_search]:!p-0
-                  [&_.select\\_\\_trigger]:!text-xs
-                  [&_.select\\_\\_value]:!text-xs
-                  [&_.select\\_\\_trigger]:!text-[12px]
-                  [&_.select\\_\\_value]:!text-[12px]
-                  [&_*]:!text-xs
-                  [&_*]:!text-[12px]
-                  [&_.select\\_\\_trigger]:!p-0
-                  [&_.select\\_\\_value]:!p-0
-                  [&_.select\\_\\_item]:!p-0
-                  [&_.select\\_\\_content]:!p-0
-                  [&_*]:!p-0
-                  [&_.select\\_\\_trigger]:!w-[150px]
-                  [&_.select\\_\\_trigger]:!max-w-[150px]
-                  [&_.select\\_\\_value]:!w-[150px]
-                  [&_.select\\_\\_value]:!max-w-[150px]
-                  [&_.select\\_\\_value]:!truncate
-                `}
-                contentClassName={String.raw`
-                  [&_.select\\_\\_content]:!w-fit
-                  [&_.select\\_\\_content]:!min-w-[150px]
-                  [&_.select\\_\\_content]:!max-w-[500px]
-                  [&_.select\\_\\_content]:!bg-white
-                  [&_.select\\_\\_content]:!border
-                  [&_.select\\_\\_content]:!border-[0.5px]
-                  [&_.select\\_\\_content]:!border-gray-300
-                  [&_.select\\_\\_content]:!rounded-md
-                  [&_.select\\_\\_list-item]:!text-xs
-                  [&_.select\\_\\_content]:!text-[12px]
-                  [&_.select\\_\\_list-item]:!text-[12px]
-                  [&_*]:!text-xs
-                  [&_*]:!text-[12px]
-                  [&_.select\\_\\_list-item]:!whitespace-nowrap
-                  [&_.select\\_\\_list-item]:!overflow-visible
-                  [&_.select\\_\\_list-item]:!text-ellipsis-none
-                  [&_.select\\_\\_list-item]:bg-white
-                  [&_.select\\_\\_list-item]:hover:bg-gray-100
-                  [&_.select\\_\\_content]:bg-white
-                  [&_.select\\_\\_item]:bg-white
-                `}
-                options={
-                  stateMilestones?.map((milestone) => ({
-                    label: milestone.title,
-                    value: milestone.id,
-                  })) || []
-                }
-                value={context.row.milestoneId || undefined}
-                placeholder="Set milestone..."
-                onChange={(value) => {
-                  // If there's an existing milestone, remove it first
-                  if (context.row.milestoneId) {
-                    dispatch(
-                      actions.removeDeliverableInSet({
-                        deliverableId: context.row.id,
-                        milestoneId: context.row.milestoneId,
-                      })
-                    );
-                  }
-                  // Add the new milestone
-                  if (value) {
-                    dispatch(
-                      actions.addDeliverableInSet({
-                        deliverableId: context.row.id,
-                        milestoneId: value as string,
-                      })
-                    );
-                  }
-                }}
-              />
+              <div className="text-center mx-1">
+                {context.row.milestoneTitle}
+              </div>
             </div>
           );
         },
@@ -358,8 +300,38 @@ const Deliverables: React.FC<ProjectsProps> = ({
       {
         field: "projectTitle",
         title: "Project",
-        editable: false,
+        editable: true,
+        sortable: true,
         align: "center" as ColumnAlignment,
+        valueGetter: (row: any) => row.projectId,
+        onSave: (newValue: any, context: any) => {
+          if (newValue !== context.row.projectId) {
+            if (context.row.projectId) {
+              dispatch(
+                actions.removeDeliverableInSet({
+                  deliverableId: context.row.id,
+                  projectId: context.row.projectId,
+                })
+              );
+            }
+            dispatch(
+              actions.addDeliverableInSet({
+                deliverableId: context.row.id,
+                projectId: newValue,
+              })
+            );
+            return true;
+          }
+          return false;
+        },
+        renderCellEditor: buildEnumCellEditor({
+          className: "w-[300px]",
+          options:
+            stateProjects?.map((project) => ({
+              label: project.title,
+              value: project.id,
+            })) || [],
+        }),
         renderCell: (value: any, context: any) => {
           if (!context.row.title) return "";
           return (
@@ -376,83 +348,7 @@ const Deliverables: React.FC<ProjectsProps> = ({
                   />
                 </span>
               )}
-              <Select
-                className={String.raw`
-                  ${context.row.projectId ? "ml-2" : ""}
-                    [&]:!pl-2
-                    [&]:!pt-0
-                    [&]:!pb-0
-                    [&]:!w-[120px]
-                    [&]:!max-w-[120px]
-                    [&_.select\\_\\_search]:!p-0
-                    [&_.select\\_\\_trigger]:!text-xs
-                    [&_.select\\_\\_value]:!text-xs
-                    [&_.select\\_\\_trigger]:!text-[12px]
-                    [&_.select\\_\\_value]:!text-[12px]
-                    [&_*]:!text-xs
-                    [&_*]:!text-[12px]
-                    [&_.select\\_\\_trigger]:!p-0
-                    [&_.select\\_\\_value]:!p-0
-                    [&_.select\\_\\_item]:!p-0
-                    [&_.select\\_\\_content]:!p-0
-                    [&_*]:!p-0
-                    [&_.select\\_\\_trigger]:!w-[150px]
-                    [&_.select\\_\\_trigger]:!max-w-[150px]
-                    [&_.select\\_\\_value]:!w-[150px]
-                    [&_.select\\_\\_value]:!max-w-[150px]
-                    [&_.select\\_\\_value]:!truncate
-                  `}
-                contentClassName={String.raw`
-                    [&_.select\\_\\_content]:!w-fit
-                    [&_.select\\_\\_content]:!min-w-[150px]
-                    [&_.select\\_\\_content]:!max-w-[500px]
-                    [&_.select\\_\\_content]:!bg-white
-                    [&_.select\\_\\_content]:!border
-                    [&_.select\\_\\_content]:!border-[0.5px]
-                    [&_.select\\_\\_content]:!border-gray-300
-                    [&_.select\\_\\_content]:!rounded-md
-                    [&_.select\\_\\_list-item]:!text-xs
-                    [&_.select\\_\\_content]:!text-[12px]
-                    [&_.select\\_\\_list-item]:!text-[12px]
-                    [&_*]:!text-xs
-                    [&_*]:!text-[12px]
-                    [&_.select\\_\\_list-item]:!whitespace-nowrap
-                    [&_.select\\_\\_list-item]:!overflow-visible
-                    [&_.select\\_\\_list-item]:!text-ellipsis-none
-                    [&_.select\\_\\_list-item]:bg-white
-                    [&_.select\\_\\_list-item]:hover:bg-gray-100
-                    [&_.select\\_\\_content]:bg-white
-                    [&_.select\\_\\_item]:bg-white
-                  `}
-                options={
-                  stateProjects?.map((project) => ({
-                    label: project.title,
-                    value: project.id,
-                  })) || []
-                }
-                value={context.row.projectId || undefined}
-                placeholder="Set project..."
-                onChange={(value) => {
-                  // If there's an existing project, remove it first
-                  if (context.row.projectId) {
-                    dispatch(
-                      actions.removeDeliverableInSet({
-                        deliverableId: context.row.id,
-                        projectId: context.row.projectId,
-                      })
-                    );
-                  }
-                  // Add the new project
-                  if (value) {
-                    dispatch(
-                      actions.addDeliverableInSet({
-                        deliverableId: context.row.id,
-                        projectId: value as string,
-                      })
-                    );
-                  }
-                }}
-              />
+              <div className="text-center mx-1">{context.row.projectTitle}</div>
             </div>
           );
         },

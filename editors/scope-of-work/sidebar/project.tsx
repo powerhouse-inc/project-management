@@ -22,6 +22,7 @@ import { actions } from "../../../document-models/scope-of-work/index.js";
 import { generateId } from "document-model";
 import BudgetCalculator from "./budgetCalculator.js";
 import ProgressBar from "../components/progressBar.js";
+import { statusStyles } from "./deliverable.js";
 
 interface ProjectProps {
   project: Project | undefined;
@@ -167,7 +168,7 @@ const Project: React.FC<ProjectProps> = ({
         width: 100,
         renderCell: (value: any, context: any) => {
           return (
-            <span className="flex items-center justify-center">{value}</span>
+            <span className={`flex items-center justify-center ${statusStyles[value as keyof typeof statusStyles]}`}>{value}</span>
           );
         },
       },

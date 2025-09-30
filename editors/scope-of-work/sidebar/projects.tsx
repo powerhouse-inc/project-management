@@ -109,7 +109,7 @@ const Projects: React.FC<ProjectsProps> = ({
         editable: false,
         align: "center" as ColumnAlignment,
         renderCell: (value: any, context: any) => {
-          if (value == 0) return null;
+          if (value == 0 || value == undefined) return null;
           return (
             <div className="text-center">
               {context.row.currency} {Intl.NumberFormat("en-US").format(value)}
