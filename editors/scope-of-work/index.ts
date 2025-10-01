@@ -1,6 +1,5 @@
 import type { EditorModule } from "document-model";
 import Editor from "./editor.js";
-import type { ScopeOfWorkDocument } from "../../document-models/scope-of-work/index.js";
 
 export const module: EditorModule = {
   Component: Editor,
