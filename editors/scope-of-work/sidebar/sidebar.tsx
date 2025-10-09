@@ -1,11 +1,12 @@
 import {
   SidebarProvider,
   Sidebar,
-  IconName,
   Icon,
   useSidebar,
 } from "@powerhousedao/document-engineering";
-import { ReactElement, useState, useEffect, useMemo } from "react";
+import type {IconName} from "@powerhousedao/document-engineering";
+import { useState, useEffect, useMemo } from "react";
+import type {ReactElement} from "react";
 import ScopeOfWork from "./scopeOfWork.js";
 import Roadmap from "./roadmap.js";
 import Milestone from "./milestone.js";
@@ -21,6 +22,8 @@ import {
   ScopeOfWorkDocument,
   ScopeOfWorkState,
 } from "document-models/scope-of-work/index.js";
+import type { EditorProps } from "document-model";
+import { useSelectedScopeOfWorkDocument } from "editors/hooks/useScopeOfWorkDocument.js";
 
 type SidebarNode = {
   id: string;
@@ -104,16 +107,13 @@ const useSidebarWidth = () => {
   return { sidebarWidth, isSidebarOpen };
 };
 
-export default function SidebarMenu(props: any) {
-  const [doc, dispatch] = useDocumentById(props.documentId) as [
-    ScopeOfWorkDocument | undefined,
-    any,
-  ];
+export default function SidebarMenu(props: EditorProps) {
+  const [doc, dispatch] = useSelectedScopeOfWorkDocument();
 
-  const state = doc?.state.global as ScopeOfWorkState;
+  const state = doc.state.global;
 
   const { roadmaps, deliverables, projects, contributors } = state;
-  const milestones = state.roadmaps.flatMap((r: any) => r.milestones);
+  const milestones = state.roadmaps.flatMap((r) => r.milestones);
   const [activeNodeId, setActiveNodeId] = useState<string | undefined>(
     undefined
   );
@@ -162,7 +162,7 @@ export default function SidebarMenu(props: any) {
           {
             id: `roadmap.${id}`,
             title:
-              roadmaps.find((r: any) => r.id === id)?.title ||
+              roadmaps.find((r) => r.id === id)?.title ||
               "Unknown Roadmap",
             type: "roadmap",
             isActive: true,
@@ -170,10 +170,10 @@ export default function SidebarMenu(props: any) {
         );
         break;
 
-      case "milestone":
-        const milestone = milestones.find((m: any) => m.id === id);
-        const roadmap = roadmaps.find((r: any) =>
-          r.milestones.some((m: any) => m.id === id)
+      case "milestone": {
+        const milestone = milestones.find((m) => m.id === id);
+        const roadmap = roadmaps.find((r) =>
+          r.milestones.some((m) => m.id === id)
         );
 
         breadcrumbs.push(
@@ -199,7 +199,7 @@ export default function SidebarMenu(props: any) {
           }
         );
         break;
-
+      }
       case "projects":
         breadcrumbs.push({
           id: "projects",
@@ -209,8 +209,8 @@ export default function SidebarMenu(props: any) {
         });
         break;
 
-      case "project":
-        const project = projects.find((p: any) => p.id === id);
+      case "project": {
+        const project = projects.find((p) => p.id === id);
         breadcrumbs.push(
           {
             id: "projects",
@@ -228,7 +228,7 @@ export default function SidebarMenu(props: any) {
           }
         );
         break;
-
+      }
       case "deliverables":
         breadcrumbs.push({
           id: "deliverables",
@@ -238,8 +238,8 @@ export default function SidebarMenu(props: any) {
         });
         break;
 
-      case "deliverable":
-        const deliverable = deliverables.find((d: any) => d.id === id);
+      case "deliverable": {
+        const deliverable = deliverables.find((d) => d.id === id);
         breadcrumbs.push(
           {
             id: "deliverables",
@@ -255,8 +255,8 @@ export default function SidebarMenu(props: any) {
           }
         );
         break;
-
-      case "contributors":
+      }
+      case "contributors": {
         breadcrumbs.push({
           id: "contributors",
           title: "Contributors",
@@ -264,6 +264,7 @@ export default function SidebarMenu(props: any) {
           isActive: true,
         });
         break;
+      }
     }
 
     return breadcrumbs;
@@ -289,10 +290,10 @@ export default function SidebarMenu(props: any) {
       {
         id: "roadmaps",
         title: "Roadmaps",
-        children: roadmaps.map((roadmap: any) => ({
+        children: roadmaps.map((roadmap) => ({
           id: `roadmap.${roadmap.id}`,
           title: roadmap.title,
-          children: roadmap.milestones.map((milestone: any) => ({
+          children: roadmap.milestones.map((milestone) => ({
             id: `milestone.${milestone.id}`,
             title: milestone.sequenceCode
               ? `${milestone.sequenceCode} - ${milestone.title}`
@@ -304,7 +305,7 @@ export default function SidebarMenu(props: any) {
       {
         id: "projects",
         title: "Projects",
-        children: projects.map((project: any) => ({
+        children: projects.map((project) => ({
           id: `project.${project.id}`,
           title: project.code
             ? `${project.code} - ${project.title}`
@@ -315,7 +316,7 @@ export default function SidebarMenu(props: any) {
       {
         id: "deliverables",
         title: "Deliverables",
-        children: deliverables.map((deliverable: any) => ({
+        children: deliverables.map((deliverable) => ({
           id: `deliverable.${deliverable.id}`,
           title: deliverable.code
             ? `${deliverable.code} - ${deliverable.title}`
@@ -360,7 +361,7 @@ export default function SidebarMenu(props: any) {
         return (
           <Roadmap
             dispatch={dispatch}
-            roadmaps={roadmaps.filter((r: any) => r.id === id)}
+            roadmaps={roadmaps.filter((r) => r.id === id)}
             setActiveNodeId={setActiveNodeId}
           />
         );
@@ -368,7 +369,7 @@ export default function SidebarMenu(props: any) {
         return (
           <Milestone
             dispatch={dispatch}
-            milestones={milestones.filter((m: any) => m.id === id)}
+            milestones={milestones.filter((m) => m.id === id)}
             roadmaps={roadmaps}
             deliverables={deliverables}
             setActiveNodeId={setActiveNodeId}
@@ -390,7 +391,7 @@ export default function SidebarMenu(props: any) {
         return (
           <Deliverable
             dispatch={dispatch}
-            deliverables={deliverables.filter((d: any) => d.id === id)}
+            deliverables={deliverables.filter((d) => d.id === id)}
             projects={projects}
             contributors={contributors}
           />
@@ -408,7 +409,7 @@ export default function SidebarMenu(props: any) {
         return (
           <Project
             dispatch={dispatch}
-            project={projects.find((p: any) => p.id === id)}
+            project={projects.find((p) => p.id === id)}
             deliverables={deliverables}
             setActiveNodeId={setActiveNodeId}
             contributors={contributors}

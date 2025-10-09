@@ -4,6 +4,8 @@ import {
   Milestone,
   Project,
   PmDeliverableStatusInput,
+  ScopeOfWorkAction,
+  ScopeOfWorkDocument,
 } from "../../../document-models/scope-of-work/gen/types.js";
 import {
   Select,
@@ -14,16 +16,32 @@ import {
 } from "@powerhousedao/document-engineering";
 import { Icon } from "@powerhousedao/design-system";
 import { actions } from "../../../document-models/scope-of-work/index.js";
-import { generateId } from "document-model";
+import { generateId, Operation } from "document-model";
 import { statusOptions, statusStyles } from "./deliverable.js";
+import { DocumentDispatch } from "@powerhousedao/reactor-browser";
+import { AddDeliverableAction, AddDeliverableInSetAction, AddMilestoneDeliverableAction, AddProjectAction, AddProjectDeliverableAction, EditDeliverableAction, RemoveDeliverableAction, RemoveDeliverableInSetAction } from "document-models/scope-of-work/gen/actions.js";
 
 interface ProjectsProps {
   deliverables: Deliverable[] | undefined;
-  dispatch: any;
+  dispatch: DocumentDispatch<ScopeOfWorkAction>;
   milestones: Milestone[] | undefined;
   projects: Project[] | undefined;
   setActiveNodeId: (id: string) => void;
-  document: any;
+  document: ScopeOfWorkDocument;
+}
+
+type LatestActivity = {
+    type: string;
+    timestamp: string;
+    input: unknown;
+};
+
+type RichDeliverables = Deliverable & {
+  milestoneId: string | null;
+  milestoneTitle: string | null;
+  projectId: string | null;
+  projectTitle: string | null;
+  latestActivity: LatestActivity | null;
 }
 
 const Deliverables: React.FC<ProjectsProps> = ({
@@ -43,30 +61,32 @@ const Deliverables: React.FC<ProjectsProps> = ({
   }, [milestones, projects, deliverables]);
 
   const latestActivity = document.operations.global.filter(
-    (operation: any) =>
-      operation.type === "EDIT_DELIVERABLE" ||
-      operation.type === "ADD_DELIVERABLE" ||
-      operation.type === "REMOVE_DELIVERABLE" ||
-      operation.type === "ADD_PROJECT_DELIVERABLE" ||
-      operation.type === "ADD_MILESTONE_DELIVERABLE" ||
-      operation.type === "ADD_DELIVERABLE_IN_SET" ||
-      operation.type === "REMOVE_DELIVERABLE_IN_SET"
-  );
+    (operation) =>
+      operation.action.type === "EDIT_DELIVERABLE" ||
+      operation.action.type === "ADD_DELIVERABLE" ||
+      operation.action.type === "REMOVE_DELIVERABLE" ||
+      operation.action.type === "ADD_PROJECT_DELIVERABLE" ||
+      operation.action.type === "ADD_MILESTONE_DELIVERABLE" ||
+      operation.action.type === "ADD_DELIVERABLE_IN_SET" ||
+      operation.action.type === "REMOVE_DELIVERABLE_IN_SET"
+  ) as (Operation & {action: EditDeliverableAction
+     | AddDeliverableAction | RemoveDeliverableAction | AddProjectDeliverableAction
+    | AddMilestoneDeliverableAction | AddDeliverableInSetAction | RemoveDeliverableInSetAction})[];
 
   // Create a map of deliverable IDs to their latest activity
-  const latestActivityMap = new Map();
-  latestActivity?.forEach((activity: any) => {
-    if (activity.input?.id) {
-      latestActivityMap.set(activity.input.id, {
-        type: activity.type,
-        timestamp: activity.timestamp || activity.timestampUtcMs,
-        input: activity.input,
+  const latestActivityMap = new Map<string, LatestActivity>();
+  latestActivity?.forEach((activity) => {
+    if ("id" in activity.action.input && activity.action.input.id) {
+      latestActivityMap.set(activity.action.input.id, {
+        type: activity.action.type,
+        timestamp: activity.action.timestampUtcMs || activity.timestampUtcMs,
+        input: activity.action.input,
       });
-    } else if (activity.input?.deliverableId) {
-      latestActivityMap.set(activity.input.deliverableId, {
-        type: activity.type,
-        timestamp: activity.timestamp || activity.timestampUtcMs,
-        input: activity.input,
+    } else if ("deliverableId" in activity.action.input && activity.action.input.deliverableId) {
+      latestActivityMap.set(activity.action.input.deliverableId, {
+        type: activity.action.type,
+        timestamp: activity.action.timestampUtcMs || activity.timestampUtcMs,
+        input: activity.action.input,
       });
     }
   });
@@ -74,11 +94,11 @@ const Deliverables: React.FC<ProjectsProps> = ({
   const richDeliverables = useMemo(() => {
     // Create a map to track processed deliverable IDs to avoid duplicates
     const processedIds = new Set();
-    const result: any[] = [];
+    const result: RichDeliverables[] = [];
 
     // Helper function to add deliverable if not already processed
     const addDeliverableIfNotProcessed = (
-      deliverable: any,
+      deliverable: Deliverable,
       milestoneId: string | null,
       milestoneTitle: string | null,
       projectId: string | null,
@@ -93,7 +113,7 @@ const Deliverables: React.FC<ProjectsProps> = ({
         milestoneTitle,
         projectId,
         projectTitle,
-        latestActivity: latestActivityMap.get(deliverable.id),
+        latestActivity: latestActivityMap.get(deliverable.id) || null,
       });
     };
 
@@ -152,13 +172,13 @@ const Deliverables: React.FC<ProjectsProps> = ({
     });
   }, [milestones, projects, deliverables, latestActivityMap]);
 
-  const columns = useMemo<Array<ColumnDef<any>>>(
+  const columns = useMemo<Array<ColumnDef<RichDeliverables>>>(
     () => [
       {
         field: "link",
         width: 20,
         align: "center" as ColumnAlignment,
-        renderCell: (value: any, context: any) => {
+        renderCell: (value, context) => {
           if (!context.row?.id) return <div className="w-2"></div>;
           return (
             <div className="text-center">
@@ -180,7 +200,7 @@ const Deliverables: React.FC<ProjectsProps> = ({
         editable: true,
         sortable: true,
         align: "center" as ColumnAlignment,
-        onSave: (newValue: any, context: any) => {
+        onSave: (newValue, context) => {
           if (newValue !== context.row.title) {
             dispatch(
               actions.editDeliverable({
@@ -192,7 +212,7 @@ const Deliverables: React.FC<ProjectsProps> = ({
           }
           return false;
         },
-        renderCell: (value: any, context: any) => {
+        renderCell: (value, context) => {
           if (value === "") {
             return (
               <div className="font-light italic text-left text-gray-500">
@@ -210,9 +230,9 @@ const Deliverables: React.FC<ProjectsProps> = ({
         type: "enum",
         editable: true,
         sortable: true,
-        valueGetter: (row: any) => row.status,
+        valueGetter: (row) => row.status,
         align: "center" as ColumnAlignment,
-        renderCell: (value: any, context: any) => {
+        renderCell: (value, context) => {
           if (!value) return "";
           return (
             <div
@@ -226,7 +246,7 @@ const Deliverables: React.FC<ProjectsProps> = ({
           className: "w-[130px]",
           options: statusOptions,
         }),
-        onSave: (newValue: any, context: any) => {
+        onSave: (newValue, context) => {
           if (newValue !== context.row.status) {
             dispatch(
               actions.editDeliverable({
@@ -245,23 +265,25 @@ const Deliverables: React.FC<ProjectsProps> = ({
         editable: true,
         sortable: true,
         align: "center" as ColumnAlignment,
-        valueGetter: (row: any) => row.milestoneId,
-        onSave: (newValue: any, context: any) => {
+        valueGetter: (row) => row.milestoneId,
+        onSave: (newValue, context) => {
           if (newValue !== context.row.milestoneId) {
+            const actionsToDispatch: ScopeOfWorkAction[] = [];
             if (context.row.milestoneId) {
-              dispatch(
+              actionsToDispatch.push(
                 actions.removeDeliverableInSet({
                   deliverableId: context.row.id,
                   milestoneId: context.row.milestoneId,
                 })
               );
             }
-            dispatch(
+            actionsToDispatch.push(
               actions.addDeliverableInSet({
                 deliverableId: context.row.id,
-                milestoneId: newValue,
+                milestoneId: newValue as string,
               })
             );
+            dispatch(actionsToDispatch);
             return true;
           }
           return false;
@@ -274,7 +296,7 @@ const Deliverables: React.FC<ProjectsProps> = ({
               value: milestone.id,
             })) || [],
         }),
-        renderCell: (value: any, context: any) => {
+        renderCell: (value, context) => {
           if (!context.row.title) return "";
           return (
             <div className="flex items-center justify-center">
@@ -303,8 +325,8 @@ const Deliverables: React.FC<ProjectsProps> = ({
         editable: true,
         sortable: true,
         align: "center" as ColumnAlignment,
-        valueGetter: (row: any) => row.projectId,
-        onSave: (newValue: any, context: any) => {
+        valueGetter: (row) => row.projectId,
+        onSave: (newValue, context) => {
           if (newValue !== context.row.projectId) {
             if (context.row.projectId) {
               dispatch(
@@ -317,7 +339,7 @@ const Deliverables: React.FC<ProjectsProps> = ({
             dispatch(
               actions.addDeliverableInSet({
                 deliverableId: context.row.id,
-                projectId: newValue,
+                projectId: newValue as string,
               })
             );
             return true;
@@ -332,7 +354,7 @@ const Deliverables: React.FC<ProjectsProps> = ({
               value: project.id,
             })) || [],
         }),
-        renderCell: (value: any, context: any) => {
+        renderCell: (value, context) => {
           if (!context.row.title) return "";
           return (
             <div className="flex items-center justify-center">
@@ -358,7 +380,7 @@ const Deliverables: React.FC<ProjectsProps> = ({
         title: "Latest Activity",
         editable: false,
         align: "center" as ColumnAlignment,
-        renderCell: (value: any, context: any) => {
+        renderCell: (value, context) => {
           if (!context.row.latestActivity) return "";
           const activityText = parseLatestActivity(context.row.latestActivity);
           const [activity, time] = activityText.split("\n");
@@ -384,9 +406,9 @@ const Deliverables: React.FC<ProjectsProps> = ({
           columns={columns}
           data={richDeliverables || []}
           allowRowSelection={true}
-          onDelete={(data: any) => {
+          onDelete={(data) => {
             if (data.length > 0) {
-              data.forEach((d: any) => {
+              data.forEach((d) => {
                 dispatch(actions.removeDeliverable({ id: d.id }));
               });
             }
@@ -410,7 +432,7 @@ const Deliverables: React.FC<ProjectsProps> = ({
 
 export default Deliverables;
 
-const parseLatestActivity = (latestActivity: any) => {
+const parseLatestActivity = (latestActivity: LatestActivity) => {
   if (!latestActivity) {
     return "";
   }
@@ -428,7 +450,7 @@ const parseLatestActivity = (latestActivity: any) => {
     latestActivity.type === "ADD_DELIVERABLE_IN_SET" ||
     latestActivity.type === "REMOVE_DELIVERABLE_IN_SET"
   ) {
-    activity = `Edited ${Object.keys(latestActivity.input)[1]}`;
+    activity = `Edited ${Object.keys(latestActivity.input as object).at(1)}`;
   }
 
   // Always show the activity, even if timestamp fails
@@ -451,7 +473,7 @@ const parseLatestActivity = (latestActivity: any) => {
         // Looks like seconds, convert to milliseconds
         activityTime = new Date(latestActivity.timestamp * 1000);
       }
-    } else if (latestActivity.timestamp instanceof Date) {
+    } else if (latestActivity.timestamp as any instanceof Date) {
       // Already a Date object
       activityTime = latestActivity.timestamp;
     } else {

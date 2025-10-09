@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Roadmap } from "../../../document-models/scope-of-work/gen/types.js";
+import type { Roadmap, ScopeOfWorkAction } from "../../../document-models/scope-of-work/gen/types.js";
 import {
   ObjectSetTable,
   ColumnDef,
@@ -8,10 +8,11 @@ import {
 import { Icon } from "@powerhousedao/design-system";
 import { actions } from "../../../document-models/scope-of-work/index.js";
 import { generateId } from "document-model";
+import type { DocumentDispatch } from "@powerhousedao/reactor-browser";
 
 interface ProjectsProps {
   roadmaps: Roadmap[] | undefined;
-  dispatch: any;
+  dispatch: DocumentDispatch<ScopeOfWorkAction>;
   setActiveNodeId: (id: string) => void;
 }
 
@@ -20,13 +21,13 @@ const Roadmaps: React.FC<ProjectsProps> = ({
   dispatch,
   setActiveNodeId,
 }) => {
-  const columns = useMemo<Array<ColumnDef<any>>>(
+  const columns = useMemo<Array<ColumnDef<Roadmap>>>(
     () => [
       {
         field: "link",
         width: 20,
         align: "center" as ColumnAlignment,
-        renderCell: (value: any, context: any) => {
+        renderCell: (value, context) => {
           if (!context.row?.id) return <div className="w-2"></div>;
           return (
             <div className="text-center">
@@ -47,7 +48,7 @@ const Roadmaps: React.FC<ProjectsProps> = ({
         title: "Title",
         editable: true,
         align: "left" as ColumnAlignment,
-        onSave: (newValue: any, context: any) => {
+        onSave: (newValue, context) => {
           if (newValue !== context.row.title) {
             dispatch(
               actions.editRoadmap({
@@ -59,7 +60,7 @@ const Roadmaps: React.FC<ProjectsProps> = ({
           }
           return false;
         },
-        renderCell: (value: any, context: any) => {
+        renderCell: (value, context) => {
           if (value === "") {
             return (
               <div className="font-light italic text-left text-gray-500">
@@ -85,7 +86,7 @@ const Roadmaps: React.FC<ProjectsProps> = ({
           columns={columns}
           data={roadmaps || []}
           allowRowSelection={true}
-          onDelete={(data: any) => {
+          onDelete={(data) => {
             if (!roadmaps || data.length === 0) return;
             dispatch(actions.removeRoadmap({ id: data[0].id }));
           }}

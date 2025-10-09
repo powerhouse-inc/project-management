@@ -9,14 +9,18 @@ import {
 import {
   Agent,
   AgentType,
+  ScopeOfWorkAction,
 } from "../../../document-models/scope-of-work/gen/types.js";
 import { actions } from "../../../document-models/scope-of-work/index.js";
 import { generateId } from "document-model";
+import { DocumentDispatch } from "@powerhousedao/reactor-browser";
 
 interface ContributorsProps {
-  dispatch: any;
+  dispatch: DocumentDispatch<ScopeOfWorkAction>;
   contributors: Agent[];
 }
+
+type RichContributors = Agent & {title: string};
 
 const Contributors: React.FC<ContributorsProps> = ({
   dispatch,
@@ -29,7 +33,7 @@ const Contributors: React.FC<ContributorsProps> = ({
     }));
   }, [contributors]);
 
-  const columns = useMemo<Array<ColumnDef<any>>>(
+  const columns = useMemo<Array<ColumnDef<RichContributors>>>(
     () => [
       {
         field: "title",
@@ -37,7 +41,7 @@ const Contributors: React.FC<ContributorsProps> = ({
         editable: true,
         align: "center" as ColumnAlignment,
         width: 200,
-        onSave: (newValue: any, context: any) => {
+        onSave: (newValue, context) => {
           if (newValue !== context.row.title) {
             dispatch(
               actions.editAgent({
@@ -49,7 +53,7 @@ const Contributors: React.FC<ContributorsProps> = ({
           }
           return false;
         },
-        renderCell: (value: any, context: any) => {
+        renderCell: (value, context) => {
           if (value === "") {
             return (
               <div className="font-light italic text-gray-500 text-center">
@@ -78,8 +82,8 @@ const Contributors: React.FC<ContributorsProps> = ({
         title: "Agent Type",
         editable: true,
         align: "center" as ColumnAlignment,
-        valueGetter: (row: any) => row.agentType,
-        onSave: (newValue: any, context: any) => {
+        valueGetter: (row) => row.agentType,
+        onSave: (newValue, context) => {
           if (newValue !== context.row.agentType) {
             dispatch(
               actions.editAgent({
@@ -99,7 +103,7 @@ const Contributors: React.FC<ContributorsProps> = ({
             { label: "AI", value: "AI" },
           ],
         }),
-        renderCell: (value: any, context: any) => {
+        renderCell: (value, context) => {
           if (!context.row.agentType) return "";
           return <div className="text-center">{context.row.agentType}</div>;
         },
@@ -118,9 +122,9 @@ const Contributors: React.FC<ContributorsProps> = ({
           columns={columns}
           data={richContributors || []}
           allowRowSelection={true}
-          onDelete={(data: any) => {
+          onDelete={(data) => {
             if (data.length > 0) {
-              data.forEach((d: any) => {
+              data.forEach((d) => {
                 dispatch(actions.removeAgent({ id: d.id }));
               });
             }

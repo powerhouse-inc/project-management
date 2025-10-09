@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import {
   Agent,
   Project,
+  ScopeOfWorkAction,
 } from "../../../document-models/scope-of-work/gen/types.js";
 import {
   TextInput,
@@ -13,10 +14,11 @@ import { Icon } from "@powerhousedao/design-system";
 import { actions } from "../../../document-models/scope-of-work/index.js";
 import { generateId } from "document-model";
 import ProgressBar from "../components/progressBar.js";
+import { DocumentDispatch } from "@powerhousedao/reactor-browser";
 
 interface ProjectsProps {
   projects: Project[] | undefined;
-  dispatch: any;
+  dispatch: DocumentDispatch<ScopeOfWorkAction>;
   setActiveNodeId: (id: string) => void;
   contributors: Agent[] | undefined;
 }
@@ -27,13 +29,13 @@ const Projects: React.FC<ProjectsProps> = ({
   setActiveNodeId,
   contributors,
 }) => {
-  const columns = useMemo<Array<ColumnDef<any>>>(
+  const columns = useMemo<Array<ColumnDef<Project>>>(
     () => [
       {
         field: "link",
         width: 20,
         align: "center" as ColumnAlignment,
-        renderCell: (value: any, context: any) => {
+        renderCell: (value, context) => {
           if (!context.row?.id) return <div className="w-2"></div>;
           return (
             <div className="text-center">
@@ -54,7 +56,7 @@ const Projects: React.FC<ProjectsProps> = ({
         title: "Title",
         editable: true,
         align: "left" as ColumnAlignment,
-        onSave: (newValue: any, context: any) => {
+        onSave: (newValue, context) => {
           if (newValue !== context.row.title) {
             dispatch(
               actions.updateProject({
@@ -66,7 +68,7 @@ const Projects: React.FC<ProjectsProps> = ({
           }
           return false;
         },
-        renderCell: (value: any, context: any) => {
+        renderCell: (value, context) => {
           if (value === "") {
             return (
               <div className="font-light italic text-left text-gray-500">
@@ -83,7 +85,7 @@ const Projects: React.FC<ProjectsProps> = ({
         title: "Progress",
         align: "center" as ColumnAlignment,
         width: 150,
-        renderCell: (value: any, context: any) => {
+        renderCell: (value, context) => {
           if (!context.row.scope) return null;
           return <ProgressBar progress={context.row.scope?.progress} />;
         },
@@ -93,7 +95,7 @@ const Projects: React.FC<ProjectsProps> = ({
         title: "Owner",
         editable: false,
         align: "left" as ColumnAlignment,
-        renderCell: (value: any, context: any) => {
+        renderCell: (value, context) => {
           if (!context.row.projectOwner) return null;
           return (
             <div className="text-left">
@@ -108,11 +110,11 @@ const Projects: React.FC<ProjectsProps> = ({
         title: "Budget",
         editable: false,
         align: "center" as ColumnAlignment,
-        renderCell: (value: any, context: any) => {
+        renderCell: (value, context) => {
           if (value == 0 || value == undefined) return null;
           return (
             <div className="text-center">
-              {context.row.currency} {Intl.NumberFormat("en-US").format(value)}
+              {context.row.currency} {Intl.NumberFormat("en-US").format(value as number)}
             </div>
           );
         },
@@ -131,10 +133,10 @@ const Projects: React.FC<ProjectsProps> = ({
           columns={columns}
           data={projects || []}
           allowRowSelection={true}
-          onDelete={(data: any) => {
+          onDelete={(data) => {
             if (!projects) return;
             if (data.length > 0) {
-              data.forEach((d: any) => {
+              data.forEach((d) => {
                 dispatch(actions.removeProject({ projectId: d.id }));
               });
             }

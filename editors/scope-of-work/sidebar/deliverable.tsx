@@ -18,14 +18,17 @@ import {
   PmDeliverableStatusInput,
   Project,
   Agent,
+  ScopeOfWorkAction,
+  KeyResult,
 } from "../../../document-models/scope-of-work/index.js";
 import { actions } from "../../../document-models/scope-of-work/index.js";
 import { useEffect, useMemo, useState } from "react";
 import { generateId } from "document-model";
 import BudgetCalculator from "./budgetCalculator.js";
+import { DocumentDispatch } from "@powerhousedao/reactor-browser";
 interface DeliverablesProps {
   deliverables: Deliverable[];
-  dispatch: any;
+  dispatch: DocumentDispatch<ScopeOfWorkAction>;
   projects: Project[];
   contributors: Agent[];
 }
@@ -96,18 +99,18 @@ const Deliverable: React.FC<DeliverablesProps> = ({
     setWorkProgress(currentDeliverable.workProgress);
   }, [deliverables, currentDeliverable.owner]);
 
-  const columns = useMemo<Array<ColumnDef<any>>>(() => {
+  const columns = useMemo<Array<ColumnDef<KeyResult>>>(() => {
     return [
       {
         field: "title",
         editable: true,
-        onSave: (newValue: any, context: any) => {
+        onSave: (newValue, context) => {
           if (newValue !== context.row.title) {
             dispatch(
               actions.editKeyResult({
                 id: context.row.id,
                 deliverableId: currentDeliverable.id,
-                title: newValue,
+                title: newValue as string,
               })
             );
             return true;
@@ -118,13 +121,13 @@ const Deliverable: React.FC<DeliverablesProps> = ({
       {
         field: "link",
         editable: true,
-        onSave: (newValue: any, context: any) => {
+        onSave: (newValue, context) => {
           if (newValue !== context.row.link) {
             dispatch(
               actions.editKeyResult({
                 id: context.row.id,
                 deliverableId: currentDeliverable.id,
-                link: newValue,
+                link: newValue as string,
               })
             );
             return true;
@@ -220,13 +223,13 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                   // Get the current value from the AIDField
                   const currentValue = typeof stateDeliverable.owner === 'string' 
                     ? stateDeliverable.owner 
-                    : (stateDeliverable.owner as any)?.value || '';
+                    : (stateDeliverable.owner as unknown as {value: string})?.value || '';
                   const originalValue = typeof currentDeliverable.owner === 'string' 
                     ? currentDeliverable.owner 
-                    : (currentDeliverable.owner as any)?.value || '';
+                    : (currentDeliverable.owner as unknown as {value: string})?.value || '';
                   const currentValueStr = typeof currentValue === 'string' 
                     ? currentValue 
-                    : (currentValue as any)?.value || '';
+                    : (currentValue as unknown as {value: string})?.value || '';
                   if (currentValueStr === originalValue) return;
                   dispatch(
                     actions.editDeliverable({
@@ -258,7 +261,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                     
                     if (typeof e === 'object' && e !== null) {
                       // Object case - extract the value
-                      ownerId = (e as any).value || '';
+                      ownerId = (e as {value: string}).value || '';
                     } else if (typeof e === 'string') {
                       // String case - could be typing or selection
                       const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(e);
@@ -469,7 +472,10 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                       ? Boolean(workProgress.done)
                       : false
                   }
-                  onChange={(e: any) => {
+                  onChange={(e: boolean | 'indeterminate') => {
+                    if (e === "indeterminate") {
+                      return;
+                    }
                     dispatch(
                       actions.setDeliverableProgress({
                         id: currentDeliverable.id,
@@ -518,7 +524,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                           : 0
                       }
                       onChange={(e) => {
-                        setWorkProgress((prev: any) => {
+                        setWorkProgress((prev) => {
                           if (prev && "completed" in prev) {
                             return {
                               ...prev,
@@ -645,7 +651,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                 }}
                 onDelete={(data) => {
                   if (data.length > 0) {
-                    data.forEach((d: any) => {
+                    data.forEach((d) => {
                       dispatch(
                         actions.removeKeyResult({
                           id: d.id,

@@ -4,8 +4,9 @@ import {
   type PmBudgetTypeInput,
   PmCurrencyInput,
   Agent,
+  ScopeOfWorkAction,
 } from "../../../document-models/scope-of-work/gen/types.js";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, FormEvent } from "react";
 import {
   TextInput,
   ObjectSetTable,
@@ -23,10 +24,11 @@ import { generateId } from "document-model";
 import BudgetCalculator from "./budgetCalculator.js";
 import ProgressBar from "../components/progressBar.js";
 import { statusStyles } from "./deliverable.js";
+import { DocumentDispatch } from "@powerhousedao/reactor-browser";
 
 interface ProjectProps {
   project: Project | undefined;
-  dispatch: any;
+  dispatch: DocumentDispatch<ScopeOfWorkAction>;
   deliverables: Deliverable[];
   setActiveNodeId: (id: string) => void;
   contributors: Agent[];
@@ -61,10 +63,8 @@ const Project: React.FC<ProjectProps> = ({
     setBudget(project?.budget || 0);
   }, [deliverables, project?.id]);
 
-  const projectDeliverables =
-    project?.scope?.deliverables.map((d: any) =>
-      deliverables.find((d2: any) => d2.id === d)
-    ) || [];
+  const projectDeliverablesIds = project?.scope?.deliverables ?? [];
+  const projectDeliverables = deliverables.filter(d => projectDeliverablesIds.includes(d.id));
 
   // Validate image URL by checking file extension
   const isValidImageUrl = (url: string): boolean => {
@@ -73,13 +73,13 @@ const Project: React.FC<ProjectProps> = ({
     return validExtensions.some((ext) => url.toLowerCase().endsWith(ext));
   };
 
-  const columns = useMemo<Array<ColumnDef<any>>>(
+  const columns = useMemo<Array<ColumnDef<Deliverable>>>(
     () => [
       {
         field: "link",
         width: 20,
         align: "center" as ColumnAlignment,
-        renderCell: (value: any, context: any) => {
+        renderCell: (value, context) => {
           if (!context.row?.id) return <div className="w-2"></div>;
           return (
             <div className="text-center">
@@ -98,7 +98,7 @@ const Project: React.FC<ProjectProps> = ({
       {
         field: "title",
         editable: true,
-        onSave: (newValue: any, context: any) => {
+        onSave: (newValue, context) => {
           if (newValue !== context.row.title) {
             dispatch(
               actions.editDeliverable({
@@ -110,7 +110,7 @@ const Project: React.FC<ProjectProps> = ({
           }
           return false;
         },
-        renderCell: (value: any, context: any) => {
+        renderCell: (value, context) => {
           if (value === "") {
             return (
               <div className="font-light italic text-left text-gray-500">
@@ -126,7 +126,7 @@ const Project: React.FC<ProjectProps> = ({
         field: "owner",
         editable: false,
         align: "center" as ColumnAlignment,
-        onSave: (newValue: any, context: any) => {
+        onSave: (newValue, context) => {
           if (newValue !== context.row.title) {
             dispatch(
               actions.editDeliverable({
@@ -138,7 +138,7 @@ const Project: React.FC<ProjectProps> = ({
           }
           return false;
         },
-        renderCell: (value: any, context: any) => {
+        renderCell: (value, context) => {
           if (!context.row.owner) return null;
           return (
             <div className="text-center">
@@ -154,7 +154,7 @@ const Project: React.FC<ProjectProps> = ({
         editable: false,
         align: "center" as ColumnAlignment,
         width: 200,
-        renderCell: (value: any, context: any) => {
+        renderCell: (value, context) => {
           const progress = context.row?.workProgress || null;
           if (!progress) return null;
           return <ProgressBar progress={progress} />;
@@ -166,7 +166,7 @@ const Project: React.FC<ProjectProps> = ({
         editable: false,
         align: "center" as ColumnAlignment,
         width: 100,
-        renderCell: (value: any, context: any) => {
+        renderCell: (value, context) => {
           return (
             <span className={`flex items-center justify-center ${statusStyles[value as keyof typeof statusStyles]}`}>{value}</span>
           );
@@ -182,7 +182,7 @@ const Project: React.FC<ProjectProps> = ({
         <BudgetCalculator
           setBudgetCalculatorOpen={setBudgetCalculatorOpen}
           project={project}
-          deliverables={projectDeliverables as Deliverable[]}
+          deliverables={projectDeliverables}
           dispatch={dispatch}
         />
       ) : (
@@ -229,7 +229,7 @@ const Project: React.FC<ProjectProps> = ({
           <div className="mt-8 grid grid-cols-3 gap-2">
             <div className="col-span-1">
               <Form
-                onSubmit={(e) => {
+                onSubmit={(e: any) => {
                   e.preventDefault();
                   if (!project) return;
                   if (e.target.value === project.projectOwner) return;
@@ -468,10 +468,10 @@ const Project: React.FC<ProjectProps> = ({
               columns={columns}
               data={projectDeliverables}
               allowRowSelection={true}
-              onDelete={(data: any) => {
+              onDelete={(data) => {
                 if (!project) return;
                 if (data.length > 0) {
-                  data.forEach((d: any) => {
+                  data.forEach((d) => {
                     dispatch(
                       actions.removeProjectDeliverable({
                         projectId: project?.id,

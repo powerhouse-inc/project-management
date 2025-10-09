@@ -1,4 +1,5 @@
-import { actions } from "../../../document-models/scope-of-work/index.js";
+import { actions, ScopeOfWorkAction } from "../../../document-models/scope-of-work/index.js";
+import type { Roadmap, Milestone } from "../../../document-models/scope-of-work/gen/types.js";
 import { Textarea, TextInput } from "@powerhousedao/document-engineering";
 import React, { useState, useEffect, useMemo } from "react";
 import { Icon } from "@powerhousedao/design-system";
@@ -9,17 +10,12 @@ import {
   DatePicker,
   ColumnDef,
 } from "@powerhousedao/document-engineering";
+import { DocumentDispatch } from "@powerhousedao/reactor-browser";
 
-interface Roadmap {
-  id: string;
-  title: string;
-  description?: string;
-  [key: string]: any;
-}
 
 interface RoadmapsProps {
   roadmaps: Roadmap[];
-  dispatch: any;
+  dispatch: DocumentDispatch<ScopeOfWorkAction>;
   setActiveNodeId: (id: string) => void;
 }
 
@@ -42,13 +38,13 @@ const Roadmap: React.FC<RoadmapsProps> = ({
     setSlug(roadmap?.slug || "");
   }, [roadmap?.id]);
 
-  const columns = useMemo<Array<ColumnDef<any>>>(
+  const columns = useMemo<Array<ColumnDef<Milestone>>>(
     () => [
       {
         field: "link",
         width: 20,
         align: "center" as ColumnAlignment,
-        renderCell: (value: any, context: any) => {
+        renderCell: (value, context) => {
           if (!context.row?.id) return <div className="w-2"></div>;
           return (
             <div className="text-center">
@@ -69,7 +65,7 @@ const Roadmap: React.FC<RoadmapsProps> = ({
         title: "Title",
         editable: true,
         align: "center" as ColumnAlignment,
-        onSave: (newValue: any, context: any) => {
+        onSave: (newValue, context) => {
           if (newValue !== context.row.title) {
             dispatch(
               actions.editMilestone({
@@ -82,7 +78,7 @@ const Roadmap: React.FC<RoadmapsProps> = ({
           }
           return false;
         },
-        renderCell: (value: any, context: any) => {
+        renderCell: (value, context) => {
           if (value === "") {
             return (
               <div className="font-light italic text-left text-gray-500">
@@ -99,16 +95,19 @@ const Roadmap: React.FC<RoadmapsProps> = ({
         title: "Coordinators",
         align: "center" as ColumnAlignment,
         editable: true,
-        onSave: (newValue: any, context: any) => {
+        onSave: (newValue, context) => {
           if (Array.isArray(newValue)) {
-            newValue.forEach((id: any) => {
+            newValue.forEach((id) => {
+              if (typeof id !== "string") {
+                throw new Error(`Invalid id: ${id}`)
+              }
               const coordinator = context.row.coordinators.find(
-                (c: any) => c === id
+                (c) => c === id
               );
               if (!coordinator) {
                 dispatch(
                   actions.addCoordinator({
-                    id: id,
+                    id:  id,
                     milestoneId: context.row.id,
                   })
                 );
@@ -118,7 +117,7 @@ const Roadmap: React.FC<RoadmapsProps> = ({
           }
           if (typeof newValue === "string") {
             if (newValue === "") {
-              context.row.coordinators.forEach((c: any) => {
+              context.row.coordinators.forEach((c) => {
                 dispatch(
                   actions.removeCoordinator({
                     id: c,
@@ -130,10 +129,10 @@ const Roadmap: React.FC<RoadmapsProps> = ({
             }
             const multipleValues = newValue
               .split(",")
-              .map((value: any) => value.trim());
-            multipleValues.forEach((value: any) => {
+              .map((value) => value.trim());
+            multipleValues.forEach((value) => {
               const coordinator = context.row.coordinators.find(
-                (c: any) => c === value
+                (c) => c === value
               );
               if (!coordinator) {
                 dispatch(
@@ -155,7 +154,7 @@ const Roadmap: React.FC<RoadmapsProps> = ({
         editable: true,
         align: "center" as ColumnAlignment,
         width: 200,
-        onSave: (newValue: any, context: any) => {
+        onSave: (newValue, context) => {
           if (newValue === "") {
             dispatch(
               actions.editMilestone({
@@ -178,11 +177,11 @@ const Roadmap: React.FC<RoadmapsProps> = ({
           }
           return false;
         },
-        renderCell: (value: any, context: any) => {
+        renderCell: (value, context) => {
           if (!value) return null
           return (
             <div className="text-center">
-              {new Date(value).toLocaleDateString("en-US", {
+              {new Date(value as string).toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "long",
                 day: "numeric",

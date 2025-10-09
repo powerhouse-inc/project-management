@@ -14,6 +14,7 @@ import {
   Deliverable,
   DeliverableSetStatusInput,
   Agent,
+  ScopeOfWorkAction,
 } from "../../../document-models/scope-of-work/index.js";
 import { actions } from "../../../document-models/scope-of-work/index.js";
 import { useEffect, useMemo, useState } from "react";
@@ -21,11 +22,12 @@ import { generateId } from "document-model";
 import { Icon } from "@powerhousedao/design-system";
 import ProgressBar from "../components/progressBar.js";
 import { statusStyles } from "./deliverable.js";
+import { DocumentDispatch } from "@powerhousedao/reactor-browser";
 
 interface MilestonesProps {
   roadmaps: Roadmap[];
   milestones: Milestone[];
-  dispatch: any;
+  dispatch: DocumentDispatch<ScopeOfWorkAction>;
   deliverables: Deliverable[];
   setActiveNodeId: (id: string) => void;
   contributors: Agent[];
@@ -40,13 +42,11 @@ const Milestone: React.FC<MilestonesProps> = ({
   contributors,
 }) => {
   const milestone = milestones[0];
-  const roadmap = roadmaps.find((r: any) => {
-    return r.milestones.some((m: any) => m.id === milestone.id);
+  const roadmap = roadmaps.find((r) => {
+    return r.milestones.some((m) => m.id === milestone.id);
   });
-  const milestoneDeliverables =
-    milestone.scope?.deliverables.map((d: any) =>
-      deliverables.find((d2: any) => d2.id === d)
-    ) || [];
+  const milestoneDeliverablesIds = milestone.scope?.deliverables ?? [];
+  const milestoneDeliverables = deliverables.filter(m => milestoneDeliverablesIds.includes(m.id));
 
   const [stateMilestone, setStateMilestone] = useState(milestone);
 
@@ -54,13 +54,13 @@ const Milestone: React.FC<MilestonesProps> = ({
     setStateMilestone(milestone);
   }, [milestone]);
 
-  const columns = useMemo<Array<ColumnDef<any>>>(
+  const columns = useMemo<Array<ColumnDef<Deliverable>>>(
     () => [
       {
         field: "link",
         width: 20,
         align: "center" as ColumnAlignment,
-        renderCell: (value: any, context: any) => {
+        renderCell: (value, context) => {
           if (!context.row?.id) return <div className="w-2"></div>;
           return (
             <div className="text-center">
@@ -79,7 +79,7 @@ const Milestone: React.FC<MilestonesProps> = ({
       {
         field: "title",
         editable: true,
-        onSave: (newValue: any, context: any) => {
+        onSave: (newValue, context) => {
           if (newValue !== context.row.title) {
             dispatch(
               actions.editDeliverable({
@@ -91,7 +91,7 @@ const Milestone: React.FC<MilestonesProps> = ({
           }
           return false;
         },
-        renderCell: (value: any, context: any) => {
+        renderCell: (value, context) => {
           if (value === "") {
             return (
               <div className="font-light italic text-left text-gray-500">
@@ -107,7 +107,7 @@ const Milestone: React.FC<MilestonesProps> = ({
         field: "owner",
         editable: false,
         align: "center" as ColumnAlignment,
-        onSave: (newValue: any, context: any) => {
+        onSave: (newValue, context) => {
           if (newValue !== context.row.title) {
             dispatch(
               actions.editDeliverable({
@@ -119,8 +119,8 @@ const Milestone: React.FC<MilestonesProps> = ({
           }
           return false;
         },
-        renderCell: (value: any, context: any) => {
-          const contributor = contributors.find((c: any) => c.id === value);
+        renderCell: (value, context) => {
+          const contributor = contributors.find((c) => c.id === value);
           return (
             <div className="text-center">
               {contributor?.name ?? context.row.owner}
@@ -134,7 +134,7 @@ const Milestone: React.FC<MilestonesProps> = ({
         editable: false,
         align: "center" as ColumnAlignment,
         width: 200,
-        renderCell: (value: any, context: any) => {
+        renderCell: (value, context) => {
           const progress = context.row?.workProgress || null;
           if (!progress) return null;
           return <ProgressBar progress={progress} />;
@@ -146,7 +146,7 @@ const Milestone: React.FC<MilestonesProps> = ({
         editable: false,
         align: "center" as ColumnAlignment,
         width: 100,
-        renderCell: (value: any, context: any) => {
+        renderCell: (value, context) => {
           return (
             <span className={`flex items-center justify-center ${statusStyles[value as keyof typeof statusStyles]}`}>{value}</span>
           );
@@ -247,7 +247,7 @@ const Milestone: React.FC<MilestonesProps> = ({
               if (!roadmap) return;
               if (e.target.value === milestone.coordinators.join(", ")) return;
               if (e.target.value === "") {
-                milestone.coordinators.forEach((c: any) => {
+                milestone.coordinators.forEach((c) => {
                   dispatch(
                     actions.removeCoordinator({
                       id: c,
@@ -357,7 +357,7 @@ const Milestone: React.FC<MilestonesProps> = ({
           onDelete={(data) => {
             if (!milestoneDeliverables || data.length === 0) return;
             if (data.length > 0) {
-              data.forEach((d: any) => {
+              data.forEach((d) => {
                 dispatch(
                   actions.removeMilestoneDeliverable({
                     milestoneId: milestone.id,

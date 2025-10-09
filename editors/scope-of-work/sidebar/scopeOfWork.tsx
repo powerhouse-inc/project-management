@@ -10,29 +10,35 @@ import {
 import { Icon } from "@powerhousedao/design-system";
 import {
   actions,
+  Project,
+  Roadmap,
+  ScopeOfWorkAction,
+  ScopeOfWorkDocument,
   ScopeOfWorkStatusInput,
 } from "../../../document-models/scope-of-work/index.js";
 import { generateId } from "document-model";
 import ProgressBar from "../components/progressBar.js";
 import { ScopeOfWorkState } from "document-models/scope-of-work/index.js";
+import { DocumentDispatch } from "@powerhousedao/reactor-browser";
+import { L } from "vitest/dist/chunks/environment.d.cL3nLXbE.js";
 
 interface ScopeOfWorkProps {
-  dispatch: any;
-  document: any;
+  dispatch: DocumentDispatch<ScopeOfWorkAction>;
+  document: ScopeOfWorkDocument;
   setActiveNodeId: (id: string) => void;
 }
 
 const ScopeOfWork = (props: ScopeOfWorkProps) => {
   const { dispatch, document, setActiveNodeId } = props;
-  const state = document.state.global as ScopeOfWorkState;
+  const state = document.state.global;
 
-  const columns = useMemo<Array<ColumnDef<any>>>(
+  const columns = useMemo<Array<ColumnDef<Roadmap>>>(
     () => [
       {
         field: "link",
         width: 20,
         align: "center" as ColumnAlignment,
-        renderCell: (value: any, context: any) => {
+        renderCell: (value, context) => {
           if (!context.row?.id) return <div className="w-2"></div>;
           return (
             <div className="text-center">
@@ -53,7 +59,7 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
         title: "Roadmap Title",
         editable: true,
         align: "left" as ColumnAlignment,
-        onSave: (newValue: any, context: any) => {
+        onSave: (newValue, context) => {
           if (newValue !== context.row.title) {
             dispatch(
               actions.editRoadmap({
@@ -65,7 +71,7 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
           }
           return false;
         },
-        renderCell: (value: any, context: any) => {
+        renderCell: (value, context) => {
           if (value === "") {
             return (
               <div className="font-light italic text-left text-gray-500">
@@ -81,13 +87,13 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
     []
   );
 
-  const projectColumns = useMemo<Array<ColumnDef<any>>>(
+  const projectColumns = useMemo<Array<ColumnDef<Project>>>(
     () => [
       {
         field: "link",
         width: 20,
         align: "center" as ColumnAlignment,
-        renderCell: (value: any, context: any) => {
+        renderCell: (value, context) => {
           if (!context.row?.id) return <div className="w-2"></div>;
           return (
             <div className="text-center">
@@ -109,7 +115,7 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
         editable: true,
         align: "left" as ColumnAlignment,
         type: "string",
-        onSave: (newValue: any, context: any) => {
+        onSave: (newValue, context) => {
           if (newValue !== context.row.title) {
             dispatch(
               actions.updateProject({
@@ -121,7 +127,7 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
           }
           return false;
         },
-        renderCell: (value: any, context: any) => {
+        renderCell: (value, context) => {
           if (value === "") {
             return (
               <div className="font-light italic text-left text-gray-500">
@@ -138,7 +144,7 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
         title: "Progress",
         align: "left" as ColumnAlignment,
         width: 220,
-        renderCell: (value: any, context: any) => {
+        renderCell: (value, context) => {
           if (!context.row.scope) return null;
           return <ProgressBar progress={context.row.scope?.progress} />;
         },
@@ -175,18 +181,9 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
     }
   }, [editRowId]);
 
-  const handleDoubleClick = (row: any) => {
-    setEditRowId(row.id);
-    setEditValue(row.roadmapTitle);
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEditValue(e.target.value);
-  };
-
   const handleInputBlur = () => {
     if (editRowId !== null) {
-      if (state.roadmaps.find((row: any) => row.id === editRowId)) {
+      if (state.roadmaps.find((row) => row.id === editRowId)) {
         dispatch(
           actions.editRoadmap({ id: editRowId.toString(), title: editValue })
         );
@@ -207,19 +204,6 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
     }
   };
 
-  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      handleInputBlur();
-    }
-  };
-
-  const handleAddRow = () => {
-    const newId = generateId();
-    setTableData((prev) => [...prev, { id: newId, roadmapTitle: "" }]);
-    setEditRowId(newId);
-    setEditValue("");
-  };
-
   return (
     <div className="border border-gray-300 p-4 rounded-md ">
       <div className="mt-2">
@@ -230,7 +214,7 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
           onBlur={(e) => {
             if (e.target.value !== state.title) {
               dispatch(
-                actions.editScopeOfWork({ title: e.target.value as string })
+                actions.editScopeOfWork({ title: e.target.value })
               );
             }
           }}
@@ -246,7 +230,7 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
             if (e.target.value !== state.description) {
               dispatch(
                 actions.editScopeOfWork({
-                  description: e.target.value as string,
+                  description: e.target.value,
                 })
               );
             }
@@ -271,7 +255,7 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
         <label className="text-sm font-medium text-gray-700 ">Roadmaps</label>
         <ObjectSetTable
           columns={columns}
-          data={state.roadmaps || []}
+          data={state.roadmaps}
           allowRowSelection={true}
           onDelete={(data) => {
             if (!state.roadmaps) return;

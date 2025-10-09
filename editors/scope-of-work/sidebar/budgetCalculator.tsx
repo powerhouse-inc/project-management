@@ -5,6 +5,7 @@ import {
   Deliverable,
   actions,
   PmCurrencyInput,
+  ScopeOfWorkAction,
 } from "../../../document-models/scope-of-work/index.js";
 import { useState } from "react";
 import {
@@ -14,12 +15,13 @@ import {
   ColumnAlignment,
   Button,
 } from "@powerhousedao/document-engineering";
+import { DocumentDispatch } from "@powerhousedao/reactor-browser";
 
 interface BudgetCalculatorProps {
   setBudgetCalculatorOpen?: (open: boolean) => void;
   project?: Project;
   deliverables?: Deliverable[];
-  dispatch?: any;
+  dispatch: DocumentDispatch<ScopeOfWorkAction>;
 }
 
 const BudgetCalculator = ({
