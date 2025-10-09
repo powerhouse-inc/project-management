@@ -9,12 +9,8 @@ import type { ScopeOfWorkScopeOfWorkOperations } from "../../gen/scope-of-work/o
 
 export const reducer: ScopeOfWorkScopeOfWorkOperations = {
   editScopeOfWorkOperation(state, action, dispatch) {
-    try {
-      state.title = action.input.title ?? state.title;
-      state.description = action.input.description ?? state.description;
-      state.status = (action.input.status as ScopeOfWorkStatusInput) ?? state.status;
-    } catch (error) {
-      console.error(error);
-    }
+    state.title = action.input.title ?? state.title;
+    state.description = action.input.description ?? state.description;
+    state.status = (action.input.status as ScopeOfWorkStatusInput) ?? state.status;
   },
 };
