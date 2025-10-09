@@ -19,6 +19,10 @@
       "types": "./dist/document-models/index.d.ts",
       "default": "./dist/document-models/index.js"
     },
+    "./document-models/scope-of-work": {
+      "types": "./dist/document-models/scope-of-work/index.d.ts",
+      "default": "./dist/document-models/scope-of-work/index.js"
+    },
     "./editors": {
       "types": "./dist/editors/index.d.ts",
       "default": "./dist/editors/index.js"
