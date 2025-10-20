@@ -13,7 +13,6 @@ import {
   ObjectSetTable,
   ColumnDef,
   ColumnAlignment,
-  Button,
 } from "@powerhousedao/document-engineering";
 import { DocumentDispatch } from "@powerhousedao/reactor-browser";
 
@@ -47,7 +46,7 @@ const BudgetCalculator = ({
         setMarginInputValue((margin[0] ?? 0).toString());
       } else {
         setMargin(0);
-        setMarginInputValue('0');
+        setMarginInputValue("0");
       }
     }
   }, [deliverables]);
@@ -164,9 +163,7 @@ const BudgetCalculator = ({
         <h3 className="text-2xl font-bold">Budget Calculator</h3>
         <div>
           Project:{" "}
-          <span className="font-bold rounded-md p-2">
-            {project?.title}
-          </span>
+          <span className="font-bold rounded-md p-2">{project?.title}</span>
         </div>
         <div className="flex items-center gap-2">
           Currency:
@@ -207,10 +204,12 @@ const BudgetCalculator = ({
       <div className="flex justify-end items-center gap-4">
         <span>Total Cost:</span>
         <div className="min-w-[100px] h-8 bg-gray-100 border border-gray-300 rounded px-2 flex items-center justify-center">
-          {project?.currency} {Intl.NumberFormat("en-US").format(
-            richDeliverables
-              ?.reduce((acc, deliverable) => acc + deliverable.subtotal, 0)
-              || 0
+          {project?.currency}{" "}
+          {Intl.NumberFormat("en-US").format(
+            richDeliverables?.reduce(
+              (acc, deliverable) => acc + deliverable.subtotal,
+              0
+            ) || 0
           )}
         </div>
       </div>
@@ -228,7 +227,7 @@ const BudgetCalculator = ({
             onChange={(e) => {
               const value = e.target.value;
               setMarginInputValue(value);
-              if (value === '') {
+              if (value === "") {
                 // Allow empty input during editing
                 return;
               }
@@ -238,9 +237,9 @@ const BudgetCalculator = ({
             }}
             onBlur={() => {
               // If input is empty, set margin to 0
-              if (marginInputValue === '') {
+              if (marginInputValue === "") {
                 setMargin(0);
-                setMarginInputValue('0');
+                setMarginInputValue("0");
               } else {
                 // Ensure input value matches the actual margin
                 setMarginInputValue(margin.toString());

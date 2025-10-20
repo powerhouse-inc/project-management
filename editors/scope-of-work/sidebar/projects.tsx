@@ -5,7 +5,6 @@ import {
   ScopeOfWorkAction,
 } from "../../../document-models/scope-of-work/gen/types.js";
 import {
-  TextInput,
   ObjectSetTable,
   ColumnDef,
   ColumnAlignment,

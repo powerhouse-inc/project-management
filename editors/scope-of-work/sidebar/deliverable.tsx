@@ -1,19 +1,15 @@
 import {
-  DatePicker,
   ObjectSetTable,
   ColumnDef,
   Textarea,
   TextInput,
   Select,
   Checkbox,
-  NumberInput,
   Icon,
   AIDField,
   Form,
 } from "@powerhousedao/document-engineering";
 import {
-  Milestone,
-  Roadmap,
   type Deliverable,
   PmDeliverableStatusInput,
   Project,
@@ -221,15 +217,24 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                   e.preventDefault();
                   if (!stateDeliverable) return;
                   // Get the current value from the AIDField
-                  const currentValue = typeof stateDeliverable.owner === 'string' 
-                    ? stateDeliverable.owner 
-                    : (stateDeliverable.owner as unknown as {value: string})?.value || '';
-                  const originalValue = typeof currentDeliverable.owner === 'string' 
-                    ? currentDeliverable.owner 
-                    : (currentDeliverable.owner as unknown as {value: string})?.value || '';
-                  const currentValueStr = typeof currentValue === 'string' 
-                    ? currentValue 
-                    : (currentValue as unknown as {value: string})?.value || '';
+                  const currentValue =
+                    typeof stateDeliverable.owner === "string"
+                      ? stateDeliverable.owner
+                      : (stateDeliverable.owner as unknown as { value: string })
+                          ?.value || "";
+                  const originalValue =
+                    typeof currentDeliverable.owner === "string"
+                      ? currentDeliverable.owner
+                      : (
+                          currentDeliverable.owner as unknown as {
+                            value: string;
+                          }
+                        )?.value || "";
+                  const currentValueStr =
+                    typeof currentValue === "string"
+                      ? currentValue
+                      : (currentValue as unknown as { value: string })?.value ||
+                        "";
                   if (currentValueStr === originalValue) return;
                   dispatch(
                     actions.editDeliverable({
@@ -257,15 +262,18 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                   }))}
                   onChange={(e) => {
                     // Handle both object and string cases
-                    let ownerId = '';
-                    
-                    if (typeof e === 'object' && e !== null) {
+                    let ownerId = "";
+
+                    if (typeof e === "object" && e !== null) {
                       // Object case - extract the value
-                      ownerId = (e as {value: string}).value || '';
-                    } else if (typeof e === 'string') {
+                      ownerId = (e as { value: string }).value || "";
+                    } else if (typeof e === "string") {
                       // String case - could be typing or selection
-                      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(e);
-                      
+                      const isUUID =
+                        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+                          e
+                        );
+
                       if (isUUID) {
                         ownerId = e;
                       } else {
@@ -273,17 +281,17 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                         return;
                       }
                     }
-                    
+
                     // If we have a valid owner ID, update state and dispatch
                     if (ownerId) {
                       setStateDeliverable({
                         ...stateDeliverable,
                         owner: ownerId,
                       });
-                      
+
                       // Check if this is different from the original value
-                      const originalValue = currentDeliverable.owner || '';
-                      
+                      const originalValue = currentDeliverable.owner || "";
+
                       if (ownerId !== originalValue) {
                         dispatch(
                           actions.editDeliverable({
@@ -297,15 +305,15 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                   variant="withValueAndTitle"
                   onBlur={(e) => {
                     if (!stateDeliverable) return;
-                    
-                    const originalValue = currentDeliverable.owner || '';
+
+                    const originalValue = currentDeliverable.owner || "";
                     const targetValue = e.target.value;
-                    
+
                     // Check if the input value is different from the original value
                     if (targetValue === originalValue) {
                       return;
                     }
-                    
+
                     // If user typed something new, dispatch with the typed value
                     dispatch(
                       actions.editDeliverable({
@@ -472,7 +480,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                       ? Boolean(workProgress.done)
                       : false
                   }
-                  onChange={(e: boolean | 'indeterminate') => {
+                  onChange={(e: boolean | "indeterminate") => {
                     if (e === "indeterminate") {
                       return;
                     }

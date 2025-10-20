@@ -18,9 +18,7 @@ import {
 } from "../../../document-models/scope-of-work/index.js";
 import { generateId } from "document-model";
 import ProgressBar from "../components/progressBar.js";
-import { ScopeOfWorkState } from "document-models/scope-of-work/index.js";
 import { DocumentDispatch } from "@powerhousedao/reactor-browser";
-import { L } from "vitest/dist/chunks/environment.d.cL3nLXbE.js";
 
 interface ScopeOfWorkProps {
   dispatch: DocumentDispatch<ScopeOfWorkAction>;
@@ -183,7 +181,7 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
 
   const handleInputBlur = () => {
     if (editRowId !== null) {
-      if (state.roadmaps.find((row) => row.id === editRowId)) {
+      if (state.roadmaps.find((row: Roadmap) => row.id === editRowId)) {
         dispatch(
           actions.editRoadmap({ id: editRowId.toString(), title: editValue })
         );
@@ -213,9 +211,7 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
           defaultValue={state.title}
           onBlur={(e) => {
             if (e.target.value !== state.title) {
-              dispatch(
-                actions.editScopeOfWork({ title: e.target.value })
-              );
+              dispatch(actions.editScopeOfWork({ title: e.target.value }));
             }
           }}
         />

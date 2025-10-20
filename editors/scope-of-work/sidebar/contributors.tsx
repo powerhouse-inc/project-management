@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import {
-  Select,
   ObjectSetTable,
   ColumnDef,
   ColumnAlignment,
@@ -20,7 +19,7 @@ interface ContributorsProps {
   contributors: Agent[];
 }
 
-type RichContributors = Agent & {title: string};
+type RichContributors = Agent & { title: string };
 
 const Contributors: React.FC<ContributorsProps> = ({
   dispatch,

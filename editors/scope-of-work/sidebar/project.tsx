@@ -6,7 +6,7 @@ import {
   Agent,
   ScopeOfWorkAction,
 } from "../../../document-models/scope-of-work/gen/types.js";
-import { useMemo, useState, useEffect, FormEvent } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   TextInput,
   ObjectSetTable,
@@ -16,7 +16,6 @@ import {
   AIDField,
   Form,
   Select,
-  NumberInput,
 } from "@powerhousedao/document-engineering";
 import { Icon } from "@powerhousedao/design-system";
 import { actions } from "../../../document-models/scope-of-work/index.js";

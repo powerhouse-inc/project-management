@@ -6,7 +6,6 @@ import {
   TextInput,
   ColumnAlignment,
   Select,
-  NumberInput,
 } from "@powerhousedao/document-engineering";
 import {
   type Milestone,
@@ -46,7 +45,9 @@ const Milestone: React.FC<MilestonesProps> = ({
     return r.milestones.some((m) => m.id === milestone.id);
   });
   const milestoneDeliverablesIds = milestone.scope?.deliverables ?? [];
-  const milestoneDeliverables = deliverables.filter(m => milestoneDeliverablesIds.includes(m.id));
+  const milestoneDeliverables = deliverables.filter((m) =>
+    milestoneDeliverablesIds.includes(m.id)
+  );
 
   const [stateMilestone, setStateMilestone] = useState(milestone);
 
@@ -148,7 +149,11 @@ const Milestone: React.FC<MilestonesProps> = ({
         width: 100,
         renderCell: (value, context) => {
           return (
-            <span className={`flex items-center justify-center ${statusStyles[value as keyof typeof statusStyles]}`}>{value}</span>
+            <span
+              className={`flex items-center justify-center ${statusStyles[value as keyof typeof statusStyles]}`}
+            >
+              {value}
+            </span>
           );
         },
       },

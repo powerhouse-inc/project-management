@@ -4,9 +4,9 @@ import {
   Icon,
   useSidebar,
 } from "@powerhousedao/document-engineering";
-import type {IconName} from "@powerhousedao/document-engineering";
+import type { IconName } from "@powerhousedao/document-engineering";
 import { useState, useEffect, useMemo } from "react";
-import type {ReactElement} from "react";
+import type { ReactElement } from "react";
 import ScopeOfWork from "./scopeOfWork.js";
 import Roadmap from "./roadmap.js";
 import Milestone from "./milestone.js";
@@ -17,13 +17,13 @@ import Deliverables from "./deliverables.js";
 import Roadmaps from "./roadmaps.js";
 import Contributors from "./contributors.js";
 import BreadCrumbs from "../components/breadCrumbs.js";
-import { useDocumentById } from "@powerhousedao/reactor-browser";
+import { useSelectedScopeOfWorkDocument } from "../../hooks/useScopeOfWorkDocument.js";
 import {
-  ScopeOfWorkDocument,
-  ScopeOfWorkState,
-} from "document-models/scope-of-work/index.js";
-import type { EditorProps } from "document-model";
-import { useSelectedScopeOfWorkDocument } from "editors/hooks/useScopeOfWorkDocument.js";
+  type Milestone as MilestoneType,
+  type Roadmap as RoadmapType,
+  type Project as ProjectType,
+  type Deliverable as DeliverableType,
+} from "../../../document-models/scope-of-work/gen/types.js";
 
 type SidebarNode = {
   id: string;
@@ -107,13 +107,15 @@ const useSidebarWidth = () => {
   return { sidebarWidth, isSidebarOpen };
 };
 
-export default function SidebarMenu(props: EditorProps) {
+export default function SidebarMenu() {
   const [doc, dispatch] = useSelectedScopeOfWorkDocument();
 
   const state = doc.state.global;
 
   const { roadmaps, deliverables, projects, contributors } = state;
-  const milestones = state.roadmaps.flatMap((r) => r.milestones);
+  const milestones: MilestoneType[] = state.roadmaps.flatMap(
+    (r: RoadmapType) => r.milestones
+  );
   const [activeNodeId, setActiveNodeId] = useState<string | undefined>(
     undefined
   );
@@ -162,7 +164,7 @@ export default function SidebarMenu(props: EditorProps) {
           {
             id: `roadmap.${id}`,
             title:
-              roadmaps.find((r) => r.id === id)?.title ||
+              roadmaps.find((r: RoadmapType) => r.id === id)?.title ||
               "Unknown Roadmap",
             type: "roadmap",
             isActive: true,
@@ -172,7 +174,7 @@ export default function SidebarMenu(props: EditorProps) {
 
       case "milestone": {
         const milestone = milestones.find((m) => m.id === id);
-        const roadmap = roadmaps.find((r) =>
+        const roadmap = roadmaps.find((r: RoadmapType) =>
           r.milestones.some((m) => m.id === id)
         );
 
@@ -210,7 +212,7 @@ export default function SidebarMenu(props: EditorProps) {
         break;
 
       case "project": {
-        const project = projects.find((p) => p.id === id);
+        const project = projects.find((p: ProjectType) => p.id === id);
         breadcrumbs.push(
           {
             id: "projects",
@@ -239,7 +241,9 @@ export default function SidebarMenu(props: EditorProps) {
         break;
 
       case "deliverable": {
-        const deliverable = deliverables.find((d) => d.id === id);
+        const deliverable = deliverables.find(
+          (d: DeliverableType) => d.id === id
+        );
         breadcrumbs.push(
           {
             id: "deliverables",
@@ -290,7 +294,7 @@ export default function SidebarMenu(props: EditorProps) {
       {
         id: "roadmaps",
         title: "Roadmaps",
-        children: roadmaps.map((roadmap) => ({
+        children: roadmaps.map((roadmap: RoadmapType) => ({
           id: `roadmap.${roadmap.id}`,
           title: roadmap.title,
           children: roadmap.milestones.map((milestone) => ({
@@ -305,7 +309,7 @@ export default function SidebarMenu(props: EditorProps) {
       {
         id: "projects",
         title: "Projects",
-        children: projects.map((project) => ({
+        children: projects.map((project: ProjectType) => ({
           id: `project.${project.id}`,
           title: project.code
             ? `${project.code} - ${project.title}`
@@ -316,7 +320,7 @@ export default function SidebarMenu(props: EditorProps) {
       {
         id: "deliverables",
         title: "Deliverables",
-        children: deliverables.map((deliverable) => ({
+        children: deliverables.map((deliverable: DeliverableType) => ({
           id: `deliverable.${deliverable.id}`,
           title: deliverable.code
             ? `${deliverable.code} - ${deliverable.title}`
@@ -361,7 +365,7 @@ export default function SidebarMenu(props: EditorProps) {
         return (
           <Roadmap
             dispatch={dispatch}
-            roadmaps={roadmaps.filter((r) => r.id === id)}
+            roadmaps={roadmaps.filter((r: RoadmapType) => r.id === id)}
             setActiveNodeId={setActiveNodeId}
           />
         );
@@ -391,7 +395,9 @@ export default function SidebarMenu(props: EditorProps) {
         return (
           <Deliverable
             dispatch={dispatch}
-            deliverables={deliverables.filter((d) => d.id === id)}
+            deliverables={deliverables.filter(
+              (d: DeliverableType) => d.id === id
+            )}
             projects={projects}
             contributors={contributors}
           />
@@ -409,7 +415,7 @@ export default function SidebarMenu(props: EditorProps) {
         return (
           <Project
             dispatch={dispatch}
-            project={projects.find((p) => p.id === id)}
+            project={projects.find((p: ProjectType) => p.id === id)}
             deliverables={deliverables}
             setActiveNodeId={setActiveNodeId}
             contributors={contributors}

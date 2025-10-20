@@ -7,7 +7,6 @@ import { generateId } from "document-model";
 import {
   ObjectSetTable,
   ColumnAlignment,
-  DatePicker,
   ColumnDef,
 } from "@powerhousedao/document-engineering";
 import { DocumentDispatch } from "@powerhousedao/reactor-browser";

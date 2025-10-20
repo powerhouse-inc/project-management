@@ -8,7 +8,6 @@ import {
   ScopeOfWorkDocument,
 } from "../../../document-models/scope-of-work/gen/types.js";
 import {
-  Select,
   ObjectSetTable,
   ColumnDef,
   ColumnAlignment,
@@ -19,7 +18,15 @@ import { actions } from "../../../document-models/scope-of-work/index.js";
 import { generateId, Operation } from "document-model";
 import { statusOptions, statusStyles } from "./deliverable.js";
 import { DocumentDispatch } from "@powerhousedao/reactor-browser";
-import { AddDeliverableAction, AddDeliverableInSetAction, AddMilestoneDeliverableAction, AddProjectAction, AddProjectDeliverableAction, EditDeliverableAction, RemoveDeliverableAction, RemoveDeliverableInSetAction } from "document-models/scope-of-work/gen/actions.js";
+import {
+  AddDeliverableAction,
+  AddDeliverableInSetAction,
+  AddMilestoneDeliverableAction,
+  AddProjectDeliverableAction,
+  EditDeliverableAction,
+  RemoveDeliverableAction,
+  RemoveDeliverableInSetAction,
+} from "document-models/scope-of-work/gen/actions.js";
 
 interface ProjectsProps {
   deliverables: Deliverable[] | undefined;
@@ -31,9 +38,9 @@ interface ProjectsProps {
 }
 
 type LatestActivity = {
-    type: string;
-    timestamp: string;
-    input: unknown;
+  type: string;
+  timestamp: string;
+  input: unknown;
 };
 
 type RichDeliverables = Deliverable & {
@@ -42,7 +49,7 @@ type RichDeliverables = Deliverable & {
   projectId: string | null;
   projectTitle: string | null;
   latestActivity: LatestActivity | null;
-}
+};
 
 const Deliverables: React.FC<ProjectsProps> = ({
   deliverables,
@@ -61,31 +68,57 @@ const Deliverables: React.FC<ProjectsProps> = ({
   }, [milestones, projects, deliverables]);
 
   const latestActivity = document.operations.global.filter(
-    (operation) =>
-      operation.action.type === "EDIT_DELIVERABLE" ||
-      operation.action.type === "ADD_DELIVERABLE" ||
-      operation.action.type === "REMOVE_DELIVERABLE" ||
-      operation.action.type === "ADD_PROJECT_DELIVERABLE" ||
-      operation.action.type === "ADD_MILESTONE_DELIVERABLE" ||
-      operation.action.type === "ADD_DELIVERABLE_IN_SET" ||
-      operation.action.type === "REMOVE_DELIVERABLE_IN_SET"
-  ) as (Operation & {action: EditDeliverableAction
-     | AddDeliverableAction | RemoveDeliverableAction | AddProjectDeliverableAction
-    | AddMilestoneDeliverableAction | AddDeliverableInSetAction | RemoveDeliverableInSetAction})[];
+    (operation) => {
+      const typedOperation = operation as Operation & {
+        timestampUtcMs: string;
+        action:
+          | EditDeliverableAction
+          | AddDeliverableAction
+          | RemoveDeliverableAction
+          | AddProjectDeliverableAction
+          | AddMilestoneDeliverableAction
+          | AddDeliverableInSetAction
+          | RemoveDeliverableInSetAction;
+      };
+      return (
+        typedOperation.action.type === "EDIT_DELIVERABLE" ||
+        typedOperation.action.type === "ADD_DELIVERABLE" ||
+        typedOperation.action.type === "REMOVE_DELIVERABLE" ||
+        typedOperation.action.type === "ADD_PROJECT_DELIVERABLE" ||
+        typedOperation.action.type === "ADD_MILESTONE_DELIVERABLE" ||
+        typedOperation.action.type === "ADD_DELIVERABLE_IN_SET" ||
+        typedOperation.action.type === "REMOVE_DELIVERABLE_IN_SET"
+      );
+    }
+  ) as (Operation & {
+    timestampUtcMs: string;
+    action:
+      | EditDeliverableAction
+      | AddDeliverableAction
+      | RemoveDeliverableAction
+      | AddProjectDeliverableAction
+      | AddMilestoneDeliverableAction
+      | AddDeliverableInSetAction
+      | RemoveDeliverableInSetAction;
+  })[];
 
   // Create a map of deliverable IDs to their latest activity
-  const latestActivityMap = new Map<string, LatestActivity>();
+  const latestActivityMap = new Map<string, LatestActivity>(); 
   latestActivity?.forEach((activity) => {
+    
     if ("id" in activity.action.input && activity.action.input.id) {
       latestActivityMap.set(activity.action.input.id, {
         type: activity.action.type,
-        timestamp: activity.action.timestampUtcMs || activity.timestampUtcMs,
+        timestamp: activity.timestampUtcMs,
         input: activity.action.input,
       });
-    } else if ("deliverableId" in activity.action.input && activity.action.input.deliverableId) {
+    } else if (
+      "deliverableId" in activity.action.input &&
+      activity.action.input.deliverableId
+    ) {
       latestActivityMap.set(activity.action.input.deliverableId, {
         type: activity.action.type,
-        timestamp: activity.action.timestampUtcMs || activity.timestampUtcMs,
+        timestamp: activity.timestampUtcMs,
         input: activity.action.input,
       });
     }
@@ -385,9 +418,9 @@ const Deliverables: React.FC<ProjectsProps> = ({
           const activityText = parseLatestActivity(context.row.latestActivity);
           const [activity, time] = activityText.split("\n");
           return (
-            <div className="text-xs">
+            <div className="text-xs text-center">
               <div>{activity}</div>
-              <div className=" text-gray-500">{time}</div>
+              <div className="text-gray-500">{time}</div>
             </div>
           );
         },
@@ -473,7 +506,7 @@ const parseLatestActivity = (latestActivity: LatestActivity) => {
         // Looks like seconds, convert to milliseconds
         activityTime = new Date(latestActivity.timestamp * 1000);
       }
-    } else if (latestActivity.timestamp as any instanceof Date) {
+    } else if ((latestActivity.timestamp as any) instanceof Date) {
       // Already a Date object
       activityTime = latestActivity.timestamp;
     } else {
