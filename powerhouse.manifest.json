@@ -16,7 +16,9 @@
         {
             "id": "scope-of-work-editor",
             "name": "Scope Of Work",
-            "documentTypes": ["powerhouse/scopeofwork"]
+            "documentTypes": [
+                "powerhouse/scopeofwork"
+            ]
         }
     ],
     "apps": [],
