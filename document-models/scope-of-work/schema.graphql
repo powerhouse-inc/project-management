@@ -36,16 +36,10 @@ enum ScopeOfWorkStatus {
 }
 
 type Agent {
-  id: ID!
-  agentType: AgentType!
+  id: PHID!
   name: String!
-  code: String
-}
-
-enum AgentType {
-  HUMAN
-  GROUP
-  AI
+  icon: URL
+  description: String
 }
 
 type Deliverable {
@@ -383,29 +377,21 @@ input RemoveDeliverableInSetInput {
 # contributors
 
 input AddAgentInput {
-  id: ID!
+  id: PHID!
   name: String!
-  agentType: AgentTypeInput
-  code: String
-  imageUrl: String
-}
-
-enum AgentTypeInput {
-  HUMAN
-  GROUP
-  AI
+  icon: URL
+  description: String
 }
 
 input RemoveAgentInput {
-  id: OID!
+  id: PHID!
 }
 
 input EditAgentInput {
-  id: ID!
+  id: PHID!
   name: String
-  agentType: AgentTypeInput
-  code: String
-  imageUrl: String
+  icon: URL
+  description: String
 }
 
 # projects

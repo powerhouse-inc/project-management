@@ -11,8 +11,6 @@ import type {
   AddProjectInput,
   AddRoadmapInput,
   Agent,
-  AgentType,
-  AgentTypeInput,
   Binary,
   BudgetAnchorProject,
   BudgetExpenditure,
@@ -77,10 +75,6 @@ export const isDefinedNonNullAny = (v: any): v is definedNonNullAny =>
 export const definedNonNullAnySchema = z
   .any()
   .refine((v) => isDefinedNonNullAny(v));
-
-export const AgentTypeSchema = z.enum(["AI", "GROUP", "HUMAN"]);
-
-export const AgentTypeInputSchema = z.enum(["AI", "GROUP", "HUMAN"]);
 
 export const BudgetTypeSchema = z.enum([
   "CAPEX",
@@ -160,10 +154,9 @@ export const UnitSchema = z.enum(["Hours", "StoryPoints"]);
 
 export function AddAgentInputSchema(): z.ZodObject<Properties<AddAgentInput>> {
   return z.object({
-    agentType: z.lazy(() => AgentTypeInputSchema.nullish()),
-    code: z.string().nullish(),
+    description: z.string().nullish(),
+    icon: z.string().url().nullish(),
     id: z.string(),
-    imageUrl: z.string().nullish(),
     name: z.string(),
   });
 }
@@ -274,8 +267,8 @@ export function AddRoadmapInputSchema(): z.ZodObject<
 export function AgentSchema(): z.ZodObject<Properties<Agent>> {
   return z.object({
     __typename: z.literal("Agent").optional(),
-    agentType: AgentTypeSchema,
-    code: z.string().nullable(),
+    description: z.string().nullable(),
+    icon: z.string().url().nullable(),
     id: z.string(),
     name: z.string(),
   });
@@ -362,10 +355,9 @@ export function EditAgentInputSchema(): z.ZodObject<
   Properties<EditAgentInput>
 > {
   return z.object({
-    agentType: z.lazy(() => AgentTypeInputSchema.nullish()),
-    code: z.string().nullish(),
+    description: z.string().nullish(),
+    icon: z.string().url().nullish(),
     id: z.string(),
-    imageUrl: z.string().nullish(),
     name: z.string().nullish(),
   });
 }

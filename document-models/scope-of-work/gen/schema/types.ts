@@ -57,10 +57,9 @@ export type Scalars = {
 };
 
 export type AddAgentInput = {
-  agentType?: InputMaybe<AgentTypeInput | `${AgentTypeInput}`>;
-  code?: InputMaybe<Scalars["String"]["input"]>;
-  id: Scalars["ID"]["input"];
-  imageUrl?: InputMaybe<Scalars["String"]["input"]>;
+  description?: InputMaybe<Scalars["String"]["input"]>;
+  icon?: InputMaybe<Scalars["URL"]["input"]>;
+  id: Scalars["PHID"]["input"];
   name: Scalars["String"]["input"];
 };
 
@@ -132,15 +131,11 @@ export type AddRoadmapInput = {
 };
 
 export type Agent = {
-  agentType: AgentType | `${AgentType}`;
-  code: Maybe<Scalars["String"]["output"]>;
-  id: Scalars["ID"]["output"];
+  description: Maybe<Scalars["String"]["output"]>;
+  icon: Maybe<Scalars["URL"]["output"]>;
+  id: Scalars["PHID"]["output"];
   name: Scalars["String"]["output"];
 };
-
-export type AgentType = "AI" | "GROUP" | "HUMAN";
-
-export type AgentTypeInput = "AI" | "GROUP" | "HUMAN";
 
 export type Binary = {
   done: Maybe<Scalars["Boolean"]["output"]>;
@@ -215,10 +210,9 @@ export type DeliverablesSet = {
 };
 
 export type EditAgentInput = {
-  agentType?: InputMaybe<AgentTypeInput | `${AgentTypeInput}`>;
-  code?: InputMaybe<Scalars["String"]["input"]>;
-  id: Scalars["ID"]["input"];
-  imageUrl?: InputMaybe<Scalars["String"]["input"]>;
+  description?: InputMaybe<Scalars["String"]["input"]>;
+  icon?: InputMaybe<Scalars["URL"]["input"]>;
+  id: Scalars["PHID"]["input"];
   name?: InputMaybe<Scalars["String"]["input"]>;
 };
 
@@ -328,7 +322,7 @@ export type Project = {
 };
 
 export type RemoveAgentInput = {
-  id: Scalars["OID"]["input"];
+  id: Scalars["PHID"]["input"];
 };
 
 export type RemoveCoordinatorInput = {

@@ -26,16 +26,10 @@ export const schema: DocumentNode = gql`
   }
 
   type Agent {
-    id: ID!
-    agentType: AgentType!
+    id: PHID!
     name: String!
-    code: String
-  }
-
-  enum AgentType {
-    HUMAN
-    GROUP
-    AI
+    icon: URL
+    description: String
   }
 
   type Deliverable {
@@ -544,27 +538,19 @@ export const schema: DocumentNode = gql`
   Module: Contributors
   """
   input ScopeOfWork_AddAgentInput {
-    id: ID!
+    id: PHID!
     name: String!
-    agentType: AgentTypeInput
-    code: String
-    imageUrl: String
-  }
-
-  enum AgentTypeInput {
-    HUMAN
-    GROUP
-    AI
+    icon: URL
+    description: String
   }
   input ScopeOfWork_RemoveAgentInput {
-    id: OID!
+    id: PHID!
   }
   input ScopeOfWork_EditAgentInput {
-    id: ID!
+    id: PHID!
     name: String
-    agentType: AgentTypeInput
-    code: String
-    imageUrl: String
+    icon: URL
+    description: String
   }
 
   """
