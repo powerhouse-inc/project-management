@@ -36,13 +36,30 @@ import {
   type AddProjectDeliverableInput,
   type RemoveProjectDeliverableInput,
   type ScopeOfWorkDocument,
+  type Progress,
 } from "../../document-models/scope-of-work/index.js";
 import { setName } from "document-model";
 
 export const getResolvers = (subgraph: Subgraph): Record<string, unknown> => {
   const reactor = subgraph.reactor;
 
+
+
   return {
+    ScopeOfWork_Progress: {
+      __resolveType(obj: Progress) {
+        if ("done" in obj) {
+          return "ScopeOfWork_Binary";
+        }
+        if ("value" in obj) {
+          return "ScopeOfWork_Percentage";
+        }
+        if ("completed" in obj) {
+          return "ScopeOfWork_StoryPoint";
+        }
+        return null;
+      },
+    },
     Query: {
       ScopeOfWork: async () => {
         return {
@@ -325,7 +342,7 @@ export const getResolvers = (subgraph: Subgraph): Record<string, unknown> => {
         if (result.status !== "SUCCESS") {
           throw new Error(
             result.error?.message ??
-              "Failed to setDeliverableBudgetAnchorProject",
+            "Failed to setDeliverableBudgetAnchorProject",
           );
         }
 
