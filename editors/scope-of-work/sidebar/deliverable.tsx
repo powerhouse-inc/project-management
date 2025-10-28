@@ -252,7 +252,6 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                   initialOptions={contributors.map((c) => ({
                     value: c.id,
                     title: c.name,
-                    agentType: c.agentType,
                     path: {
                       text: "Link",
                       url: "https://powerhouse.inc",
@@ -332,7 +331,6 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                     return contributorsFilter.map((c) => ({
                       value: c.id,
                       title: c.name,
-                      agentType: c.agentType,
                       path: {
                         text: "Link",
                         url: "https://powerhouse.inc",
@@ -348,7 +346,6 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                     return {
                       value: agent.id,
                       title: agent.name,
-                      agentType: agent.agentType,
                       description: " ",
                       icon: "Person",
                       path: {

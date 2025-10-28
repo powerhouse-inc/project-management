@@ -248,7 +248,6 @@ const Project: React.FC<ProjectProps> = ({
                   initialOptions={contributors.map((c) => ({
                     value: c.id,
                     title: c.name,
-                    agentType: c.agentType,
                     path: {
                       text: "Link",
                       url: "https://powerhouse.inc",
@@ -278,7 +277,6 @@ const Project: React.FC<ProjectProps> = ({
                     return contributorsFilter.map((c) => ({
                       value: c.id,
                       title: c.name,
-                      agentType: c.agentType,
                       path: {
                         text: "Link",
                         url: "https://powerhouse.inc",
@@ -294,7 +292,6 @@ const Project: React.FC<ProjectProps> = ({
                     return {
                       value: agent.id,
                       title: agent.name,
-                      agentType: agent.agentType,
                       description: " ",
                       icon: "Person",
                       path: {
