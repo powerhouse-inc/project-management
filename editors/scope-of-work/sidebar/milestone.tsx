@@ -1,31 +1,31 @@
 import {
   DatePicker,
   ObjectSetTable,
-  ColumnDef,
+  type ColumnDef,
   Textarea,
   TextInput,
-  ColumnAlignment,
+  type ColumnAlignment,
   Select,
 } from "@powerhousedao/document-engineering";
 import {
-  type Milestone,
-  Roadmap,
-  Deliverable,
-  DeliverableSetStatusInput,
-  Agent,
-  ScopeOfWorkAction,
+  type Milestone as MilestoneType,
+  type Roadmap,
+  type Deliverable,
+  type DeliverableSetStatusInput,
+  type Agent,
+  type ScopeOfWorkAction,
 } from "../../../document-models/scope-of-work/index.js";
 import { actions } from "../../../document-models/scope-of-work/index.js";
 import { useEffect, useMemo, useState } from "react";
-import { generateId } from "document-model";
+import { generateId } from "document-model/core";
 import { Icon } from "@powerhousedao/design-system";
 import ProgressBar from "../components/progressBar.js";
 import { statusStyles } from "./deliverable.js";
-import { DocumentDispatch } from "@powerhousedao/reactor-browser";
+import { type DocumentDispatch } from "@powerhousedao/reactor-browser";
 
 interface MilestonesProps {
   roadmaps: Roadmap[];
-  milestones: Milestone[];
+  milestones: MilestoneType[];
   dispatch: DocumentDispatch<ScopeOfWorkAction>;
   deliverables: Deliverable[];
   setActiveNodeId: (id: string) => void;

@@ -2,12 +2,12 @@ import { useMemo } from "react";
 import type { Roadmap, ScopeOfWorkAction } from "../../../document-models/scope-of-work/gen/types.js";
 import {
   ObjectSetTable,
-  ColumnDef,
-  ColumnAlignment,
+  type ColumnDef,
+  type ColumnAlignment,
 } from "@powerhousedao/document-engineering";
 import { Icon } from "@powerhousedao/design-system";
 import { actions } from "../../../document-models/scope-of-work/index.js";
-import { generateId } from "document-model";
+import { generateId } from "document-model/core";
 import type { DocumentDispatch } from "@powerhousedao/reactor-browser";
 
 interface ProjectsProps {

@@ -5,7 +5,7 @@
  */
 
 import type { ScopeOfWorkMilestonesOperations } from "../../gen/milestones/operations.js";
-import type { Deliverable, Milestone } from "../../gen/types.js";
+import type { Deliverable } from "../../gen/types.js";
 import { applyInvariants } from "./projects.js";
 
 export const reducer: ScopeOfWorkMilestonesOperations = {

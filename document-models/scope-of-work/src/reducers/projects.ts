@@ -4,9 +4,8 @@
  * - delete the file and run the code generator again to have it reset
  */
 
-import { de } from "zod/v4/locales";
 import type { ScopeOfWorkProjectsOperations } from "../../gen/projects/operations.js";
-import type { Deliverable, DeliverablesSet, Project, ScopeOfWorkState } from "../../gen/types.js";
+import type { Deliverable, DeliverablesSet, ScopeOfWorkState } from "../../gen/types.js";
 
 export const reducer: ScopeOfWorkProjectsOperations = {
   addProjectOperation(state, action, dispatch) {

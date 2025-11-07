@@ -1,4 +1,4 @@
-import { createAction } from "document-model";
+import { createAction } from "document-model/core";
 import { z, type EditScopeOfWorkInput } from "../types.js";
 import { type EditScopeOfWorkAction } from "./actions.js";
 

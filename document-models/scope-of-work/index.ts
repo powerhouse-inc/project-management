@@ -4,24 +4,26 @@
  */
 
 import {
-  actions as BaseActions,
+  createState,
   type DocumentModelModule,
+  baseActions,
 } from "document-model";
+import { defaultBaseState } from "document-model/core";
 import { actions as ScopeOfWorkActions } from "./gen/index.js";
 import { reducer } from "./gen/reducer.js";
 import { documentModel } from "./gen/document-model.js";
 import genUtils from "./gen/utils.js";
 import * as customUtils from "./src/utils.js";
-import type { ScopeOfWorkPHState } from "./gen/ph-factories.js";
+import type { ScopeOfWorkPHState } from "./gen/types.js";
 
 const utils = { ...genUtils, ...customUtils };
-const actions = { ...BaseActions, ...ScopeOfWorkActions };
+const actions = { ...baseActions, ...ScopeOfWorkActions };
 
 export const module: DocumentModelModule<ScopeOfWorkPHState> = {
   reducer,
   actions,
   utils,
-  documentModel,
+  documentModel: createState(defaultBaseState(), documentModel),
 };
 
 export { reducer, actions, utils, documentModel };

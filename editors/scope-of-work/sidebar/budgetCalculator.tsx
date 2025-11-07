@@ -1,20 +1,20 @@
 import { useMemo, useEffect, useRef } from "react";
 import { Icon } from "@powerhousedao/design-system";
 import {
-  Project,
-  Deliverable,
+  type Project,
+  type Deliverable,
   actions,
-  PmCurrencyInput,
-  ScopeOfWorkAction,
+  type PmCurrencyInput,
+  type ScopeOfWorkAction,
 } from "../../../document-models/scope-of-work/index.js";
 import { useState } from "react";
 import {
   Select,
   ObjectSetTable,
-  ColumnDef,
-  ColumnAlignment,
+  type ColumnDef,
+  type ColumnAlignment,
 } from "@powerhousedao/document-engineering";
-import { DocumentDispatch } from "@powerhousedao/reactor-browser";
+import { type DocumentDispatch } from "@powerhousedao/reactor-browser";
 
 interface BudgetCalculatorProps {
   setBudgetCalculatorOpen?: (open: boolean) => void;

@@ -4,21 +4,21 @@ import {
   Textarea,
   Select,
   ObjectSetTable,
-  ColumnDef,
-  ColumnAlignment,
+  type ColumnDef,
+  type ColumnAlignment,
 } from "@powerhousedao/document-engineering";
 import { Icon } from "@powerhousedao/design-system";
 import {
   actions,
-  Project,
-  Roadmap,
-  ScopeOfWorkAction,
-  ScopeOfWorkDocument,
-  ScopeOfWorkStatusInput,
+  type Project,
+  type Roadmap,
+  type ScopeOfWorkAction,
+  type ScopeOfWorkDocument,
+  type ScopeOfWorkStatusInput,
 } from "../../../document-models/scope-of-work/index.js";
-import { generateId } from "document-model";
+import { generateId } from "document-model/core";
 import ProgressBar from "../components/progressBar.js";
-import { DocumentDispatch } from "@powerhousedao/reactor-browser";
+import { type DocumentDispatch } from "@powerhousedao/reactor-browser";
 
 interface ScopeOfWorkProps {
   dispatch: DocumentDispatch<ScopeOfWorkAction>;

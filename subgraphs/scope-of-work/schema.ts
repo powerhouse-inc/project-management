@@ -3,166 +3,7 @@ import type { DocumentNode } from "graphql";
 
 export const schema: DocumentNode = gql`
   """
-  Subgraph definition for ScopeOfWork (powerhouse/scopeofwork)
-  """
-  type ScopeOfWorkState {
-    title: String!
-    description: String!
-    status: ScopeOfWorkStatus!
-    deliverables: [Deliverable!]!
-    projects: [Project!]!
-    roadmaps: [Roadmap!]!
-    contributors: [Agent!]!
-  }
-
-  enum ScopeOfWorkStatus {
-    DRAFT
-    SUBMITTED
-    IN_PROGRESS
-    REJECTED
-    APPROVED
-    DELIVERED
-    CANCELED
-  }
-
-  type Agent {
-    id: PHID!
-    name: String!
-    icon: URL
-    description: String
-  }
-
-  type Deliverable {
-    id: OID!
-    owner: ID
-    title: String!
-    code: String!
-    description: String!
-    status: DeliverableStatus!
-    workProgress: Progress
-    keyResults: [KeyResult!]!
-    budgetAnchor: BudgetAnchorProject
-  }
-
-  type BudgetAnchorProject {
-    project: OID
-    unit: Unit
-    unitCost: Float!
-    quantity: Float!
-    margin: Float!
-  }
-
-  enum Unit {
-    StoryPoints
-    Hours
-  }
-
-  enum DeliverableStatus {
-    WONT_DO
-    DRAFT
-    TODO
-    BLOCKED
-    IN_PROGRESS
-    DELIVERED
-    CANCELED
-  }
-
-  union Progress = StoryPoint | Percentage | Binary
-
-  type Percentage {
-    value: Float!
-  }
-
-  type Binary {
-    done: Boolean
-  }
-
-  type StoryPoint {
-    total: Int!
-    completed: Int!
-  }
-
-  type KeyResult {
-    id: OID!
-    title: String!
-    link: String!
-  }
-
-  type Project {
-    id: OID!
-    code: String!
-    title: String!
-    projectOwner: ID
-    abstract: String
-    imageUrl: URL
-    scope: DeliverablesSet
-    budgetType: BudgetType
-    currency: PMCurrency
-    budget: Float
-    expenditure: BudgetExpenditure
-  }
-
-  enum PMCurrency {
-    DAI
-    USDS
-    EUR
-    USD
-  }
-
-  enum BudgetType {
-    CONTINGENCY
-    OPEX
-    CAPEX
-    OVERHEAD
-  }
-
-  type BudgetExpenditure {
-    percentage: Float!
-    actuals: Float!
-    cap: Float!
-  }
-
-  type Roadmap {
-    id: OID!
-    slug: String!
-    title: String!
-    description: String!
-    milestones: [Milestone!]!
-  }
-
-  type Milestone {
-    id: OID!
-    sequenceCode: String!
-    title: String!
-    description: String!
-    deliveryTarget: String!
-    scope: DeliverablesSet
-    coordinators: [ID!]!
-    budget: Float
-  }
-
-  type DeliverablesSet {
-    deliverables: [OID!]!
-    status: DeliverableSetStatus!
-    progress: Progress!
-    deliverablesCompleted: DeliverablesCompleted!
-  }
-
-  type DeliverablesCompleted {
-    total: Int!
-    completed: Int!
-  }
-
-  enum DeliverableSetStatus {
-    DRAFT
-    TODO
-    IN_PROGRESS
-    FINISHED
-    CANCELED
-  }
-
-  """
-  Queries: ScopeOfWork
+  Queries: ScopeOfWork Document
   """
   type ScopeOfWorkQueries {
     getDocument(docId: PHID!, driveId: PHID): ScopeOfWork
@@ -438,6 +279,11 @@ export const schema: DocumentNode = gql`
     unitCost: Float
     quantity: Float
     margin: Float
+  }
+
+  enum Unit {
+    StoryPoints
+    Hours
   }
 
   """

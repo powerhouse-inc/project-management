@@ -1,6 +1,6 @@
 import {
   useDocumentOfType,
-  useSelectedDocumentId,
+  useSelectedDocumentOfType,
 } from "@powerhousedao/reactor-browser";
 import type {
   ScopeOfWorkAction,
@@ -15,6 +15,7 @@ export function useScopeOfWorkDocument(documentId: string | null | undefined) {
 }
 
 export function useSelectedScopeOfWorkDocument() {
-  const selectedDocumentId = useSelectedDocumentId();
-  return useScopeOfWorkDocument(selectedDocumentId);
+  return useSelectedDocumentOfType<ScopeOfWorkDocument, ScopeOfWorkAction>(
+    "powerhouse/scopeofwork",
+  );
 }

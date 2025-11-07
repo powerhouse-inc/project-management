@@ -1,27 +1,17 @@
 /**
  * Factory methods for creating ScopeOfWorkDocument instances
  */
-
-import {
-  createBaseState,
-  defaultBaseState,
-  type PHAuthState,
-  type PHDocumentState,
-  type PHBaseState,
-} from "document-model";
+import type { PHAuthState, PHDocumentState, PHBaseState } from "document-model";
+import { createBaseState, defaultBaseState } from "document-model/core";
 import type {
   ScopeOfWorkDocument,
   ScopeOfWorkLocalState,
-  ScopeOfWorkState,
+  ScopeOfWorkGlobalState,
+  ScopeOfWorkPHState,
 } from "./types.js";
 import { createDocument } from "./utils.js";
 
-export type ScopeOfWorkPHState = PHBaseState & {
-  global: ScopeOfWorkState;
-  local: ScopeOfWorkLocalState;
-};
-
-export function defaultGlobalState(): ScopeOfWorkState {
+export function defaultGlobalState(): ScopeOfWorkGlobalState {
   return {
     title: "",
     description: "",
@@ -46,12 +36,12 @@ export function defaultPHState(): ScopeOfWorkPHState {
 }
 
 export function createGlobalState(
-  state?: Partial<ScopeOfWorkState>,
-): ScopeOfWorkState {
+  state?: Partial<ScopeOfWorkGlobalState>,
+): ScopeOfWorkGlobalState {
   return {
     ...defaultGlobalState(),
     ...(state || {}),
-  } as ScopeOfWorkState;
+  } as ScopeOfWorkGlobalState;
 }
 
 export function createLocalState(
@@ -65,7 +55,7 @@ export function createLocalState(
 
 export function createState(
   baseState?: Partial<PHBaseState>,
-  globalState?: Partial<ScopeOfWorkState>,
+  globalState?: Partial<ScopeOfWorkGlobalState>,
   localState?: Partial<ScopeOfWorkLocalState>,
 ): ScopeOfWorkPHState {
   return {
@@ -84,7 +74,7 @@ export function createScopeOfWorkDocument(
   state?: Partial<{
     auth?: Partial<PHAuthState>;
     document?: Partial<PHDocumentState>;
-    global?: Partial<ScopeOfWorkState>;
+    global?: Partial<ScopeOfWorkGlobalState>;
     local?: Partial<ScopeOfWorkLocalState>;
   }>,
 ): ScopeOfWorkDocument {

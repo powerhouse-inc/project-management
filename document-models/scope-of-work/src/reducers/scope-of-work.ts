@@ -4,7 +4,7 @@
  * - delete the file and run the code generator again to have it reset
  */
 
-import { ScopeOfWorkStatusInput } from "document-models/scope-of-work/gen/schema/index.js";
+import type { ScopeOfWorkStatusInput } from "../../gen/schema/index.js";
 import type { ScopeOfWorkScopeOfWorkOperations } from "../../gen/scope-of-work/operations.js";
 
 export const reducer: ScopeOfWorkScopeOfWorkOperations = {

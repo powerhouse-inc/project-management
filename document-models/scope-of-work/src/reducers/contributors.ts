@@ -8,48 +8,58 @@ import type { ScopeOfWorkContributorsOperations } from "../../gen/contributors/o
 
 export const reducer: ScopeOfWorkContributorsOperations = {
   addAgentOperation(state, action, dispatch) {
-    // Check if agent with same ID already exists
-    const existingAgent = state.contributors.find(agent => agent.id === action.input.id);
-    if (existingAgent) {
-      throw new Error(`Agent with ID ${action.input.id} already exists`);
+
+
+    if (action.input.id === undefined || action.input.name === undefined) {
+      throw new Error("Invalid input");
     }
 
-    // Create new agent with correct structure matching GraphQL schema
     const agent = {
       id: action.input.id,
       name: action.input.name,
-      icon: action.input.icon || null,
-      description: action.input.description || null,
+      icon: action.input.icon || "",
+      description: action.input.description || "",
     };
 
     state.contributors.push(agent);
+
+
   },
   removeAgentOperation(state, action, dispatch) {
-    // Find agent by ID
-    const agentIndex = state.contributors.findIndex(agent => agent.id === action.input.id);
-    if (agentIndex === -1) {
-      throw new Error(`Agent with ID ${action.input.id} not found`);
+
+    if (action.input.id === undefined) {
+      throw new Error("Invalid agent id input");
     }
 
-    // Remove agent from contributors array
-    state.contributors.splice(agentIndex, 1);
+    const agent = state.contributors.find((agent) => agent.id === action.input.id);
+    if (!agent) {
+      throw new Error("Agent not found");
+    }
+
+    state.contributors = state.contributors.filter((agent) => agent.id !== action.input.id);
+
+
   },
   editAgentOperation(state, action, dispatch) {
-    // Find agent by ID
-    const agentIndex = state.contributors.findIndex(agent => agent.id === action.input.id);
-    if (agentIndex === -1) {
-      throw new Error(`Agent with ID ${action.input.id} not found`);
+
+    if (action.input.id === undefined) {
+      throw new Error("Invalid agent id input");
     }
 
-    // Update agent with provided fields, preserving existing values for optional fields
-    const existingAgent = state.contributors[agentIndex];
+    const agent = state.contributors.find((agent) => agent.id === action.input.id);
+    if (!agent) {
+      throw new Error("Agent not found");
+    }
+
     const updatedAgent = {
-      ...existingAgent,
-      name: action.input.name ?? existingAgent.name,
-      icon: action.input.icon ?? existingAgent.icon,
-      description: action.input.description ?? existingAgent.description,
+      ...agent,
+      name: action.input.name || agent.name,
+      icon: action.input.icon || agent.icon,
+      description: action.input.description || agent.description,
     };
 
-    state.contributors[agentIndex] = updatedAgent;
+    state.contributors = state.contributors.map((agent) => agent.id === action.input.id ? updatedAgent : agent);
+
   }
+
 };
