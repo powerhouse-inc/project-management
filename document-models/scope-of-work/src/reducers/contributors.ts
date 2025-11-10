@@ -17,8 +17,8 @@ export const reducer: ScopeOfWorkContributorsOperations = {
     const agent = {
       id: action.input.id,
       name: action.input.name,
-      icon: action.input.icon || "",
-      description: action.input.description || "",
+      icon: action.input.icon || null,
+      description: action.input.description || null,
     };
 
     state.contributors.push(agent);
