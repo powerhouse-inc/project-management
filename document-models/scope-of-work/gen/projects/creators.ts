@@ -1,24 +1,33 @@
 import { createAction } from "document-model/core";
 import {
-  z,
-  type AddProjectInput,
-  type UpdateProjectInput,
-  type UpdateProjectOwnerInput,
-  type RemoveProjectInput,
-  type SetProjectMarginInput,
-  type SetProjectTotalBudgetInput,
-  type AddProjectDeliverableInput,
-  type RemoveProjectDeliverableInput,
+  AddProjectInputSchema,
+  UpdateProjectInputSchema,
+  UpdateProjectOwnerInputSchema,
+  RemoveProjectInputSchema,
+  SetProjectMarginInputSchema,
+  SetProjectTotalBudgetInputSchema,
+  AddProjectDeliverableInputSchema,
+  RemoveProjectDeliverableInputSchema,
+} from "../schema/zod.js";
+import type {
+  AddProjectInput,
+  UpdateProjectInput,
+  UpdateProjectOwnerInput,
+  RemoveProjectInput,
+  SetProjectMarginInput,
+  SetProjectTotalBudgetInput,
+  AddProjectDeliverableInput,
+  RemoveProjectDeliverableInput,
 } from "../types.js";
-import {
-  type AddProjectAction,
-  type UpdateProjectAction,
-  type UpdateProjectOwnerAction,
-  type RemoveProjectAction,
-  type SetProjectMarginAction,
-  type SetProjectTotalBudgetAction,
-  type AddProjectDeliverableAction,
-  type RemoveProjectDeliverableAction,
+import type {
+  AddProjectAction,
+  UpdateProjectAction,
+  UpdateProjectOwnerAction,
+  RemoveProjectAction,
+  SetProjectMarginAction,
+  SetProjectTotalBudgetAction,
+  AddProjectDeliverableAction,
+  RemoveProjectDeliverableAction,
 } from "./actions.js";
 
 export const addProject = (input: AddProjectInput) =>
@@ -26,7 +35,7 @@ export const addProject = (input: AddProjectInput) =>
     "ADD_PROJECT",
     { ...input },
     undefined,
-    z.AddProjectInputSchema,
+    AddProjectInputSchema,
     "global",
   );
 
@@ -35,7 +44,7 @@ export const updateProject = (input: UpdateProjectInput) =>
     "UPDATE_PROJECT",
     { ...input },
     undefined,
-    z.UpdateProjectInputSchema,
+    UpdateProjectInputSchema,
     "global",
   );
 
@@ -44,7 +53,7 @@ export const updateProjectOwner = (input: UpdateProjectOwnerInput) =>
     "UPDATE_PROJECT_OWNER",
     { ...input },
     undefined,
-    z.UpdateProjectOwnerInputSchema,
+    UpdateProjectOwnerInputSchema,
     "global",
   );
 
@@ -53,7 +62,7 @@ export const removeProject = (input: RemoveProjectInput) =>
     "REMOVE_PROJECT",
     { ...input },
     undefined,
-    z.RemoveProjectInputSchema,
+    RemoveProjectInputSchema,
     "global",
   );
 
@@ -62,7 +71,7 @@ export const setProjectMargin = (input: SetProjectMarginInput) =>
     "SET_PROJECT_MARGIN",
     { ...input },
     undefined,
-    z.SetProjectMarginInputSchema,
+    SetProjectMarginInputSchema,
     "global",
   );
 
@@ -71,7 +80,7 @@ export const setProjectTotalBudget = (input: SetProjectTotalBudgetInput) =>
     "SET_PROJECT_TOTAL_BUDGET",
     { ...input },
     undefined,
-    z.SetProjectTotalBudgetInputSchema,
+    SetProjectTotalBudgetInputSchema,
     "global",
   );
 
@@ -80,7 +89,7 @@ export const addProjectDeliverable = (input: AddProjectDeliverableInput) =>
     "ADD_PROJECT_DELIVERABLE",
     { ...input },
     undefined,
-    z.AddProjectDeliverableInputSchema,
+    AddProjectDeliverableInputSchema,
     "global",
   );
 
@@ -91,6 +100,6 @@ export const removeProjectDeliverable = (
     "REMOVE_PROJECT_DELIVERABLE",
     { ...input },
     undefined,
-    z.RemoveProjectDeliverableInputSchema,
+    RemoveProjectDeliverableInputSchema,
     "global",
   );

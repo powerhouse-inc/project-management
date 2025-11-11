@@ -7,7 +7,7 @@
 import type { ScopeOfWorkStatusInput } from "../../gen/schema/index.js";
 import type { ScopeOfWorkScopeOfWorkOperations } from "../../gen/scope-of-work/operations.js";
 
-export const reducer: ScopeOfWorkScopeOfWorkOperations = {
+export const scopeOfWorkScopeOfWorkOperations: ScopeOfWorkScopeOfWorkOperations = {
   editScopeOfWorkOperation(state, action, dispatch) {
     state.title = action.input.title ?? state.title;
     state.description = action.input.description ?? state.description;

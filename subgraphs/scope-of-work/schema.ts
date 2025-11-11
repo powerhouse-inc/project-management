@@ -193,10 +193,10 @@ export const schema: DocumentNode = gql`
   input ScopeOfWork_EditScopeOfWorkInput {
     title: String
     description: String
-    status: ScopeOfWorkStatusInput #defaults to DRAFT
+    status: ScopeOfWork_ScopeOfWorkStatusInput #defaults to DRAFT
   }
 
-  enum ScopeOfWorkStatusInput {
+  enum ScopeOfWork_ScopeOfWorkStatusInput {
     DRAFT
     SUBMITTED
     IN_PROGRESS
@@ -215,10 +215,10 @@ export const schema: DocumentNode = gql`
     title: String
     code: String
     description: String
-    status: PMDeliverableStatusInput
+    status: ScopeOfWork_PMDeliverableStatusInput
   }
 
-  enum PMDeliverableStatusInput {
+  enum ScopeOfWork_PMDeliverableStatusInput {
     WONT_DO
     DRAFT
     TODO
@@ -241,17 +241,17 @@ export const schema: DocumentNode = gql`
 
   input ScopeOfWork_SetDeliverableProgressInput {
     id: OID! #deliverable id
-    workProgress: ProgressInput
+    workProgress: ScopeOfWork_ProgressInput
   }
 
-  input ProgressInput {
+  input ScopeOfWork_ProgressInput {
     # Only one of these fields should be provided
     percentage: Float
-    storyPoints: StoryPointInput
+    storyPoints: ScopeOfWork_StoryPointInput
     done: Boolean
   }
 
-  input StoryPointInput {
+  input ScopeOfWork_StoryPointInput {
     total: Int!
     completed: Int!
   }
@@ -275,15 +275,10 @@ export const schema: DocumentNode = gql`
   input ScopeOfWork_SetDeliverableBudgetAnchorProjectInput {
     deliverableId: ID!
     project: OID
-    unit: Unit
+    unit: ScopeOfWork_Unit
     unitCost: Float
     quantity: Float
     margin: Float
-  }
-
-  enum Unit {
-    StoryPoints
-    Hours
   }
 
   """
@@ -353,11 +348,11 @@ export const schema: DocumentNode = gql`
   input ScopeOfWork_EditDeliverablesSetInput {
     milestoneId: ID
     projectId: ID
-    status: DeliverableSetStatusInput
-    deliverablesCompleted: DeliverablesCompletedInput
+    status: ScopeOfWork_DeliverableSetStatusInput
+    deliverablesCompleted: ScopeOfWork_DeliverablesCompletedInput
   }
 
-  enum DeliverableSetStatusInput {
+  enum ScopeOfWork_DeliverableSetStatusInput {
     DRAFT
     TODO
     IN_PROGRESS
@@ -365,7 +360,7 @@ export const schema: DocumentNode = gql`
     CANCELED
   }
 
-  input DeliverablesCompletedInput {
+  input ScopeOfWork_DeliverablesCompletedInput {
     total: Int!
     completed: Int!
   }
@@ -409,19 +404,19 @@ export const schema: DocumentNode = gql`
     projectOwner: ID # Initial project owner
     abstract: String
     imageUrl: URL
-    budgetType: PMBudgetTypeInput
-    currency: PMCurrencyInput
+    budgetType: ScopeOfWork_PMBudgetTypeInput
+    currency: ScopeOfWork_PMCurrencyInput
     budget: Float
   }
 
-  enum PMBudgetTypeInput {
+  enum ScopeOfWork_PMBudgetTypeInput {
     CONTINGENCY
     OPEX
     CAPEX
     OVERHEAD
   }
 
-  enum PMCurrencyInput {
+  enum ScopeOfWork_PMCurrencyInput {
     DAI
     USDS
     EUR
@@ -440,7 +435,7 @@ export const schema: DocumentNode = gql`
   }
   input ScopeOfWork_UpdateProjectOwnerInput {
     id: OID! # The ID of the project
-    projectOwner: ID! # The ID of the new owner (Agent)
+    projectOwner: ID! # The ID of the new owner (ScopeOfWork_Agent)
   }
   input ScopeOfWork_RemoveProjectInput {
     projectId: ID!

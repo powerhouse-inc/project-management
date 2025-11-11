@@ -3,36 +3,28 @@
  * - change it by adding new tests or modifying the existing ones
  */
 
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import { generateMock } from "@powerhousedao/codegen";
-import utils from "../../gen/utils.js";
 import {
-  z,
-  type EditDeliverablesSetInput,
-  type AddDeliverableInSetInput,
-  type RemoveDeliverableInSetInput,
-} from "../../gen/schema/index.js";
-import { reducer } from "../../gen/reducer.js";
-import * as creators from "../../gen/deliverables-set/creators.js";
-import type { ScopeOfWorkDocument } from "../../gen/types.js";
+  reducer,
+  utils,
+  isScopeOfWorkDocument,
+  editDeliverablesSet,
+  EditDeliverablesSetInputSchema,
+  addDeliverableInSet,
+  AddDeliverableInSetInputSchema,
+  removeDeliverableInSet,
+  RemoveDeliverableInSetInputSchema,
+} from "../../index.js";
 
 describe("DeliverablesSet Operations", () => {
-  let document: ScopeOfWorkDocument;
-
-  beforeEach(() => {
-    document = utils.createDocument();
-  });
-
   it("should handle editDeliverablesSet operation", () => {
-    const input: EditDeliverablesSetInput = generateMock(
-      z.EditDeliverablesSetInputSchema(),
-    );
+    const document = utils.createDocument();
+    const input = generateMock(EditDeliverablesSetInputSchema());
 
-    const updatedDocument = reducer(
-      document,
-      creators.editDeliverablesSet(input),
-    );
+    const updatedDocument = reducer(document, editDeliverablesSet(input));
 
+    expect(isScopeOfWorkDocument(updatedDocument)).toBe(true);
     expect(updatedDocument.operations.global).toHaveLength(1);
     expect(updatedDocument.operations.global[0].action.type).toBe(
       "EDIT_DELIVERABLES_SET",
@@ -43,15 +35,12 @@ describe("DeliverablesSet Operations", () => {
     expect(updatedDocument.operations.global[0].index).toEqual(0);
   });
   it("should handle addDeliverableInSet operation", () => {
-    const input: AddDeliverableInSetInput = generateMock(
-      z.AddDeliverableInSetInputSchema(),
-    );
+    const document = utils.createDocument();
+    const input = generateMock(AddDeliverableInSetInputSchema());
 
-    const updatedDocument = reducer(
-      document,
-      creators.addDeliverableInSet(input),
-    );
+    const updatedDocument = reducer(document, addDeliverableInSet(input));
 
+    expect(isScopeOfWorkDocument(updatedDocument)).toBe(true);
     expect(updatedDocument.operations.global).toHaveLength(1);
     expect(updatedDocument.operations.global[0].action.type).toBe(
       "ADD_DELIVERABLE_IN_SET",
@@ -62,15 +51,12 @@ describe("DeliverablesSet Operations", () => {
     expect(updatedDocument.operations.global[0].index).toEqual(0);
   });
   it("should handle removeDeliverableInSet operation", () => {
-    const input: RemoveDeliverableInSetInput = generateMock(
-      z.RemoveDeliverableInSetInputSchema(),
-    );
+    const document = utils.createDocument();
+    const input = generateMock(RemoveDeliverableInSetInputSchema());
 
-    const updatedDocument = reducer(
-      document,
-      creators.removeDeliverableInSet(input),
-    );
+    const updatedDocument = reducer(document, removeDeliverableInSet(input));
 
+    expect(isScopeOfWorkDocument(updatedDocument)).toBe(true);
     expect(updatedDocument.operations.global).toHaveLength(1);
     expect(updatedDocument.operations.global[0].action.type).toBe(
       "REMOVE_DELIVERABLE_IN_SET",

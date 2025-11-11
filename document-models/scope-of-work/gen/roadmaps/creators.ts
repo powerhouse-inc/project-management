@@ -1,14 +1,18 @@
 import { createAction } from "document-model/core";
 import {
-  z,
-  type AddRoadmapInput,
-  type RemoveRoadmapInput,
-  type EditRoadmapInput,
+  AddRoadmapInputSchema,
+  RemoveRoadmapInputSchema,
+  EditRoadmapInputSchema,
+} from "../schema/zod.js";
+import type {
+  AddRoadmapInput,
+  RemoveRoadmapInput,
+  EditRoadmapInput,
 } from "../types.js";
-import {
-  type AddRoadmapAction,
-  type RemoveRoadmapAction,
-  type EditRoadmapAction,
+import type {
+  AddRoadmapAction,
+  RemoveRoadmapAction,
+  EditRoadmapAction,
 } from "./actions.js";
 
 export const addRoadmap = (input: AddRoadmapInput) =>
@@ -16,7 +20,7 @@ export const addRoadmap = (input: AddRoadmapInput) =>
     "ADD_ROADMAP",
     { ...input },
     undefined,
-    z.AddRoadmapInputSchema,
+    AddRoadmapInputSchema,
     "global",
   );
 
@@ -25,7 +29,7 @@ export const removeRoadmap = (input: RemoveRoadmapInput) =>
     "REMOVE_ROADMAP",
     { ...input },
     undefined,
-    z.RemoveRoadmapInputSchema,
+    RemoveRoadmapInputSchema,
     "global",
   );
 
@@ -34,6 +38,6 @@ export const editRoadmap = (input: EditRoadmapInput) =>
     "EDIT_ROADMAP",
     { ...input },
     undefined,
-    z.EditRoadmapInputSchema,
+    EditRoadmapInputSchema,
     "global",
   );

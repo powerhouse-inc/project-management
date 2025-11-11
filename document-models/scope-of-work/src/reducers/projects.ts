@@ -1,13 +1,8 @@
-/**
- * This is a scaffold file meant for customization:
- * - modify it by implementing the reducer functions
- * - delete the file and run the code generator again to have it reset
- */
-
 import type { ScopeOfWorkProjectsOperations } from "../../gen/projects/operations.js";
-import type { Deliverable, DeliverablesSet, ScopeOfWorkState } from "../../gen/types.js";
+import type { ScopeOfWorkState, Deliverable, DeliverablesSet } from "../../gen/schema/types.js";
 
-export const reducer: ScopeOfWorkProjectsOperations = {
+
+export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
   addProjectOperation(state, action, dispatch) {
     const project = {
       id: action.input.id,

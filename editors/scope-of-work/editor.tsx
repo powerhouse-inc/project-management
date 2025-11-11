@@ -1,12 +1,13 @@
-import { DocumentToolbar } from "@powerhousedao/design-system";
+import { DocumentToolbar } from "@powerhousedao/design-system/connect";
 import {
   setSelectedNode,
   useParentFolderForSelectedNode,
 } from "@powerhousedao/reactor-browser";
-import { useSelectedScopeOfWorkDocument } from "../hooks/useScopeOfWorkDocument.js";
+import { useSelectedScopeOfWorkDocument } from "../../document-models/scope-of-work/hooks.js";
 import SidebarMenu from "./sidebar/sidebar.js";
 
-export function Editor() {
+/** Implement your editor behavior here */
+export default function Editor() {
   const [document] = useSelectedScopeOfWorkDocument();
 
   // Get the parent folder node for the currently selected node
@@ -16,6 +17,8 @@ export function Editor() {
   function handleClose() {
     setSelectedNode(parentFolder?.id);
   }
+
+  if (!document) return null;
 
   return (
     <div>

@@ -1,44 +1,47 @@
 import type { BaseSubgraph } from "@powerhousedao/reactor-api";
 import { addFile } from "document-drive";
+import { setName } from "document-model";
 import {
   actions,
-  type EditScopeOfWorkInput,
-  type AddDeliverableInput,
-  type RemoveDeliverableInput,
-  type EditDeliverableInput,
-  type SetDeliverableProgressInput,
-  type AddKeyResultInput,
-  type RemoveKeyResultInput,
-  type EditKeyResultInput,
-  type SetDeliverableBudgetAnchorProjectInput,
-  type AddRoadmapInput,
-  type RemoveRoadmapInput,
-  type EditRoadmapInput,
-  type AddMilestoneInput,
-  type RemoveMilestoneInput,
-  type EditMilestoneInput,
-  type AddCoordinatorInput,
-  type RemoveCoordinatorInput,
-  type AddMilestoneDeliverableInput,
-  type RemoveMilestoneDeliverableInput,
-  type EditDeliverablesSetInput,
-  type AddDeliverableInSetInput,
-  type RemoveDeliverableInSetInput,
-  type AddAgentInput,
-  type RemoveAgentInput,
-  type EditAgentInput,
-  type AddProjectInput,
-  type UpdateProjectInput,
-  type UpdateProjectOwnerInput,
-  type RemoveProjectInput,
-  type SetProjectMarginInput,
-  type SetProjectTotalBudgetInput,
-  type AddProjectDeliverableInput,
-  type RemoveProjectDeliverableInput,
-  type ScopeOfWorkDocument,
-  type Progress,
+  scopeOfWorkDocumentType,
 } from "../../document-models/scope-of-work/index.js";
-import { setName } from "document-model";
+
+import type {
+  ScopeOfWorkDocument,
+  EditScopeOfWorkInput,
+  AddDeliverableInput,
+  RemoveDeliverableInput,
+  EditDeliverableInput,
+  SetDeliverableProgressInput,
+  AddKeyResultInput,
+  RemoveKeyResultInput,
+  EditKeyResultInput,
+  SetDeliverableBudgetAnchorProjectInput,
+  AddRoadmapInput,
+  RemoveRoadmapInput,
+  EditRoadmapInput,
+  AddMilestoneInput,
+  RemoveMilestoneInput,
+  EditMilestoneInput,
+  AddCoordinatorInput,
+  RemoveCoordinatorInput,
+  AddMilestoneDeliverableInput,
+  RemoveMilestoneDeliverableInput,
+  EditDeliverablesSetInput,
+  AddDeliverableInSetInput,
+  RemoveDeliverableInSetInput,
+  AddAgentInput,
+  RemoveAgentInput,
+  EditAgentInput,
+  AddProjectInput,
+  UpdateProjectInput,
+  UpdateProjectOwnerInput,
+  RemoveProjectInput,
+  SetProjectMarginInput,
+  SetProjectTotalBudgetInput,
+  AddProjectDeliverableInput,
+  RemoveProjectDeliverableInput,
+} from "../../document-models/scope-of-work/index.js";
 
 export const getResolvers = (
   subgraph: BaseSubgraph,
@@ -46,20 +49,6 @@ export const getResolvers = (
   const reactor = subgraph.reactor;
 
   return {
-    ScopeOfWork_Progress: {
-      __resolveType(obj: Progress) {
-        if ("done" in obj) {
-          return "ScopeOfWork_Binary";
-        }
-        if ("value" in obj) {
-          return "ScopeOfWork_Percentage";
-        }
-        if ("completed" in obj) {
-          return "ScopeOfWork_StoryPoint";
-        }
-        return null;
-      },
-    },
     Query: {
       ScopeOfWork: async () => {
         return {
@@ -112,7 +101,7 @@ export const getResolvers = (
             );
 
             return docs.filter(
-              (doc) => doc.header.documentType === "powerhouse/scopeofwork",
+              (doc) => doc.header.documentType === scopeOfWorkDocumentType,
             );
           },
         };
@@ -124,7 +113,7 @@ export const getResolvers = (
         args: { name: string; driveId?: string },
       ) => {
         const { driveId, name } = args;
-        const document = await reactor.addDocument("powerhouse/scopeofwork");
+        const document = await reactor.addDocument(scopeOfWorkDocumentType);
 
         if (driveId) {
           await reactor.addAction(
@@ -132,7 +121,7 @@ export const getResolvers = (
             addFile({
               name,
               id: document.header.id,
-              documentType: "powerhouse/scopeofwork",
+              documentType: scopeOfWorkDocumentType,
             }),
           );
         }

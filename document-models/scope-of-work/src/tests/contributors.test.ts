@@ -3,31 +3,28 @@
  * - change it by adding new tests or modifying the existing ones
  */
 
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import { generateMock } from "@powerhousedao/codegen";
-import utils from "../../gen/utils.js";
 import {
-  z,
-  type AddAgentInput,
-  type RemoveAgentInput,
-  type EditAgentInput,
-} from "../../gen/schema/index.js";
-import { reducer } from "../../gen/reducer.js";
-import * as creators from "../../gen/contributors/creators.js";
-import type { ScopeOfWorkDocument } from "../../gen/types.js";
+  reducer,
+  utils,
+  isScopeOfWorkDocument,
+  addAgent,
+  AddAgentInputSchema,
+  removeAgent,
+  RemoveAgentInputSchema,
+  editAgent,
+  EditAgentInputSchema,
+} from "../../index.js";
 
 describe("Contributors Operations", () => {
-  let document: ScopeOfWorkDocument;
-
-  beforeEach(() => {
-    document = utils.createDocument();
-  });
-
   it("should handle addAgent operation", () => {
-    const input: AddAgentInput = generateMock(z.AddAgentInputSchema());
+    const document = utils.createDocument();
+    const input = generateMock(AddAgentInputSchema());
 
-    const updatedDocument = reducer(document, creators.addAgent(input));
+    const updatedDocument = reducer(document, addAgent(input));
 
+    expect(isScopeOfWorkDocument(updatedDocument)).toBe(true);
     expect(updatedDocument.operations.global).toHaveLength(1);
     expect(updatedDocument.operations.global[0].action.type).toBe("ADD_AGENT");
     expect(updatedDocument.operations.global[0].action.input).toStrictEqual(
@@ -36,10 +33,12 @@ describe("Contributors Operations", () => {
     expect(updatedDocument.operations.global[0].index).toEqual(0);
   });
   it("should handle removeAgent operation", () => {
-    const input: RemoveAgentInput = generateMock(z.RemoveAgentInputSchema());
+    const document = utils.createDocument();
+    const input = generateMock(RemoveAgentInputSchema());
 
-    const updatedDocument = reducer(document, creators.removeAgent(input));
+    const updatedDocument = reducer(document, removeAgent(input));
 
+    expect(isScopeOfWorkDocument(updatedDocument)).toBe(true);
     expect(updatedDocument.operations.global).toHaveLength(1);
     expect(updatedDocument.operations.global[0].action.type).toBe(
       "REMOVE_AGENT",
@@ -50,10 +49,12 @@ describe("Contributors Operations", () => {
     expect(updatedDocument.operations.global[0].index).toEqual(0);
   });
   it("should handle editAgent operation", () => {
-    const input: EditAgentInput = generateMock(z.EditAgentInputSchema());
+    const document = utils.createDocument();
+    const input = generateMock(EditAgentInputSchema());
 
-    const updatedDocument = reducer(document, creators.editAgent(input));
+    const updatedDocument = reducer(document, editAgent(input));
 
+    expect(isScopeOfWorkDocument(updatedDocument)).toBe(true);
     expect(updatedDocument.operations.global).toHaveLength(1);
     expect(updatedDocument.operations.global[0].action.type).toBe("EDIT_AGENT");
     expect(updatedDocument.operations.global[0].action.input).toStrictEqual(

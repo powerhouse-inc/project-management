@@ -3,35 +3,36 @@
  * - change it by adding new tests or modifying the existing ones
  */
 
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import { generateMock } from "@powerhousedao/codegen";
-import utils from "../../gen/utils.js";
 import {
-  z,
-  type AddMilestoneInput,
-  type RemoveMilestoneInput,
-  type EditMilestoneInput,
-  type AddCoordinatorInput,
-  type RemoveCoordinatorInput,
-  type AddMilestoneDeliverableInput,
-  type RemoveMilestoneDeliverableInput,
-} from "../../gen/schema/index.js";
-import { reducer } from "../../gen/reducer.js";
-import * as creators from "../../gen/milestones/creators.js";
-import type { ScopeOfWorkDocument } from "../../gen/types.js";
+  reducer,
+  utils,
+  isScopeOfWorkDocument,
+  addMilestone,
+  AddMilestoneInputSchema,
+  removeMilestone,
+  RemoveMilestoneInputSchema,
+  editMilestone,
+  EditMilestoneInputSchema,
+  addCoordinator,
+  AddCoordinatorInputSchema,
+  removeCoordinator,
+  RemoveCoordinatorInputSchema,
+  addMilestoneDeliverable,
+  AddMilestoneDeliverableInputSchema,
+  removeMilestoneDeliverable,
+  RemoveMilestoneDeliverableInputSchema,
+} from "../../index.js";
 
 describe("Milestones Operations", () => {
-  let document: ScopeOfWorkDocument;
-
-  beforeEach(() => {
-    document = utils.createDocument();
-  });
-
   it("should handle addMilestone operation", () => {
-    const input: AddMilestoneInput = generateMock(z.AddMilestoneInputSchema());
+    const document = utils.createDocument();
+    const input = generateMock(AddMilestoneInputSchema());
 
-    const updatedDocument = reducer(document, creators.addMilestone(input));
+    const updatedDocument = reducer(document, addMilestone(input));
 
+    expect(isScopeOfWorkDocument(updatedDocument)).toBe(true);
     expect(updatedDocument.operations.global).toHaveLength(1);
     expect(updatedDocument.operations.global[0].action.type).toBe(
       "ADD_MILESTONE",
@@ -42,12 +43,12 @@ describe("Milestones Operations", () => {
     expect(updatedDocument.operations.global[0].index).toEqual(0);
   });
   it("should handle removeMilestone operation", () => {
-    const input: RemoveMilestoneInput = generateMock(
-      z.RemoveMilestoneInputSchema(),
-    );
+    const document = utils.createDocument();
+    const input = generateMock(RemoveMilestoneInputSchema());
 
-    const updatedDocument = reducer(document, creators.removeMilestone(input));
+    const updatedDocument = reducer(document, removeMilestone(input));
 
+    expect(isScopeOfWorkDocument(updatedDocument)).toBe(true);
     expect(updatedDocument.operations.global).toHaveLength(1);
     expect(updatedDocument.operations.global[0].action.type).toBe(
       "REMOVE_MILESTONE",
@@ -58,12 +59,12 @@ describe("Milestones Operations", () => {
     expect(updatedDocument.operations.global[0].index).toEqual(0);
   });
   it("should handle editMilestone operation", () => {
-    const input: EditMilestoneInput = generateMock(
-      z.EditMilestoneInputSchema(),
-    );
+    const document = utils.createDocument();
+    const input = generateMock(EditMilestoneInputSchema());
 
-    const updatedDocument = reducer(document, creators.editMilestone(input));
+    const updatedDocument = reducer(document, editMilestone(input));
 
+    expect(isScopeOfWorkDocument(updatedDocument)).toBe(true);
     expect(updatedDocument.operations.global).toHaveLength(1);
     expect(updatedDocument.operations.global[0].action.type).toBe(
       "EDIT_MILESTONE",
@@ -74,12 +75,12 @@ describe("Milestones Operations", () => {
     expect(updatedDocument.operations.global[0].index).toEqual(0);
   });
   it("should handle addCoordinator operation", () => {
-    const input: AddCoordinatorInput = generateMock(
-      z.AddCoordinatorInputSchema(),
-    );
+    const document = utils.createDocument();
+    const input = generateMock(AddCoordinatorInputSchema());
 
-    const updatedDocument = reducer(document, creators.addCoordinator(input));
+    const updatedDocument = reducer(document, addCoordinator(input));
 
+    expect(isScopeOfWorkDocument(updatedDocument)).toBe(true);
     expect(updatedDocument.operations.global).toHaveLength(1);
     expect(updatedDocument.operations.global[0].action.type).toBe(
       "ADD_COORDINATOR",
@@ -90,15 +91,12 @@ describe("Milestones Operations", () => {
     expect(updatedDocument.operations.global[0].index).toEqual(0);
   });
   it("should handle removeCoordinator operation", () => {
-    const input: RemoveCoordinatorInput = generateMock(
-      z.RemoveCoordinatorInputSchema(),
-    );
+    const document = utils.createDocument();
+    const input = generateMock(RemoveCoordinatorInputSchema());
 
-    const updatedDocument = reducer(
-      document,
-      creators.removeCoordinator(input),
-    );
+    const updatedDocument = reducer(document, removeCoordinator(input));
 
+    expect(isScopeOfWorkDocument(updatedDocument)).toBe(true);
     expect(updatedDocument.operations.global).toHaveLength(1);
     expect(updatedDocument.operations.global[0].action.type).toBe(
       "REMOVE_COORDINATOR",
@@ -109,15 +107,12 @@ describe("Milestones Operations", () => {
     expect(updatedDocument.operations.global[0].index).toEqual(0);
   });
   it("should handle addMilestoneDeliverable operation", () => {
-    const input: AddMilestoneDeliverableInput = generateMock(
-      z.AddMilestoneDeliverableInputSchema(),
-    );
+    const document = utils.createDocument();
+    const input = generateMock(AddMilestoneDeliverableInputSchema());
 
-    const updatedDocument = reducer(
-      document,
-      creators.addMilestoneDeliverable(input),
-    );
+    const updatedDocument = reducer(document, addMilestoneDeliverable(input));
 
+    expect(isScopeOfWorkDocument(updatedDocument)).toBe(true);
     expect(updatedDocument.operations.global).toHaveLength(1);
     expect(updatedDocument.operations.global[0].action.type).toBe(
       "ADD_MILESTONE_DELIVERABLE",
@@ -128,15 +123,15 @@ describe("Milestones Operations", () => {
     expect(updatedDocument.operations.global[0].index).toEqual(0);
   });
   it("should handle removeMilestoneDeliverable operation", () => {
-    const input: RemoveMilestoneDeliverableInput = generateMock(
-      z.RemoveMilestoneDeliverableInputSchema(),
-    );
+    const document = utils.createDocument();
+    const input = generateMock(RemoveMilestoneDeliverableInputSchema());
 
     const updatedDocument = reducer(
       document,
-      creators.removeMilestoneDeliverable(input),
+      removeMilestoneDeliverable(input),
     );
 
+    expect(isScopeOfWorkDocument(updatedDocument)).toBe(true);
     expect(updatedDocument.operations.global).toHaveLength(1);
     expect(updatedDocument.operations.global[0].action.type).toBe(
       "REMOVE_MILESTONE_DELIVERABLE",

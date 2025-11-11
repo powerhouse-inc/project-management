@@ -1,15 +1,12 @@
-/**
- * This is a scaffold file meant for customization:
- * - modify it by implementing the reducer functions
- * - delete the file and run the code generator again to have it reset
- */
-
-import type { ScopeOfWorkMilestonesOperations } from "../../gen/milestones/operations.js";
 import type { Deliverable } from "../../gen/types.js";
 import { applyInvariants } from "./projects.js";
+import type { ScopeOfWorkMilestonesOperations } from "../../gen/milestones/operations.js";
+import type { ScopeOfWorkState } from "../../gen/schema/types.js";
+import type { EditMilestoneAction } from "../../gen/milestones/actions.js";
+import { type SignalDispatch } from "document-model";
 
-export const reducer: ScopeOfWorkMilestonesOperations = {
-  editMilestoneOperation(state, action, dispatch) {
+export const scopeOfWorkMilestonesOperations: ScopeOfWorkMilestonesOperations = {
+  editMilestoneOperation(state: ScopeOfWorkState, action: EditMilestoneAction, dispatch?: SignalDispatch) {
     const foundRoadmap = state.roadmaps.find((roadmap) => String(roadmap.id) === String(action.input.roadmapId));
     if (!foundRoadmap) {
       throw new Error("Roadmap not found");
