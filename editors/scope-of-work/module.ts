@@ -6,7 +6,7 @@ export const ScopeOfWork: EditorModule = {
   Component: lazy(() => import("./editor.js")),
   documentTypes: ["powerhouse/scopeofwork"],
   config: {
-    id: "scope-of-work",
-    name: "scope-of-work",
+    id: "scope-of-work-editor",
+    name: "Scope Of Work Editor",
   },
 };
