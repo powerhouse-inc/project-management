@@ -13,7 +13,7 @@ export const reducer: ScopeOfWorkDeliverablesOperations = {
 
     const deliverable: Deliverable = {
       id: action.input.id,
-      owner: action.input.owner || "",
+      owner: action.input.owner || null,
       title: action.input.title || "",
       code: action.input.code || "",
       description: action.input.description || "",
