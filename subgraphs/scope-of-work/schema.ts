@@ -429,8 +429,8 @@ export const schema: DocumentNode = gql`
     title: String
     abstract: String
     imageUrl: URL
-    budgetType: PMBudgetTypeInput
-    currency: PMCurrencyInput
+    budgetType: ScopeOfWork_PMBudgetTypeInput
+    currency: ScopeOfWork_PMCurrencyInput
     budget: Float
   }
   input ScopeOfWork_UpdateProjectOwnerInput {
