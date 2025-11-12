@@ -236,7 +236,7 @@ export const schema: DocumentNode = gql`
     title: String
     code: String
     description: String
-    status: PMDeliverableStatusInput
+    status: ScopeOfWork_PMDeliverableStatusInput
   }
 
   input ScopeOfWork_SetDeliverableProgressInput {
