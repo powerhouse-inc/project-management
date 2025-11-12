@@ -331,7 +331,7 @@ export const getResolvers = (
         if (result.status !== "SUCCESS") {
           throw new Error(
             result.error?.message ??
-            "Failed to setDeliverableBudgetAnchorProject",
+              "Failed to setDeliverableBudgetAnchorProject",
           );
         }
 

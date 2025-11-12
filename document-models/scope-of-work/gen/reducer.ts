@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 import type { StateReducer } from "document-model";
 import { isDocumentAction, createReducer } from "document-model/core";
-import type { ScopeOfWorkPHState } from "../gen/types.js";
+import type { ScopeOfWorkPHState } from "./types.js";
 
 import { scopeOfWorkScopeOfWorkOperations } from "../src/reducers/scope-of-work.js";
 import { scopeOfWorkDeliverablesOperations } from "../src/reducers/deliverables.js";
