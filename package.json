@@ -1,7 +1,7 @@
 {
   "name": "@powerhousedao/project-management",
   "description": "The Scope of Work model defines a structured plan for executing contributor work; it includes deliverables and roadmaps with milestones with each being linked to ownership, progress tracking.",
-  "version": "0.0.52",
+  "version": "0.0.53",
   "license": "AGPL-3.0-only",
   "type": "module",
   "files": [
@@ -12,32 +12,26 @@
   },
   "exports": {
     ".": {
-      "development": "./index.ts",
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
     "./document-models": {
-      "development": "./document-models/index.ts",
       "types": "./dist/document-models/index.d.ts",
       "default": "./dist/document-models/index.js"
     },
     "./editors": {
-      "development": "./editors/index.ts",
       "types": "./dist/editors/index.d.ts",
       "default": "./dist/editors/index.js"
     },
     "./subgraphs": {
-      "development": "./subgraphs/index.ts",
       "types": "./dist/subgraphs/index.d.ts",
       "default": "./dist/subgraphs/index.js"
     },
     "./processors": {
-      "development": "./processors/index.ts",
       "types": "./dist/processors/index.d.ts",
       "default": "./dist/processors/index.js"
     },
     "./manifest": {
-      "development": "./powerhouse.manifest.json",
       "default": "./dist/powerhouse.manifest.json"
     },
     "./style.css": "./dist/style.css"
