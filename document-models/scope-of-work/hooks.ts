@@ -8,7 +8,7 @@ import {
 import type {
   ScopeOfWorkDocument,
   ScopeOfWorkAction,
-} from "./gen/types.js";
+} from "@powerhousedao/project-management/document-models/scope-of-work";
 import { isScopeOfWorkDocument } from "./gen/document-schema.js";
 
 /** Hook to get a ScopeOfWork document by its id */

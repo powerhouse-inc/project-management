@@ -1,9 +1,9 @@
 import { applyInvariants } from "./projects.js";
 import type { Deliverable, KeyResult } from "../../gen/schema/types.js";
-import type { ScopeOfWorkDeliverablesOperations } from "../../gen/deliverables/operations.js";
+import type { ScopeOfWorkDeliverablesOperations } from "@powerhousedao/project-management/document-models/scope-of-work";
 
 export const scopeOfWorkDeliverablesOperations: ScopeOfWorkDeliverablesOperations = {
-  addDeliverableOperation(state, action, dispatch) {
+  addDeliverableOperation(state, action) {
 
     const deliverable: Deliverable = {
       id: action.input.id,
@@ -26,7 +26,7 @@ export const scopeOfWorkDeliverablesOperations: ScopeOfWorkDeliverablesOperation
     state.deliverables.push(deliverable);
 
   },
-  removeDeliverableOperation(state, action, dispatch) {
+  removeDeliverableOperation(state, action) {
 
     if (action.input.id === undefined) {
       throw new Error("Invalid deliverable id input");
@@ -54,7 +54,7 @@ export const scopeOfWorkDeliverablesOperations: ScopeOfWorkDeliverablesOperation
     applyInvariants(state, ["budget", "margin", "progress"]);
 
   },
-  editDeliverableOperation(state, action, dispatch) {
+  editDeliverableOperation(state, action) {
 
     const deliverable = state.deliverables.find((deliverable) => String(deliverable.id) === String(action.input.id));
     if (!deliverable) {
@@ -74,7 +74,7 @@ export const scopeOfWorkDeliverablesOperations: ScopeOfWorkDeliverablesOperation
     applyInvariants(state, ["progress"]);
 
   },
-  setDeliverableProgressOperation(state, action, dispatch) {
+  setDeliverableProgressOperation(state, action) {
     const deliverable = state.deliverables.find((deliverable) => String(deliverable.id) === String(action.input.id));
     if (!deliverable) {
       throw new Error("Deliverable not found");
@@ -103,7 +103,7 @@ export const scopeOfWorkDeliverablesOperations: ScopeOfWorkDeliverablesOperation
 
 
   },
-  addKeyResultOperation(state, action, dispatch) {
+  addKeyResultOperation(state, action) {
 
     const updatedDeliverable = state.deliverables.find((deliverable) => String(deliverable.id) === String(action.input.deliverableId));
     if (!updatedDeliverable) {
@@ -121,7 +121,7 @@ export const scopeOfWorkDeliverablesOperations: ScopeOfWorkDeliverablesOperation
 
 
   },
-  removeKeyResultOperation(state, action, dispatch) {
+  removeKeyResultOperation(state, action) {
 
     const updatedDeliverable = state.deliverables.find((deliverable) => String(deliverable.id) === String(action.input.deliverableId));
     if (!updatedDeliverable) {
@@ -133,7 +133,7 @@ export const scopeOfWorkDeliverablesOperations: ScopeOfWorkDeliverablesOperation
 
 
   },
-  editKeyResultOperation(state, action, dispatch) {
+  editKeyResultOperation(state, action) {
     if (action.input.id === undefined || action.input.deliverableId === undefined) {
       throw new Error("Invalid key result id or deliverable id input");
     }
@@ -155,7 +155,7 @@ export const scopeOfWorkDeliverablesOperations: ScopeOfWorkDeliverablesOperation
     state.deliverables = state.deliverables.map((deliverable) => String(deliverable.id) === String(action.input.deliverableId) ? updatedDeliverable : deliverable);
 
   },
-  setDeliverableBudgetAnchorProjectOperation(state, action, dispatch) {
+  setDeliverableBudgetAnchorProjectOperation(state, action) {
     const foundDeliverable = state.deliverables.find((deliverable) => String(deliverable.id) === String(action.input.deliverableId));
     if (!foundDeliverable) {
       throw new Error("Deliverable not found");

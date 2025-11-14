@@ -132,7 +132,7 @@ const BudgetCalculator = ({
           }
           return false;
         },
-        renderCell: (value: any, context: any) => {
+        renderCell: (value: any) => {
           return (
             <div className="text-center">
               {project?.currency} {Intl.NumberFormat("en-US").format(value)}
@@ -145,7 +145,7 @@ const BudgetCalculator = ({
         title: "Subtotal",
         editable: false,
         align: "center" as ColumnAlignment,
-        renderCell: (value: any, context: any) => {
+        renderCell: (value: any) => {
           return (
             <div className="text-center">
               {project?.currency} {Intl.NumberFormat("en-US").format(value)}

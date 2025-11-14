@@ -1,9 +1,8 @@
-import type { ScopeOfWorkProjectsOperations } from "../../gen/projects/operations.js";
 import type { ScopeOfWorkState, Deliverable, DeliverablesSet } from "../../gen/schema/types.js";
-
+import type { ScopeOfWorkProjectsOperations } from "@powerhousedao/project-management/document-models/scope-of-work";
 
 export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
-  addProjectOperation(state, action, dispatch) {
+  addProjectOperation(state, action) {
     const project = {
       id: action.input.id,
       code: action.input.code,
@@ -34,7 +33,7 @@ export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
     state.projects.push(project);
 
   },
-  updateProjectOperation(state, action, dispatch) {
+  updateProjectOperation(state, action) {
     const project = state.projects.find((p) => p.id === action.input.id);
     if (!project) {
       throw new Error("Project not found");
@@ -42,7 +41,7 @@ export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
     Object.assign(project, action.input);
 
   },
-  updateProjectOwnerOperation(state, action, dispatch) {
+  updateProjectOwnerOperation(state, action) {
     const project = state.projects.find((p) => p.id === action.input.id);
     if (!project) {
       throw new Error("Project not found");
@@ -50,7 +49,7 @@ export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
     project.projectOwner = action.input.projectOwner || "";
 
   },
-  removeProjectOperation(state, action, dispatch) {
+  removeProjectOperation(state, action) {
 
     // remove deliverables linked to project from project scope
     const project = state.projects.find((p) => p.id === action.input.projectId);
@@ -64,7 +63,7 @@ export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
     applyInvariants(state, ["budget", "margin"]);
 
   },
-  setProjectMarginOperation(state, action, dispatch) {
+  setProjectMarginOperation(state, action) {
     const project = state.projects.find((p) => p.id === action.input.projectId);
     if (!project) {
       throw new Error("Project not found");
@@ -96,7 +95,7 @@ export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
 
 
   },
-  setProjectTotalBudgetOperation(state, action, dispatch) {
+  setProjectTotalBudgetOperation(state, action) {
     const project = state.projects.find((p) => p.id === action.input.projectId);
     if (!project) {
       throw new Error("Project not found");
@@ -105,7 +104,7 @@ export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
     applyInvariants(state, ["margin"]);
 
   },
-  addProjectDeliverableOperation(state, action, dispatch) {
+  addProjectDeliverableOperation(state, action) {
 
     // add deliverable to deliverables 
     const newDeliverable: Deliverable = {
@@ -140,7 +139,7 @@ export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
     project.scope.deliverables.push(newDeliverable.id);
 
   },
-  removeProjectDeliverableOperation(state, action, dispatch) {
+  removeProjectDeliverableOperation(state, action) {
     const project = state.projects.find((p) => p.id === action.input.projectId);
     if (!project) {
       throw new Error("Project not found");

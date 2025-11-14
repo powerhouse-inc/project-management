@@ -77,7 +77,7 @@ const Roadmap: React.FC<RoadmapsProps> = ({
           }
           return false;
         },
-        renderCell: (value, context) => {
+        renderCell: (value) => {
           if (value === "") {
             return (
               <div className="font-light italic text-left text-gray-500">
@@ -176,7 +176,7 @@ const Roadmap: React.FC<RoadmapsProps> = ({
           }
           return false;
         },
-        renderCell: (value, context) => {
+        renderCell: (value) => {
           if (!value) return null
           return (
             <div className="text-center">

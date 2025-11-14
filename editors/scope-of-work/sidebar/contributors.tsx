@@ -43,8 +43,6 @@ const Contributors: React.FC<ContributorsProps> = ({
       .filter((doc) => doc.header.documentType === "powerhouse/builder-profile")
       .map((doc) => {
         const name = (doc.state as any).global?.name || doc.header.id;
-        const description = (doc.state as any).global?.description || "";
-        const icon = (doc.state as any).global?.icon || null;
 
         return {
           id: doc.header.id,
@@ -171,7 +169,7 @@ const Contributors: React.FC<ContributorsProps> = ({
             }}
           />
         ),
-        renderCell: (value, context) => {
+        renderCell: (value) => {
           if (value === "" || !value) {
             return (
               <div className="font-light italic text-gray-500 text-center">
@@ -201,7 +199,7 @@ const Contributors: React.FC<ContributorsProps> = ({
           }
           return false;
         },
-        renderCell: (value, context) => {
+        renderCell: (value) => {
           return <div className="text-center">{value}</div>;
         },
       },

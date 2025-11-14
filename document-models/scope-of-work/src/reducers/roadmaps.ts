@@ -1,8 +1,7 @@
-import type { ScopeOfWorkRoadmapsOperations } from "../../gen/roadmaps/operations.js";
-
+import type { ScopeOfWorkRoadmapsOperations } from "@powerhousedao/project-management/document-models/scope-of-work";
 
 export const scopeOfWorkRoadmapsOperations: ScopeOfWorkRoadmapsOperations = {
-  editRoadmapOperation(state, action, dispatch) {
+  editRoadmapOperation(state, action) {
     const roadmap = state.roadmaps.find((roadmap) => String(roadmap.id) === String(action.input.id));
     if (!roadmap) {
       throw new Error("Roadmap not found");
@@ -18,7 +17,7 @@ export const scopeOfWorkRoadmapsOperations: ScopeOfWorkRoadmapsOperations = {
     state.roadmaps = state.roadmaps.map((roadmap) => String(roadmap.id) === String(action.input.id) ? updatedRoadmap : roadmap);
 
   },
-  addRoadmapOperation(state, action, dispatch) {
+  addRoadmapOperation(state, action) {
     if (action.input.id === undefined || action.input.title === undefined) {
       throw new Error("Invalid input");
     }
@@ -34,7 +33,7 @@ export const scopeOfWorkRoadmapsOperations: ScopeOfWorkRoadmapsOperations = {
     state.roadmaps.push(roadmap);
 
   },
-  removeRoadmapOperation(state, action, dispatch) {
+  removeRoadmapOperation(state, action) {
     if (action.input.id === undefined) {
       throw new Error("Invalid roadmap id input");
     }

@@ -109,7 +109,7 @@ const Project: React.FC<ProjectProps> = ({
           }
           return false;
         },
-        renderCell: (value, context) => {
+        renderCell: (value) => {
           if (value === "") {
             return (
               <div className="font-light italic text-left text-gray-500">
@@ -165,7 +165,7 @@ const Project: React.FC<ProjectProps> = ({
         editable: false,
         align: "center" as ColumnAlignment,
         width: 100,
-        renderCell: (value, context) => {
+        renderCell: (value) => {
           return (
             <span className={`flex items-center justify-center ${statusStyles[value as keyof typeof statusStyles]}`}>{value}</span>
           );

@@ -60,7 +60,7 @@ const Roadmaps: React.FC<ProjectsProps> = ({
           }
           return false;
         },
-        renderCell: (value, context) => {
+        renderCell: (value) => {
           if (value === "") {
             return (
               <div className="font-light italic text-left text-gray-500">
