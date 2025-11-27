@@ -1,6 +1,8 @@
 {
   "documentModelsDir": "./document-models",
   "editorsDir": "./editors",
+  "processorsDir": "./processors",
+  "subgraphsDir": "./subgraphs",
   "studio": {
     "port": 3000
   },

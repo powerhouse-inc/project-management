@@ -1,19 +1,19 @@
 import { useMemo } from "react";
 import {
-  Agent,
-  Project,
-  ScopeOfWorkAction,
+  type Agent,
+  type Project,
+  type ScopeOfWorkAction,
 } from "../../../document-models/scope-of-work/gen/types.js";
 import {
   ObjectSetTable,
-  ColumnDef,
-  ColumnAlignment,
+  type ColumnDef,
+  type ColumnAlignment,
 } from "@powerhousedao/document-engineering";
 import { Icon } from "@powerhousedao/design-system";
 import { actions } from "../../../document-models/scope-of-work/index.js";
-import { generateId } from "document-model";
+import { generateId } from "document-model/core";
 import ProgressBar from "../components/progressBar.js";
-import { DocumentDispatch } from "@powerhousedao/reactor-browser";
+import { type DocumentDispatch } from "@powerhousedao/reactor-browser";
 
 interface ProjectsProps {
   projects: Project[] | undefined;
@@ -67,7 +67,7 @@ const Projects: React.FC<ProjectsProps> = ({
           }
           return false;
         },
-        renderCell: (value, context) => {
+        renderCell: (value) => {
           if (value === "") {
             return (
               <div className="font-light italic text-left text-gray-500">

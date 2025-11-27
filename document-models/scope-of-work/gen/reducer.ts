@@ -1,23 +1,55 @@
 // TODO: remove eslint-disable rules once refactor is done
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
+import type { StateReducer } from "document-model";
+import { isDocumentAction, createReducer } from "document-model/core";
+import type { ScopeOfWorkPHState } from "@powerhousedao/project-management/document-models/scope-of-work";
+
+import { scopeOfWorkScopeOfWorkOperations } from "../src/reducers/scope-of-work.js";
+import { scopeOfWorkDeliverablesOperations } from "../src/reducers/deliverables.js";
+import { scopeOfWorkRoadmapsOperations } from "../src/reducers/roadmaps.js";
+import { scopeOfWorkMilestonesOperations } from "../src/reducers/milestones.js";
+import { scopeOfWorkDeliverablesSetOperations } from "../src/reducers/deliverables-set.js";
+import { scopeOfWorkContributorsOperations } from "../src/reducers/contributors.js";
+import { scopeOfWorkProjectsOperations } from "../src/reducers/projects.js";
+
 import {
-  type StateReducer,
-  isDocumentAction,
-  createReducer,
-} from "document-model";
-import { ScopeOfWorkPHState } from "./ph-factories.js";
-import { z } from "./types.js";
+  EditScopeOfWorkInputSchema,
+  AddDeliverableInputSchema,
+  RemoveDeliverableInputSchema,
+  EditDeliverableInputSchema,
+  SetDeliverableProgressInputSchema,
+  AddKeyResultInputSchema,
+  RemoveKeyResultInputSchema,
+  EditKeyResultInputSchema,
+  SetDeliverableBudgetAnchorProjectInputSchema,
+  AddRoadmapInputSchema,
+  RemoveRoadmapInputSchema,
+  EditRoadmapInputSchema,
+  AddMilestoneInputSchema,
+  RemoveMilestoneInputSchema,
+  EditMilestoneInputSchema,
+  AddCoordinatorInputSchema,
+  RemoveCoordinatorInputSchema,
+  AddMilestoneDeliverableInputSchema,
+  RemoveMilestoneDeliverableInputSchema,
+  EditDeliverablesSetInputSchema,
+  AddDeliverableInSetInputSchema,
+  RemoveDeliverableInSetInputSchema,
+  AddAgentInputSchema,
+  RemoveAgentInputSchema,
+  EditAgentInputSchema,
+  AddProjectInputSchema,
+  UpdateProjectInputSchema,
+  UpdateProjectOwnerInputSchema,
+  RemoveProjectInputSchema,
+  SetProjectMarginInputSchema,
+  SetProjectTotalBudgetInputSchema,
+  AddProjectDeliverableInputSchema,
+  RemoveProjectDeliverableInputSchema,
+} from "./schema/zod.js";
 
-import { reducer as ScopeOfWorkReducer } from "../src/reducers/scope-of-work.js";
-import { reducer as DeliverablesReducer } from "../src/reducers/deliverables.js";
-import { reducer as RoadmapsReducer } from "../src/reducers/roadmaps.js";
-import { reducer as MilestonesReducer } from "../src/reducers/milestones.js";
-import { reducer as DeliverablesSetReducer } from "../src/reducers/deliverables-set.js";
-import { reducer as ContributorsReducer } from "../src/reducers/contributors.js";
-import { reducer as ProjectsReducer } from "../src/reducers/projects.js";
-
-export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
+const stateReducer: StateReducer<ScopeOfWorkPHState> = (
   state,
   action,
   dispatch,
@@ -28,8 +60,8 @@ export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
 
   switch (action.type) {
     case "EDIT_SCOPE_OF_WORK":
-      z.EditScopeOfWorkInputSchema().parse(action.input);
-      ScopeOfWorkReducer.editScopeOfWorkOperation(
+      EditScopeOfWorkInputSchema().parse(action.input);
+      scopeOfWorkScopeOfWorkOperations.editScopeOfWorkOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,
@@ -37,8 +69,8 @@ export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
       break;
 
     case "ADD_DELIVERABLE":
-      z.AddDeliverableInputSchema().parse(action.input);
-      DeliverablesReducer.addDeliverableOperation(
+      AddDeliverableInputSchema().parse(action.input);
+      scopeOfWorkDeliverablesOperations.addDeliverableOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,
@@ -46,8 +78,8 @@ export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
       break;
 
     case "REMOVE_DELIVERABLE":
-      z.RemoveDeliverableInputSchema().parse(action.input);
-      DeliverablesReducer.removeDeliverableOperation(
+      RemoveDeliverableInputSchema().parse(action.input);
+      scopeOfWorkDeliverablesOperations.removeDeliverableOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,
@@ -55,8 +87,8 @@ export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
       break;
 
     case "EDIT_DELIVERABLE":
-      z.EditDeliverableInputSchema().parse(action.input);
-      DeliverablesReducer.editDeliverableOperation(
+      EditDeliverableInputSchema().parse(action.input);
+      scopeOfWorkDeliverablesOperations.editDeliverableOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,
@@ -64,8 +96,8 @@ export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
       break;
 
     case "SET_DELIVERABLE_PROGRESS":
-      z.SetDeliverableProgressInputSchema().parse(action.input);
-      DeliverablesReducer.setDeliverableProgressOperation(
+      SetDeliverableProgressInputSchema().parse(action.input);
+      scopeOfWorkDeliverablesOperations.setDeliverableProgressOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,
@@ -73,8 +105,8 @@ export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
       break;
 
     case "ADD_KEY_RESULT":
-      z.AddKeyResultInputSchema().parse(action.input);
-      DeliverablesReducer.addKeyResultOperation(
+      AddKeyResultInputSchema().parse(action.input);
+      scopeOfWorkDeliverablesOperations.addKeyResultOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,
@@ -82,8 +114,8 @@ export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
       break;
 
     case "REMOVE_KEY_RESULT":
-      z.RemoveKeyResultInputSchema().parse(action.input);
-      DeliverablesReducer.removeKeyResultOperation(
+      RemoveKeyResultInputSchema().parse(action.input);
+      scopeOfWorkDeliverablesOperations.removeKeyResultOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,
@@ -91,8 +123,8 @@ export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
       break;
 
     case "EDIT_KEY_RESULT":
-      z.EditKeyResultInputSchema().parse(action.input);
-      DeliverablesReducer.editKeyResultOperation(
+      EditKeyResultInputSchema().parse(action.input);
+      scopeOfWorkDeliverablesOperations.editKeyResultOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,
@@ -100,8 +132,8 @@ export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
       break;
 
     case "SET_DELIVERABLE_BUDGET_ANCHOR_PROJECT":
-      z.SetDeliverableBudgetAnchorProjectInputSchema().parse(action.input);
-      DeliverablesReducer.setDeliverableBudgetAnchorProjectOperation(
+      SetDeliverableBudgetAnchorProjectInputSchema().parse(action.input);
+      scopeOfWorkDeliverablesOperations.setDeliverableBudgetAnchorProjectOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,
@@ -109,8 +141,8 @@ export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
       break;
 
     case "ADD_ROADMAP":
-      z.AddRoadmapInputSchema().parse(action.input);
-      RoadmapsReducer.addRoadmapOperation(
+      AddRoadmapInputSchema().parse(action.input);
+      scopeOfWorkRoadmapsOperations.addRoadmapOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,
@@ -118,8 +150,8 @@ export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
       break;
 
     case "REMOVE_ROADMAP":
-      z.RemoveRoadmapInputSchema().parse(action.input);
-      RoadmapsReducer.removeRoadmapOperation(
+      RemoveRoadmapInputSchema().parse(action.input);
+      scopeOfWorkRoadmapsOperations.removeRoadmapOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,
@@ -127,8 +159,8 @@ export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
       break;
 
     case "EDIT_ROADMAP":
-      z.EditRoadmapInputSchema().parse(action.input);
-      RoadmapsReducer.editRoadmapOperation(
+      EditRoadmapInputSchema().parse(action.input);
+      scopeOfWorkRoadmapsOperations.editRoadmapOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,
@@ -136,8 +168,8 @@ export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
       break;
 
     case "ADD_MILESTONE":
-      z.AddMilestoneInputSchema().parse(action.input);
-      MilestonesReducer.addMilestoneOperation(
+      AddMilestoneInputSchema().parse(action.input);
+      scopeOfWorkMilestonesOperations.addMilestoneOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,
@@ -145,8 +177,8 @@ export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
       break;
 
     case "REMOVE_MILESTONE":
-      z.RemoveMilestoneInputSchema().parse(action.input);
-      MilestonesReducer.removeMilestoneOperation(
+      RemoveMilestoneInputSchema().parse(action.input);
+      scopeOfWorkMilestonesOperations.removeMilestoneOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,
@@ -154,8 +186,8 @@ export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
       break;
 
     case "EDIT_MILESTONE":
-      z.EditMilestoneInputSchema().parse(action.input);
-      MilestonesReducer.editMilestoneOperation(
+      EditMilestoneInputSchema().parse(action.input);
+      scopeOfWorkMilestonesOperations.editMilestoneOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,
@@ -163,8 +195,8 @@ export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
       break;
 
     case "ADD_COORDINATOR":
-      z.AddCoordinatorInputSchema().parse(action.input);
-      MilestonesReducer.addCoordinatorOperation(
+      AddCoordinatorInputSchema().parse(action.input);
+      scopeOfWorkMilestonesOperations.addCoordinatorOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,
@@ -172,8 +204,8 @@ export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
       break;
 
     case "REMOVE_COORDINATOR":
-      z.RemoveCoordinatorInputSchema().parse(action.input);
-      MilestonesReducer.removeCoordinatorOperation(
+      RemoveCoordinatorInputSchema().parse(action.input);
+      scopeOfWorkMilestonesOperations.removeCoordinatorOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,
@@ -181,8 +213,8 @@ export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
       break;
 
     case "ADD_MILESTONE_DELIVERABLE":
-      z.AddMilestoneDeliverableInputSchema().parse(action.input);
-      MilestonesReducer.addMilestoneDeliverableOperation(
+      AddMilestoneDeliverableInputSchema().parse(action.input);
+      scopeOfWorkMilestonesOperations.addMilestoneDeliverableOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,
@@ -190,8 +222,8 @@ export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
       break;
 
     case "REMOVE_MILESTONE_DELIVERABLE":
-      z.RemoveMilestoneDeliverableInputSchema().parse(action.input);
-      MilestonesReducer.removeMilestoneDeliverableOperation(
+      RemoveMilestoneDeliverableInputSchema().parse(action.input);
+      scopeOfWorkMilestonesOperations.removeMilestoneDeliverableOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,
@@ -199,8 +231,8 @@ export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
       break;
 
     case "EDIT_DELIVERABLES_SET":
-      z.EditDeliverablesSetInputSchema().parse(action.input);
-      DeliverablesSetReducer.editDeliverablesSetOperation(
+      EditDeliverablesSetInputSchema().parse(action.input);
+      scopeOfWorkDeliverablesSetOperations.editDeliverablesSetOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,
@@ -208,8 +240,8 @@ export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
       break;
 
     case "ADD_DELIVERABLE_IN_SET":
-      z.AddDeliverableInSetInputSchema().parse(action.input);
-      DeliverablesSetReducer.addDeliverableInSetOperation(
+      AddDeliverableInSetInputSchema().parse(action.input);
+      scopeOfWorkDeliverablesSetOperations.addDeliverableInSetOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,
@@ -217,8 +249,8 @@ export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
       break;
 
     case "REMOVE_DELIVERABLE_IN_SET":
-      z.RemoveDeliverableInSetInputSchema().parse(action.input);
-      DeliverablesSetReducer.removeDeliverableInSetOperation(
+      RemoveDeliverableInSetInputSchema().parse(action.input);
+      scopeOfWorkDeliverablesSetOperations.removeDeliverableInSetOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,
@@ -226,8 +258,8 @@ export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
       break;
 
     case "ADD_AGENT":
-      z.AddAgentInputSchema().parse(action.input);
-      ContributorsReducer.addAgentOperation(
+      AddAgentInputSchema().parse(action.input);
+      scopeOfWorkContributorsOperations.addAgentOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,
@@ -235,8 +267,8 @@ export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
       break;
 
     case "REMOVE_AGENT":
-      z.RemoveAgentInputSchema().parse(action.input);
-      ContributorsReducer.removeAgentOperation(
+      RemoveAgentInputSchema().parse(action.input);
+      scopeOfWorkContributorsOperations.removeAgentOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,
@@ -244,8 +276,8 @@ export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
       break;
 
     case "EDIT_AGENT":
-      z.EditAgentInputSchema().parse(action.input);
-      ContributorsReducer.editAgentOperation(
+      EditAgentInputSchema().parse(action.input);
+      scopeOfWorkContributorsOperations.editAgentOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,
@@ -253,8 +285,8 @@ export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
       break;
 
     case "ADD_PROJECT":
-      z.AddProjectInputSchema().parse(action.input);
-      ProjectsReducer.addProjectOperation(
+      AddProjectInputSchema().parse(action.input);
+      scopeOfWorkProjectsOperations.addProjectOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,
@@ -262,8 +294,8 @@ export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
       break;
 
     case "UPDATE_PROJECT":
-      z.UpdateProjectInputSchema().parse(action.input);
-      ProjectsReducer.updateProjectOperation(
+      UpdateProjectInputSchema().parse(action.input);
+      scopeOfWorkProjectsOperations.updateProjectOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,
@@ -271,8 +303,8 @@ export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
       break;
 
     case "UPDATE_PROJECT_OWNER":
-      z.UpdateProjectOwnerInputSchema().parse(action.input);
-      ProjectsReducer.updateProjectOwnerOperation(
+      UpdateProjectOwnerInputSchema().parse(action.input);
+      scopeOfWorkProjectsOperations.updateProjectOwnerOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,
@@ -280,8 +312,8 @@ export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
       break;
 
     case "REMOVE_PROJECT":
-      z.RemoveProjectInputSchema().parse(action.input);
-      ProjectsReducer.removeProjectOperation(
+      RemoveProjectInputSchema().parse(action.input);
+      scopeOfWorkProjectsOperations.removeProjectOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,
@@ -289,8 +321,8 @@ export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
       break;
 
     case "SET_PROJECT_MARGIN":
-      z.SetProjectMarginInputSchema().parse(action.input);
-      ProjectsReducer.setProjectMarginOperation(
+      SetProjectMarginInputSchema().parse(action.input);
+      scopeOfWorkProjectsOperations.setProjectMarginOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,
@@ -298,8 +330,8 @@ export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
       break;
 
     case "SET_PROJECT_TOTAL_BUDGET":
-      z.SetProjectTotalBudgetInputSchema().parse(action.input);
-      ProjectsReducer.setProjectTotalBudgetOperation(
+      SetProjectTotalBudgetInputSchema().parse(action.input);
+      scopeOfWorkProjectsOperations.setProjectTotalBudgetOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,
@@ -307,8 +339,8 @@ export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
       break;
 
     case "ADD_PROJECT_DELIVERABLE":
-      z.AddProjectDeliverableInputSchema().parse(action.input);
-      ProjectsReducer.addProjectDeliverableOperation(
+      AddProjectDeliverableInputSchema().parse(action.input);
+      scopeOfWorkProjectsOperations.addProjectDeliverableOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,
@@ -316,8 +348,8 @@ export const stateReducer: StateReducer<ScopeOfWorkPHState> = (
       break;
 
     case "REMOVE_PROJECT_DELIVERABLE":
-      z.RemoveProjectDeliverableInputSchema().parse(action.input);
-      ProjectsReducer.removeProjectDeliverableOperation(
+      RemoveProjectDeliverableInputSchema().parse(action.input);
+      scopeOfWorkProjectsOperations.removeProjectDeliverableOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,

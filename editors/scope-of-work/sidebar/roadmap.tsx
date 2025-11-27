@@ -1,19 +1,19 @@
-import { actions, ScopeOfWorkAction } from "../../../document-models/scope-of-work/index.js";
-import type { Roadmap, Milestone } from "../../../document-models/scope-of-work/gen/types.js";
+import { actions, type ScopeOfWorkAction } from "../../../document-models/scope-of-work/index.js";
+import type { Roadmap as RoadmapType, Milestone as MilestoneType } from "../../../document-models/scope-of-work/gen/types.js";
 import { Textarea, TextInput } from "@powerhousedao/document-engineering";
 import React, { useState, useEffect, useMemo } from "react";
 import { Icon } from "@powerhousedao/design-system";
-import { generateId } from "document-model";
+import { generateId } from "document-model/core";
 import {
   ObjectSetTable,
-  ColumnAlignment,
-  ColumnDef,
+  type ColumnAlignment,
+  type ColumnDef,
 } from "@powerhousedao/document-engineering";
-import { DocumentDispatch } from "@powerhousedao/reactor-browser";
+import { type DocumentDispatch } from "@powerhousedao/reactor-browser";
 
 
 interface RoadmapsProps {
-  roadmaps: Roadmap[];
+  roadmaps: RoadmapType[];
   dispatch: DocumentDispatch<ScopeOfWorkAction>;
   setActiveNodeId: (id: string) => void;
 }
@@ -37,7 +37,7 @@ const Roadmap: React.FC<RoadmapsProps> = ({
     setSlug(roadmap?.slug || "");
   }, [roadmap?.id]);
 
-  const columns = useMemo<Array<ColumnDef<Milestone>>>(
+  const columns = useMemo<Array<ColumnDef<MilestoneType>>>(
     () => [
       {
         field: "link",
@@ -77,7 +77,7 @@ const Roadmap: React.FC<RoadmapsProps> = ({
           }
           return false;
         },
-        renderCell: (value, context) => {
+        renderCell: (value) => {
           if (value === "") {
             return (
               <div className="font-light italic text-left text-gray-500">
@@ -176,7 +176,7 @@ const Roadmap: React.FC<RoadmapsProps> = ({
           }
           return false;
         },
-        renderCell: (value, context) => {
+        renderCell: (value) => {
           if (!value) return null
           return (
             <div className="text-center">

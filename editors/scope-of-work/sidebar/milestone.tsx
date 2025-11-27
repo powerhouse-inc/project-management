@@ -1,31 +1,31 @@
 import {
   DatePicker,
   ObjectSetTable,
-  ColumnDef,
+  type ColumnDef,
   Textarea,
   TextInput,
-  ColumnAlignment,
+  type ColumnAlignment,
   Select,
 } from "@powerhousedao/document-engineering";
 import {
-  type Milestone,
-  Roadmap,
-  Deliverable,
-  DeliverableSetStatusInput,
-  Agent,
-  ScopeOfWorkAction,
+  type Milestone as MilestoneType,
+  type Roadmap,
+  type Deliverable,
+  type DeliverableSetStatusInput,
+  type Agent,
+  type ScopeOfWorkAction,
 } from "../../../document-models/scope-of-work/index.js";
 import { actions } from "../../../document-models/scope-of-work/index.js";
 import { useEffect, useMemo, useState } from "react";
-import { generateId } from "document-model";
+import { generateId } from "document-model/core";
 import { Icon } from "@powerhousedao/design-system";
 import ProgressBar from "../components/progressBar.js";
 import { statusStyles } from "./deliverable.js";
-import { DocumentDispatch } from "@powerhousedao/reactor-browser";
+import { type DocumentDispatch } from "@powerhousedao/reactor-browser";
 
 interface MilestonesProps {
   roadmaps: Roadmap[];
-  milestones: Milestone[];
+  milestones: MilestoneType[];
   dispatch: DocumentDispatch<ScopeOfWorkAction>;
   deliverables: Deliverable[];
   setActiveNodeId: (id: string) => void;
@@ -92,7 +92,7 @@ const Milestone: React.FC<MilestonesProps> = ({
           }
           return false;
         },
-        renderCell: (value, context) => {
+        renderCell: (value) => {
           if (value === "") {
             return (
               <div className="font-light italic text-left text-gray-500">
@@ -147,7 +147,7 @@ const Milestone: React.FC<MilestonesProps> = ({
         editable: false,
         align: "center" as ColumnAlignment,
         width: 100,
-        renderCell: (value, context) => {
+        renderCell: (value) => {
           return (
             <span
               className={`flex items-center justify-center ${statusStyles[value as keyof typeof statusStyles]}`}
@@ -274,7 +274,7 @@ const Milestone: React.FC<MilestonesProps> = ({
         <div className="col-span-3 flex justify-end">
           <DatePicker
             key={stateMilestone.id}
-            className="w-full"
+            className="w-full bg-white"
             name="deliveryTarget"
             label="Delivery Target"
             value={stateMilestone.deliveryTarget}

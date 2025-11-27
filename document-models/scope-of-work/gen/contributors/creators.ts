@@ -1,14 +1,18 @@
-import { createAction } from "document-model";
+import { createAction } from "document-model/core";
 import {
-  z,
-  type AddAgentInput,
-  type RemoveAgentInput,
-  type EditAgentInput,
+  AddAgentInputSchema,
+  RemoveAgentInputSchema,
+  EditAgentInputSchema,
+} from "../schema/zod.js";
+import type {
+  AddAgentInput,
+  RemoveAgentInput,
+  EditAgentInput,
 } from "../types.js";
-import {
-  type AddAgentAction,
-  type RemoveAgentAction,
-  type EditAgentAction,
+import type {
+  AddAgentAction,
+  RemoveAgentAction,
+  EditAgentAction,
 } from "./actions.js";
 
 export const addAgent = (input: AddAgentInput) =>
@@ -16,7 +20,7 @@ export const addAgent = (input: AddAgentInput) =>
     "ADD_AGENT",
     { ...input },
     undefined,
-    z.AddAgentInputSchema,
+    AddAgentInputSchema,
     "global",
   );
 
@@ -25,7 +29,7 @@ export const removeAgent = (input: RemoveAgentInput) =>
     "REMOVE_AGENT",
     { ...input },
     undefined,
-    z.RemoveAgentInputSchema,
+    RemoveAgentInputSchema,
     "global",
   );
 
@@ -34,6 +38,6 @@ export const editAgent = (input: EditAgentInput) =>
     "EDIT_AGENT",
     { ...input },
     undefined,
-    z.EditAgentInputSchema,
+    EditAgentInputSchema,
     "global",
   );

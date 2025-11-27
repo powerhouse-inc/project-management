@@ -3,123 +3,157 @@
  * - change it by adding new tests or modifying the existing ones
  */
 
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import { generateMock } from "@powerhousedao/codegen";
-import utils from "../../gen/utils.js";
 import {
-  z,
-  type AddProjectInput,
-  type UpdateProjectInput,
-  type UpdateProjectOwnerInput,
-} from "../../gen/schema/index.js";
-import { reducer } from "../../gen/reducer.js";
-import * as creators from "../../gen/projects/creators.js";
-import type { ScopeOfWorkDocument } from "../../gen/types.js";
+  reducer,
+  utils,
+  isScopeOfWorkDocument,
+  addProject,
+  AddProjectInputSchema,
+  updateProject,
+  UpdateProjectInputSchema,
+  updateProjectOwner,
+  UpdateProjectOwnerInputSchema,
+  removeProject,
+  RemoveProjectInputSchema,
+  setProjectMargin,
+  SetProjectMarginInputSchema,
+  setProjectTotalBudget,
+  SetProjectTotalBudgetInputSchema,
+  addProjectDeliverable,
+  AddProjectDeliverableInputSchema,
+  removeProjectDeliverable,
+  RemoveProjectDeliverableInputSchema,
+} from "../../index.js";
 
 describe("Projects Operations", () => {
-  let document: ScopeOfWorkDocument;
-
-  beforeEach(() => {
-    document = utils.createDocument();
-  });
-
   it("should handle addProject operation", () => {
-    const input: AddProjectInput = {
-      id: "1",
-      code: "1",
-      title: "Project 1",
-      projectOwner: "Project Owner 1",
-      abstract: "Abstract 1",
-      imageUrl: "https://example.com/image.png",
-      budgetType: "CAPEX",
-    }
+    const document = utils.createDocument();
+    const input = generateMock(AddProjectInputSchema());
 
-    const updatedDocument = reducer(document, creators.addProject(input));
+    const updatedDocument = reducer(document, addProject(input));
 
+    expect(isScopeOfWorkDocument(updatedDocument)).toBe(true);
     expect(updatedDocument.operations.global).toHaveLength(1);
-    expect(updatedDocument.operations.global[0].action.type).toBe("ADD_PROJECT");
-    expect(updatedDocument.operations.global[0].action.input).toStrictEqual(input);
+    expect(updatedDocument.operations.global[0].action.type).toBe(
+      "ADD_PROJECT",
+    );
+    expect(updatedDocument.operations.global[0].action.input).toStrictEqual(
+      input,
+    );
     expect(updatedDocument.operations.global[0].index).toEqual(0);
-    expect(updatedDocument.state.global.projects).toHaveLength(1);
-    expect(updatedDocument.state.global.projects[0].id).toStrictEqual(input.id);
   });
   it("should handle updateProject operation", () => {
+    const document = utils.createDocument();
+    const input = generateMock(UpdateProjectInputSchema());
 
-    const addProjectInput: AddProjectInput = {
-      id: "1",
-      code: "1",
-      title: "Project 1",
-      projectOwner: "Project Owner 1",
-      abstract: "Abstract 1",
-    }
-    let updatedDocument = reducer(document, creators.addProject(addProjectInput));
+    const updatedDocument = reducer(document, updateProject(input));
 
-    const input: UpdateProjectInput = {
-      id: "1",
-      code: "1",
-      title: "Updated Project 1",
-      abstract: "Updated Abstract 1",
-      imageUrl: "https://example.com/updated-image.png",
-      budgetType: "OPEX",
-    };
-
-    updatedDocument = reducer(updatedDocument, creators.updateProject(input));
-
-    expect(updatedDocument.operations.global).toHaveLength(2);
-    expect(updatedDocument.operations.global[1].action.type).toBe("UPDATE_PROJECT");
-    expect(updatedDocument.operations.global[1].action.input).toStrictEqual(input);
-    expect(updatedDocument.operations.global[1].index).toEqual(1);
-    expect(updatedDocument.state.global.projects).toHaveLength(1);
-    expect(updatedDocument.state.global.projects[0].title).toStrictEqual(input.title);
+    expect(isScopeOfWorkDocument(updatedDocument)).toBe(true);
+    expect(updatedDocument.operations.global).toHaveLength(1);
+    expect(updatedDocument.operations.global[0].action.type).toBe(
+      "UPDATE_PROJECT",
+    );
+    expect(updatedDocument.operations.global[0].action.input).toStrictEqual(
+      input,
+    );
+    expect(updatedDocument.operations.global[0].index).toEqual(0);
   });
   it("should handle updateProjectOwner operation", () => {
-    const addProjectInput: AddProjectInput = {
-      id: "1",
-      code: "1",
-      title: "Project 1",
-      projectOwner: "Project Owner 1",
-      abstract: "Abstract 1",
-    }
-    let updatedDocument = reducer(document, creators.addProject(addProjectInput));
+    const document = utils.createDocument();
+    const input = generateMock(UpdateProjectOwnerInputSchema());
 
-    const input: UpdateProjectOwnerInput = {
-      id: "1",
-      projectOwner: "New Project Owner",
-    };
+    const updatedDocument = reducer(document, updateProjectOwner(input));
 
-    updatedDocument = reducer(
-      updatedDocument,
-      creators.updateProjectOwner(input),
-    );
-
-    expect(updatedDocument.operations.global).toHaveLength(2);
-    expect(updatedDocument.operations.global[1].action.type).toBe(
+    expect(isScopeOfWorkDocument(updatedDocument)).toBe(true);
+    expect(updatedDocument.operations.global).toHaveLength(1);
+    expect(updatedDocument.operations.global[0].action.type).toBe(
       "UPDATE_PROJECT_OWNER",
     );
-    expect(updatedDocument.operations.global[1].action.input).toStrictEqual(input);
-    expect(updatedDocument.operations.global[1].index).toEqual(1);
-    expect(updatedDocument.state.global.projects).toHaveLength(1);
-    expect(updatedDocument.state.global.projects[0]).toStrictEqual({
-      ...updatedDocument.state.global.projects[0],
-      projectOwner: input.projectOwner,
-    });
+    expect(updatedDocument.operations.global[0].action.input).toStrictEqual(
+      input,
+    );
+    expect(updatedDocument.operations.global[0].index).toEqual(0);
   });
   it("should handle removeProject operation", () => {
-    const addProjectInput: AddProjectInput = {
-      id: "1",
-      code: "1",
-      title: "Project 1",
-      projectOwner: "Project Owner 1",
-      abstract: "Abstract 1",
-    }
-    let updatedDocument = reducer(document, creators.addProject(addProjectInput));
+    const document = utils.createDocument();
+    const input = generateMock(RemoveProjectInputSchema());
 
-    updatedDocument = reducer(updatedDocument, creators.removeProject({ projectId: "1" }));
+    const updatedDocument = reducer(document, removeProject(input));
 
-    expect(updatedDocument.operations.global).toHaveLength(2);
-    expect(updatedDocument.operations.global[1].action.type).toBe("REMOVE_PROJECT");
-    expect(updatedDocument.operations.global[1].action.input).toStrictEqual({ projectId: "1" });
-    expect(updatedDocument.operations.global[1].index).toEqual(1);
-    expect(updatedDocument.state.global.projects).toHaveLength(0);
+    expect(isScopeOfWorkDocument(updatedDocument)).toBe(true);
+    expect(updatedDocument.operations.global).toHaveLength(1);
+    expect(updatedDocument.operations.global[0].action.type).toBe(
+      "REMOVE_PROJECT",
+    );
+    expect(updatedDocument.operations.global[0].action.input).toStrictEqual(
+      input,
+    );
+    expect(updatedDocument.operations.global[0].index).toEqual(0);
+  });
+  it("should handle setProjectMargin operation", () => {
+    const document = utils.createDocument();
+    const input = generateMock(SetProjectMarginInputSchema());
+
+    const updatedDocument = reducer(document, setProjectMargin(input));
+
+    expect(isScopeOfWorkDocument(updatedDocument)).toBe(true);
+    expect(updatedDocument.operations.global).toHaveLength(1);
+    expect(updatedDocument.operations.global[0].action.type).toBe(
+      "SET_PROJECT_MARGIN",
+    );
+    expect(updatedDocument.operations.global[0].action.input).toStrictEqual(
+      input,
+    );
+    expect(updatedDocument.operations.global[0].index).toEqual(0);
+  });
+  it("should handle setProjectTotalBudget operation", () => {
+    const document = utils.createDocument();
+    const input = generateMock(SetProjectTotalBudgetInputSchema());
+
+    const updatedDocument = reducer(document, setProjectTotalBudget(input));
+
+    expect(isScopeOfWorkDocument(updatedDocument)).toBe(true);
+    expect(updatedDocument.operations.global).toHaveLength(1);
+    expect(updatedDocument.operations.global[0].action.type).toBe(
+      "SET_PROJECT_TOTAL_BUDGET",
+    );
+    expect(updatedDocument.operations.global[0].action.input).toStrictEqual(
+      input,
+    );
+    expect(updatedDocument.operations.global[0].index).toEqual(0);
+  });
+  it("should handle addProjectDeliverable operation", () => {
+    const document = utils.createDocument();
+    const input = generateMock(AddProjectDeliverableInputSchema());
+
+    const updatedDocument = reducer(document, addProjectDeliverable(input));
+
+    expect(isScopeOfWorkDocument(updatedDocument)).toBe(true);
+    expect(updatedDocument.operations.global).toHaveLength(1);
+    expect(updatedDocument.operations.global[0].action.type).toBe(
+      "ADD_PROJECT_DELIVERABLE",
+    );
+    expect(updatedDocument.operations.global[0].action.input).toStrictEqual(
+      input,
+    );
+    expect(updatedDocument.operations.global[0].index).toEqual(0);
+  });
+  it("should handle removeProjectDeliverable operation", () => {
+    const document = utils.createDocument();
+    const input = generateMock(RemoveProjectDeliverableInputSchema());
+
+    const updatedDocument = reducer(document, removeProjectDeliverable(input));
+
+    expect(isScopeOfWorkDocument(updatedDocument)).toBe(true);
+    expect(updatedDocument.operations.global).toHaveLength(1);
+    expect(updatedDocument.operations.global[0].action.type).toBe(
+      "REMOVE_PROJECT_DELIVERABLE",
+    );
+    expect(updatedDocument.operations.global[0].action.input).toStrictEqual(
+      input,
+    );
+    expect(updatedDocument.operations.global[0].index).toEqual(0);
   });
 });

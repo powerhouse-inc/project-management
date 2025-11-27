@@ -1,14 +1,10 @@
-/**
- * This is a scaffold file meant for customization:
- * - modify it by implementing the reducer functions
- * - delete the file and run the code generator again to have it reset
- */
-
-import type { ScopeOfWorkDeliverablesSetOperations } from "../../gen/deliverables-set/operations.js";
 import { applyInvariants } from "./projects.js";
+import type { ScopeOfWorkState } from "../../gen/schema/types.js";
+import type { EditDeliverablesSetAction } from "../../gen/deliverables-set/actions.js";
+import type { ScopeOfWorkDeliverablesSetOperations } from "@powerhousedao/project-management/document-models/scope-of-work";
 
-export const reducer: ScopeOfWorkDeliverablesSetOperations = {
-  editDeliverablesSetOperation(state, action, dispatch) {
+export const scopeOfWorkDeliverablesSetOperations: ScopeOfWorkDeliverablesSetOperations = {
+  editDeliverablesSetOperation(state: ScopeOfWorkState, action: EditDeliverablesSetAction) {
     if (action.input.milestoneId && !action.input.projectId) {
       const foundRoadmap = state.roadmaps.find((roadmap) => {
         return roadmap.milestones.some((milestone) => String(milestone.id) === String(action.input.milestoneId));
@@ -58,7 +54,7 @@ export const reducer: ScopeOfWorkDeliverablesSetOperations = {
 
 
   },
-  addDeliverableInSetOperation(state, action, dispatch) {
+  addDeliverableInSetOperation(state, action) {
     // check if action.input either milestoneId or projectId is provided
     if (!action.input.milestoneId && !action.input.projectId) {
       throw new Error("Either milestoneId or projectId must be provided");
@@ -142,7 +138,7 @@ export const reducer: ScopeOfWorkDeliverablesSetOperations = {
     }
 
   },
-  removeDeliverableInSetOperation(state, action, dispatch) {
+  removeDeliverableInSetOperation(state, action) {
     if (action.input.milestoneId) {
       const foundRoadmap = state.roadmaps.find((roadmap) => {
         return roadmap.milestones.some((milestone) => String(milestone.id) === String(action.input.milestoneId));

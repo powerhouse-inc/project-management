@@ -1,32 +1,33 @@
 import { useMemo, useState, useEffect } from "react";
 import {
-  Deliverable,
-  Milestone,
-  Project,
-  PmDeliverableStatusInput,
-  ScopeOfWorkAction,
-  ScopeOfWorkDocument,
+  type Deliverable,
+  type Milestone,
+  type Project,
+  type PmDeliverableStatusInput,
+  type ScopeOfWorkAction,
+  type ScopeOfWorkDocument,
 } from "../../../document-models/scope-of-work/gen/types.js";
 import {
   ObjectSetTable,
-  ColumnDef,
-  ColumnAlignment,
+  type ColumnDef,
+  type ColumnAlignment,
   buildEnumCellEditor,
 } from "@powerhousedao/document-engineering";
 import { Icon } from "@powerhousedao/design-system";
 import { actions } from "../../../document-models/scope-of-work/index.js";
-import { generateId, Operation } from "document-model";
+import { generateId } from "document-model/core";
+import type { Operation } from "document-model";
 import { statusOptions, statusStyles } from "./deliverable.js";
-import { DocumentDispatch } from "@powerhousedao/reactor-browser";
+import { type DocumentDispatch } from "@powerhousedao/reactor-browser";
 import {
-  AddDeliverableAction,
-  AddDeliverableInSetAction,
-  AddMilestoneDeliverableAction,
-  AddProjectDeliverableAction,
-  EditDeliverableAction,
-  RemoveDeliverableAction,
-  RemoveDeliverableInSetAction,
-} from "document-models/scope-of-work/gen/actions.js";
+  type EditDeliverableAction,
+  type AddDeliverableAction,
+  type RemoveDeliverableAction,
+  type AddProjectDeliverableAction,
+  type AddMilestoneDeliverableAction,
+  type AddDeliverableInSetAction,
+  type RemoveDeliverableInSetAction,
+} from "../../../document-models/scope-of-work/gen/actions.js";
 
 interface ProjectsProps {
   deliverables: Deliverable[] | undefined;
@@ -67,30 +68,28 @@ const Deliverables: React.FC<ProjectsProps> = ({
     setStateProjects(projects);
   }, [milestones, projects, deliverables]);
 
-  const latestActivity = document.operations.global.filter(
-    (operation) => {
-      const typedOperation = operation as Operation & {
-        timestampUtcMs: string;
-        action:
-          | EditDeliverableAction
-          | AddDeliverableAction
-          | RemoveDeliverableAction
-          | AddProjectDeliverableAction
-          | AddMilestoneDeliverableAction
-          | AddDeliverableInSetAction
-          | RemoveDeliverableInSetAction;
-      };
-      return (
-        typedOperation.action.type === "EDIT_DELIVERABLE" ||
-        typedOperation.action.type === "ADD_DELIVERABLE" ||
-        typedOperation.action.type === "REMOVE_DELIVERABLE" ||
-        typedOperation.action.type === "ADD_PROJECT_DELIVERABLE" ||
-        typedOperation.action.type === "ADD_MILESTONE_DELIVERABLE" ||
-        typedOperation.action.type === "ADD_DELIVERABLE_IN_SET" ||
-        typedOperation.action.type === "REMOVE_DELIVERABLE_IN_SET"
-      );
-    }
-  ) as (Operation & {
+  const latestActivity = document.operations.global.filter((operation) => {
+    const typedOperation = operation as Operation & {
+      timestampUtcMs: string;
+      action:
+        | EditDeliverableAction
+        | AddDeliverableAction
+        | RemoveDeliverableAction
+        | AddProjectDeliverableAction
+        | AddMilestoneDeliverableAction
+        | AddDeliverableInSetAction
+        | RemoveDeliverableInSetAction;
+    };
+    return (
+      typedOperation.action.type === "EDIT_DELIVERABLE" ||
+      typedOperation.action.type === "ADD_DELIVERABLE" ||
+      typedOperation.action.type === "REMOVE_DELIVERABLE" ||
+      typedOperation.action.type === "ADD_PROJECT_DELIVERABLE" ||
+      typedOperation.action.type === "ADD_MILESTONE_DELIVERABLE" ||
+      typedOperation.action.type === "ADD_DELIVERABLE_IN_SET" ||
+      typedOperation.action.type === "REMOVE_DELIVERABLE_IN_SET"
+    );
+  }) as (Operation & {
     timestampUtcMs: string;
     action:
       | EditDeliverableAction
@@ -103,9 +102,8 @@ const Deliverables: React.FC<ProjectsProps> = ({
   })[];
 
   // Create a map of deliverable IDs to their latest activity
-  const latestActivityMap = new Map<string, LatestActivity>(); 
+  const latestActivityMap = new Map<string, LatestActivity>();
   latestActivity?.forEach((activity) => {
-    
     if ("id" in activity.action.input && activity.action.input.id) {
       latestActivityMap.set(activity.action.input.id, {
         type: activity.action.type,
@@ -245,7 +243,7 @@ const Deliverables: React.FC<ProjectsProps> = ({
           }
           return false;
         },
-        renderCell: (value, context) => {
+        renderCell: (value) => {
           if (value === "") {
             return (
               <div className="font-light italic text-left text-gray-500">

@@ -1,18 +1,18 @@
 import { useMemo } from "react";
 import {
   ObjectSetTable,
-  ColumnDef,
-  ColumnAlignment,
+  type ColumnDef,
+  type ColumnAlignment,
   PHIDInput,
 } from "@powerhousedao/document-engineering";
 import {
-  Agent,
-  ScopeOfWorkAction,
+  type Agent,
+  type ScopeOfWorkAction,
 } from "../../../document-models/scope-of-work/gen/types.js";
 import { actions } from "../../../document-models/scope-of-work/index.js";
 import {
-  DocumentDispatch,
-  useSelectedDriveDocuments,
+  type DocumentDispatch,
+  useDocumentsInSelectedDrive,
 } from "@powerhousedao/reactor-browser";
 
 interface ContributorsProps {
@@ -33,7 +33,7 @@ const Contributors: React.FC<ContributorsProps> = ({
     }));
   }, [contributors]);
 
-  const driveDocuments = useSelectedDriveDocuments();
+  const driveDocuments = useDocumentsInSelectedDrive();
 
   // Helper function to get builder profile documents from the drive
   const getBuilderProfiles = () => {
@@ -43,9 +43,7 @@ const Contributors: React.FC<ContributorsProps> = ({
       .filter((doc) => doc.header.documentType === "powerhouse/builder-profile")
       .map((doc) => {
         const name = (doc.state as any).global?.name || doc.header.id;
-        const description = (doc.state as any).global?.description || "";
-        const icon = (doc.state as any).global?.icon || null;
-        
+
         return {
           id: doc.header.id,
           label: name,
@@ -60,7 +58,9 @@ const Contributors: React.FC<ContributorsProps> = ({
     if (!driveDocuments) return null;
 
     const doc = driveDocuments.find(
-      (doc) => doc.header.documentType === "powerhouse/builder-profile" && doc.header.id === phid
+      (doc) =>
+        doc.header.documentType === "powerhouse/builder-profile" &&
+        doc.header.id === phid
     );
 
     if (!doc) return null;
@@ -107,18 +107,20 @@ const Contributors: React.FC<ContributorsProps> = ({
             onBlur={(e) => {
               const newValue = e.target.value;
               const currentValue = (value as string) || "";
-              
+
               // If a PHID is entered and it's different from current value
               if (newValue && newValue !== currentValue) {
                 const builderProfile = getBuilderProfileByPhid(newValue);
-                const existingAgent = contributors.find(agent => agent.id === newValue);
-                
+                const existingAgent = contributors.find(
+                  (agent) => agent.id === newValue
+                );
+
                 if (!existingAgent) {
                   // If we're editing an existing row (has an ID), remove the old one first
                   if (context.row.id && context.row.id !== newValue) {
                     dispatch(actions.removeAgent({ id: context.row.id }));
                   }
-                  
+
                   if (builderProfile) {
                     // Create new agent with data from builder profile
                     dispatch(
@@ -167,7 +169,7 @@ const Contributors: React.FC<ContributorsProps> = ({
             }}
           />
         ),
-        renderCell: (value, context) => {
+        renderCell: (value) => {
           if (value === "" || !value) {
             return (
               <div className="font-light italic text-gray-500 text-center">
@@ -197,7 +199,7 @@ const Contributors: React.FC<ContributorsProps> = ({
           }
           return false;
         },
-        renderCell: (value, context) => {
+        renderCell: (value) => {
           return <div className="text-center">{value}</div>;
         },
       },

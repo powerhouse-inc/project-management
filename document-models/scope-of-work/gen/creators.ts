@@ -1,7 +1,14 @@
 export * from "./scope-of-work/creators.js";
+export * as scopeOfWorkActions from "./scope-of-work/creators.js";
 export * from "./deliverables/creators.js";
+export * as deliverablesActions from "./deliverables/creators.js";
 export * from "./roadmaps/creators.js";
+export * as roadmapsActions from "./roadmaps/creators.js";
 export * from "./milestones/creators.js";
+export * as milestonesActions from "./milestones/creators.js";
 export * from "./deliverables-set/creators.js";
+export * as deliverablesSetActions from "./deliverables-set/creators.js";
 export * from "./contributors/creators.js";
+export * as contributorsActions from "./contributors/creators.js";
 export * from "./projects/creators.js";
+export * as projectsActions from "./projects/creators.js";

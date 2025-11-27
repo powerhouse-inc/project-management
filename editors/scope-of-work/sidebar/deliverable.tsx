@@ -1,6 +1,6 @@
 import {
   ObjectSetTable,
-  ColumnDef,
+  type ColumnDef,
   Textarea,
   TextInput,
   Select,
@@ -10,20 +10,20 @@ import {
   Form,
 } from "@powerhousedao/document-engineering";
 import {
-  type Deliverable,
-  PmDeliverableStatusInput,
-  Project,
-  Agent,
-  ScopeOfWorkAction,
-  KeyResult,
+  type Deliverable as DeliverableType,
+  type PmDeliverableStatusInput,
+  type Project,
+  type Agent,
+  type ScopeOfWorkAction,
+  type KeyResult,
 } from "../../../document-models/scope-of-work/index.js";
 import { actions } from "../../../document-models/scope-of-work/index.js";
 import { useEffect, useMemo, useState } from "react";
-import { generateId } from "document-model";
+import { generateId } from "document-model/core";
 import BudgetCalculator from "./budgetCalculator.js";
-import { DocumentDispatch } from "@powerhousedao/reactor-browser";
+import { type DocumentDispatch } from "@powerhousedao/reactor-browser";
 interface DeliverablesProps {
-  deliverables: Deliverable[];
+  deliverables: DeliverableType[];
   dispatch: DocumentDispatch<ScopeOfWorkAction>;
   projects: Project[];
   contributors: Agent[];

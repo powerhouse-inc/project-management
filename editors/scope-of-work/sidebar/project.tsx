@@ -1,17 +1,17 @@
 import {
-  Deliverable,
-  type Project,
+  type Deliverable as DeliverableType,
+  type Project as ProjectType,
   type PmBudgetTypeInput,
-  PmCurrencyInput,
-  Agent,
-  ScopeOfWorkAction,
+  type PmCurrencyInput,
+  type Agent,
+  type ScopeOfWorkAction,
 } from "../../../document-models/scope-of-work/gen/types.js";
 import { useMemo, useState, useEffect } from "react";
 import {
   TextInput,
   ObjectSetTable,
-  ColumnDef,
-  ColumnAlignment,
+  type ColumnDef,
+  type ColumnAlignment,
   Textarea,
   AIDField,
   Form,
@@ -19,16 +19,16 @@ import {
 } from "@powerhousedao/document-engineering";
 import { Icon } from "@powerhousedao/design-system";
 import { actions } from "../../../document-models/scope-of-work/index.js";
-import { generateId } from "document-model";
+import { generateId } from "document-model/core";
 import BudgetCalculator from "./budgetCalculator.js";
 import ProgressBar from "../components/progressBar.js";
 import { statusStyles } from "./deliverable.js";
-import { DocumentDispatch } from "@powerhousedao/reactor-browser";
+import { type DocumentDispatch } from "@powerhousedao/reactor-browser";
 
 interface ProjectProps {
-  project: Project | undefined;
+  project: ProjectType | undefined;
   dispatch: DocumentDispatch<ScopeOfWorkAction>;
-  deliverables: Deliverable[];
+  deliverables: DeliverableType[];
   setActiveNodeId: (id: string) => void;
   contributors: Agent[];
 }
@@ -72,7 +72,7 @@ const Project: React.FC<ProjectProps> = ({
     return validExtensions.some((ext) => url.toLowerCase().endsWith(ext));
   };
 
-  const columns = useMemo<Array<ColumnDef<Deliverable>>>(
+  const columns = useMemo<Array<ColumnDef<DeliverableType>>>(
     () => [
       {
         field: "link",
@@ -109,7 +109,7 @@ const Project: React.FC<ProjectProps> = ({
           }
           return false;
         },
-        renderCell: (value, context) => {
+        renderCell: (value) => {
           if (value === "") {
             return (
               <div className="font-light italic text-left text-gray-500">
@@ -165,7 +165,7 @@ const Project: React.FC<ProjectProps> = ({
         editable: false,
         align: "center" as ColumnAlignment,
         width: 100,
-        renderCell: (value, context) => {
+        renderCell: (value) => {
           return (
             <span className={`flex items-center justify-center ${statusStyles[value as keyof typeof statusStyles]}`}>{value}</span>
           );

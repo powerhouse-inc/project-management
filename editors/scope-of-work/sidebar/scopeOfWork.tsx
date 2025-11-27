@@ -4,21 +4,21 @@ import {
   Textarea,
   Select,
   ObjectSetTable,
-  ColumnDef,
-  ColumnAlignment,
+  type ColumnDef,
+  type ColumnAlignment,
 } from "@powerhousedao/document-engineering";
 import { Icon } from "@powerhousedao/design-system";
 import {
   actions,
-  Project,
-  Roadmap,
-  ScopeOfWorkAction,
-  ScopeOfWorkDocument,
-  ScopeOfWorkStatusInput,
+  type Project,
+  type Roadmap,
+  type ScopeOfWorkAction,
+  type ScopeOfWorkDocument,
+  type ScopeOfWorkStatusInput,
 } from "../../../document-models/scope-of-work/index.js";
-import { generateId } from "document-model";
+import { generateId } from "document-model/core";
 import ProgressBar from "../components/progressBar.js";
-import { DocumentDispatch } from "@powerhousedao/reactor-browser";
+import { type DocumentDispatch } from "@powerhousedao/reactor-browser";
 
 interface ScopeOfWorkProps {
   dispatch: DocumentDispatch<ScopeOfWorkAction>;
@@ -69,7 +69,7 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
           }
           return false;
         },
-        renderCell: (value, context) => {
+        renderCell: (value) => {
           if (value === "") {
             return (
               <div className="font-light italic text-left text-gray-500">
@@ -125,7 +125,7 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
           }
           return false;
         },
-        renderCell: (value, context) => {
+        renderCell: (value) => {
           if (value === "") {
             return (
               <div className="font-light italic text-left text-gray-500">
@@ -179,28 +179,6 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
     }
   }, [editRowId]);
 
-  const handleInputBlur = () => {
-    if (editRowId !== null) {
-      if (state.roadmaps.find((row: Roadmap) => row.id === editRowId)) {
-        dispatch(
-          actions.editRoadmap({ id: editRowId.toString(), title: editValue })
-        );
-      } else {
-        dispatch(
-          actions.addRoadmap({
-            id: editRowId,
-            title: editValue,
-            slug: editValue
-              .toLowerCase()
-              .replace(/ /g, "-")
-              .concat(`-${editRowId.substring(editRowId.length - 8)}`),
-          })
-        );
-      }
-      setEditRowId(null);
-      setEditValue("");
-    }
-  };
 
   return (
     <div className="border border-gray-300 p-4 rounded-md ">

@@ -17,7 +17,7 @@ import Deliverables from "./deliverables.js";
 import Roadmaps from "./roadmaps.js";
 import Contributors from "./contributors.js";
 import BreadCrumbs from "../components/breadCrumbs.js";
-import { useSelectedScopeOfWorkDocument } from "../../hooks/useScopeOfWorkDocument.js";
+import { useSelectedScopeOfWorkDocument } from "../../../document-models/scope-of-work/hooks.js";
 import {
   type Milestone as MilestoneType,
   type Roadmap as RoadmapType,
@@ -109,6 +109,8 @@ const useSidebarWidth = () => {
 
 export default function SidebarMenu() {
   const [doc, dispatch] = useSelectedScopeOfWorkDocument();
+
+  if (!doc) return null;
 
   const state = doc.state.global;
 

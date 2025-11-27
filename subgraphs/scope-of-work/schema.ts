@@ -3,166 +3,7 @@ import type { DocumentNode } from "graphql";
 
 export const schema: DocumentNode = gql`
   """
-  Subgraph definition for ScopeOfWork (powerhouse/scopeofwork)
-  """
-  type ScopeOfWorkState {
-    title: String!
-    description: String!
-    status: ScopeOfWorkStatus!
-    deliverables: [Deliverable!]!
-    projects: [Project!]!
-    roadmaps: [Roadmap!]!
-    contributors: [Agent!]!
-  }
-
-  enum ScopeOfWorkStatus {
-    DRAFT
-    SUBMITTED
-    IN_PROGRESS
-    REJECTED
-    APPROVED
-    DELIVERED
-    CANCELED
-  }
-
-  type Agent {
-    id: PHID!
-    name: String!
-    icon: URL
-    description: String
-  }
-
-  type Deliverable {
-    id: OID!
-    owner: ID
-    title: String!
-    code: String!
-    description: String!
-    status: DeliverableStatus!
-    workProgress: Progress
-    keyResults: [KeyResult!]!
-    budgetAnchor: BudgetAnchorProject
-  }
-
-  type BudgetAnchorProject {
-    project: OID
-    unit: Unit
-    unitCost: Float!
-    quantity: Float!
-    margin: Float!
-  }
-
-  enum Unit {
-    StoryPoints
-    Hours
-  }
-
-  enum DeliverableStatus {
-    WONT_DO
-    DRAFT
-    TODO
-    BLOCKED
-    IN_PROGRESS
-    DELIVERED
-    CANCELED
-  }
-
-  union Progress = StoryPoint | Percentage | Binary
-
-  type Percentage {
-    value: Float!
-  }
-
-  type Binary {
-    done: Boolean
-  }
-
-  type StoryPoint {
-    total: Int!
-    completed: Int!
-  }
-
-  type KeyResult {
-    id: OID!
-    title: String!
-    link: String!
-  }
-
-  type Project {
-    id: OID!
-    code: String!
-    title: String!
-    projectOwner: ID
-    abstract: String
-    imageUrl: URL
-    scope: DeliverablesSet
-    budgetType: BudgetType
-    currency: PMCurrency
-    budget: Float
-    expenditure: BudgetExpenditure
-  }
-
-  enum PMCurrency {
-    DAI
-    USDS
-    EUR
-    USD
-  }
-
-  enum BudgetType {
-    CONTINGENCY
-    OPEX
-    CAPEX
-    OVERHEAD
-  }
-
-  type BudgetExpenditure {
-    percentage: Float!
-    actuals: Float!
-    cap: Float!
-  }
-
-  type Roadmap {
-    id: OID!
-    slug: String!
-    title: String!
-    description: String!
-    milestones: [Milestone!]!
-  }
-
-  type Milestone {
-    id: OID!
-    sequenceCode: String!
-    title: String!
-    description: String!
-    deliveryTarget: String!
-    scope: DeliverablesSet
-    coordinators: [ID!]!
-    budget: Float
-  }
-
-  type DeliverablesSet {
-    deliverables: [OID!]!
-    status: DeliverableSetStatus!
-    progress: Progress!
-    deliverablesCompleted: DeliverablesCompleted!
-  }
-
-  type DeliverablesCompleted {
-    total: Int!
-    completed: Int!
-  }
-
-  enum DeliverableSetStatus {
-    DRAFT
-    TODO
-    IN_PROGRESS
-    FINISHED
-    CANCELED
-  }
-
-  """
-  Queries: ScopeOfWork
+  Queries: ScopeOfWork Document
   """
   type ScopeOfWorkQueries {
     getDocument(docId: PHID!, driveId: PHID): ScopeOfWork
@@ -352,10 +193,10 @@ export const schema: DocumentNode = gql`
   input ScopeOfWork_EditScopeOfWorkInput {
     title: String
     description: String
-    status: ScopeOfWorkStatusInput #defaults to DRAFT
+    status: ScopeOfWork_ScopeOfWorkStatusInput #defaults to DRAFT
   }
 
-  enum ScopeOfWorkStatusInput {
+  enum ScopeOfWork_ScopeOfWorkStatusInput {
     DRAFT
     SUBMITTED
     IN_PROGRESS
@@ -374,10 +215,10 @@ export const schema: DocumentNode = gql`
     title: String
     code: String
     description: String
-    status: PMDeliverableStatusInput
+    status: ScopeOfWork_PMDeliverableStatusInput
   }
 
-  enum PMDeliverableStatusInput {
+  enum ScopeOfWork_PMDeliverableStatusInput {
     WONT_DO
     DRAFT
     TODO
@@ -395,22 +236,22 @@ export const schema: DocumentNode = gql`
     title: String
     code: String
     description: String
-    status: PMDeliverableStatusInput
+    status: ScopeOfWork_PMDeliverableStatusInput
   }
 
   input ScopeOfWork_SetDeliverableProgressInput {
     id: OID! #deliverable id
-    workProgress: ProgressInput
+    workProgress: ScopeOfWork_ProgressInput
   }
 
-  input ProgressInput {
+  input ScopeOfWork_ProgressInput {
     # Only one of these fields should be provided
     percentage: Float
-    storyPoints: StoryPointInput
+    storyPoints: ScopeOfWork_StoryPointInput
     done: Boolean
   }
 
-  input StoryPointInput {
+  input ScopeOfWork_StoryPointInput {
     total: Int!
     completed: Int!
   }
@@ -434,7 +275,7 @@ export const schema: DocumentNode = gql`
   input ScopeOfWork_SetDeliverableBudgetAnchorProjectInput {
     deliverableId: ID!
     project: OID
-    unit: Unit
+    unit: ScopeOfWork_Unit
     unitCost: Float
     quantity: Float
     margin: Float
@@ -507,11 +348,11 @@ export const schema: DocumentNode = gql`
   input ScopeOfWork_EditDeliverablesSetInput {
     milestoneId: ID
     projectId: ID
-    status: DeliverableSetStatusInput
-    deliverablesCompleted: DeliverablesCompletedInput
+    status: ScopeOfWork_DeliverableSetStatusInput
+    deliverablesCompleted: ScopeOfWork_DeliverablesCompletedInput
   }
 
-  enum DeliverableSetStatusInput {
+  enum ScopeOfWork_DeliverableSetStatusInput {
     DRAFT
     TODO
     IN_PROGRESS
@@ -519,7 +360,7 @@ export const schema: DocumentNode = gql`
     CANCELED
   }
 
-  input DeliverablesCompletedInput {
+  input ScopeOfWork_DeliverablesCompletedInput {
     total: Int!
     completed: Int!
   }
@@ -563,19 +404,19 @@ export const schema: DocumentNode = gql`
     projectOwner: ID # Initial project owner
     abstract: String
     imageUrl: URL
-    budgetType: PMBudgetTypeInput
-    currency: PMCurrencyInput
+    budgetType: ScopeOfWork_PMBudgetTypeInput
+    currency: ScopeOfWork_PMCurrencyInput
     budget: Float
   }
 
-  enum PMBudgetTypeInput {
+  enum ScopeOfWork_PMBudgetTypeInput {
     CONTINGENCY
     OPEX
     CAPEX
     OVERHEAD
   }
 
-  enum PMCurrencyInput {
+  enum ScopeOfWork_PMCurrencyInput {
     DAI
     USDS
     EUR
@@ -588,13 +429,13 @@ export const schema: DocumentNode = gql`
     title: String
     abstract: String
     imageUrl: URL
-    budgetType: PMBudgetTypeInput
-    currency: PMCurrencyInput
+    budgetType: ScopeOfWork_PMBudgetTypeInput
+    currency: ScopeOfWork_PMCurrencyInput
     budget: Float
   }
   input ScopeOfWork_UpdateProjectOwnerInput {
     id: OID! # The ID of the project
-    projectOwner: ID! # The ID of the new owner (Agent)
+    projectOwner: ID! # The ID of the new owner (ScopeOfWork_Agent)
   }
   input ScopeOfWork_RemoveProjectInput {
     projectId: ID!

@@ -1,15 +1,8 @@
-/**
- * This is a scaffold file meant for customization:
- * - modify it by implementing the reducer functions
- * - delete the file and run the code generator again to have it reset
- */
+import type { ScopeOfWorkState, Deliverable, DeliverablesSet } from "../../gen/schema/types.js";
+import type { ScopeOfWorkProjectsOperations } from "@powerhousedao/project-management/document-models/scope-of-work";
 
-import { de } from "zod/v4/locales";
-import type { ScopeOfWorkProjectsOperations } from "../../gen/projects/operations.js";
-import type { Deliverable, DeliverablesSet, Project, ScopeOfWorkState } from "../../gen/types.js";
-
-export const reducer: ScopeOfWorkProjectsOperations = {
-  addProjectOperation(state, action, dispatch) {
+export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
+  addProjectOperation(state, action) {
     const project = {
       id: action.input.id,
       code: action.input.code,
@@ -40,7 +33,7 @@ export const reducer: ScopeOfWorkProjectsOperations = {
     state.projects.push(project);
 
   },
-  updateProjectOperation(state, action, dispatch) {
+  updateProjectOperation(state, action) {
     const project = state.projects.find((p) => p.id === action.input.id);
     if (!project) {
       throw new Error("Project not found");
@@ -48,7 +41,7 @@ export const reducer: ScopeOfWorkProjectsOperations = {
     Object.assign(project, action.input);
 
   },
-  updateProjectOwnerOperation(state, action, dispatch) {
+  updateProjectOwnerOperation(state, action) {
     const project = state.projects.find((p) => p.id === action.input.id);
     if (!project) {
       throw new Error("Project not found");
@@ -56,7 +49,7 @@ export const reducer: ScopeOfWorkProjectsOperations = {
     project.projectOwner = action.input.projectOwner || "";
 
   },
-  removeProjectOperation(state, action, dispatch) {
+  removeProjectOperation(state, action) {
 
     // remove deliverables linked to project from project scope
     const project = state.projects.find((p) => p.id === action.input.projectId);
@@ -70,7 +63,7 @@ export const reducer: ScopeOfWorkProjectsOperations = {
     applyInvariants(state, ["budget", "margin"]);
 
   },
-  setProjectMarginOperation(state, action, dispatch) {
+  setProjectMarginOperation(state, action) {
     const project = state.projects.find((p) => p.id === action.input.projectId);
     if (!project) {
       throw new Error("Project not found");
@@ -102,7 +95,7 @@ export const reducer: ScopeOfWorkProjectsOperations = {
 
 
   },
-  setProjectTotalBudgetOperation(state, action, dispatch) {
+  setProjectTotalBudgetOperation(state, action) {
     const project = state.projects.find((p) => p.id === action.input.projectId);
     if (!project) {
       throw new Error("Project not found");
@@ -111,7 +104,7 @@ export const reducer: ScopeOfWorkProjectsOperations = {
     applyInvariants(state, ["margin"]);
 
   },
-  addProjectDeliverableOperation(state, action, dispatch) {
+  addProjectDeliverableOperation(state, action) {
 
     // add deliverable to deliverables 
     const newDeliverable: Deliverable = {
@@ -146,7 +139,7 @@ export const reducer: ScopeOfWorkProjectsOperations = {
     project.scope.deliverables.push(newDeliverable.id);
 
   },
-  removeProjectDeliverableOperation(state, action, dispatch) {
+  removeProjectDeliverableOperation(state, action) {
     const project = state.projects.find((p) => p.id === action.input.projectId);
     if (!project) {
       throw new Error("Project not found");

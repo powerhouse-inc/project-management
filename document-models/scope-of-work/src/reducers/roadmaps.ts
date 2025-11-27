@@ -1,13 +1,7 @@
-/**
- * This is a scaffold file meant for customization:
- * - modify it by implementing the reducer functions
- * - delete the file and run the code generator again to have it reset
- */
+import type { ScopeOfWorkRoadmapsOperations } from "@powerhousedao/project-management/document-models/scope-of-work";
 
-import type { ScopeOfWorkRoadmapsOperations } from "../../gen/roadmaps/operations.js";
-
-export const reducer: ScopeOfWorkRoadmapsOperations = {
-  editRoadmapOperation(state, action, dispatch) {
+export const scopeOfWorkRoadmapsOperations: ScopeOfWorkRoadmapsOperations = {
+  editRoadmapOperation(state, action) {
     const roadmap = state.roadmaps.find((roadmap) => String(roadmap.id) === String(action.input.id));
     if (!roadmap) {
       throw new Error("Roadmap not found");
@@ -23,7 +17,7 @@ export const reducer: ScopeOfWorkRoadmapsOperations = {
     state.roadmaps = state.roadmaps.map((roadmap) => String(roadmap.id) === String(action.input.id) ? updatedRoadmap : roadmap);
 
   },
-  addRoadmapOperation(state, action, dispatch) {
+  addRoadmapOperation(state, action) {
     if (action.input.id === undefined || action.input.title === undefined) {
       throw new Error("Invalid input");
     }
@@ -39,7 +33,7 @@ export const reducer: ScopeOfWorkRoadmapsOperations = {
     state.roadmaps.push(roadmap);
 
   },
-  removeRoadmapOperation(state, action, dispatch) {
+  removeRoadmapOperation(state, action) {
     if (action.input.id === undefined) {
       throw new Error("Invalid roadmap id input");
     }

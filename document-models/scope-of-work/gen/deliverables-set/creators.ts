@@ -1,14 +1,18 @@
-import { createAction } from "document-model";
+import { createAction } from "document-model/core";
 import {
-  z,
-  type EditDeliverablesSetInput,
-  type AddDeliverableInSetInput,
-  type RemoveDeliverableInSetInput,
+  EditDeliverablesSetInputSchema,
+  AddDeliverableInSetInputSchema,
+  RemoveDeliverableInSetInputSchema,
+} from "../schema/zod.js";
+import type {
+  EditDeliverablesSetInput,
+  AddDeliverableInSetInput,
+  RemoveDeliverableInSetInput,
 } from "../types.js";
-import {
-  type EditDeliverablesSetAction,
-  type AddDeliverableInSetAction,
-  type RemoveDeliverableInSetAction,
+import type {
+  EditDeliverablesSetAction,
+  AddDeliverableInSetAction,
+  RemoveDeliverableInSetAction,
 } from "./actions.js";
 
 export const editDeliverablesSet = (input: EditDeliverablesSetInput) =>
@@ -16,7 +20,7 @@ export const editDeliverablesSet = (input: EditDeliverablesSetInput) =>
     "EDIT_DELIVERABLES_SET",
     { ...input },
     undefined,
-    z.EditDeliverablesSetInputSchema,
+    EditDeliverablesSetInputSchema,
     "global",
   );
 
@@ -25,7 +29,7 @@ export const addDeliverableInSet = (input: AddDeliverableInSetInput) =>
     "ADD_DELIVERABLE_IN_SET",
     { ...input },
     undefined,
-    z.AddDeliverableInSetInputSchema,
+    AddDeliverableInSetInputSchema,
     "global",
   );
 
@@ -34,6 +38,6 @@ export const removeDeliverableInSet = (input: RemoveDeliverableInSetInput) =>
     "REMOVE_DELIVERABLE_IN_SET",
     { ...input },
     undefined,
-    z.RemoveDeliverableInSetInputSchema,
+    RemoveDeliverableInSetInputSchema,
     "global",
   );

@@ -1,15 +1,11 @@
-/**
- * This is a scaffold file meant for customization:
- * - modify it by implementing the reducer functions
- * - delete the file and run the code generator again to have it reset
- */
-
-import type { ScopeOfWorkMilestonesOperations } from "../../gen/milestones/operations.js";
-import type { Deliverable, Milestone } from "../../gen/types.js";
+import type { Deliverable } from "../../gen/types.js";
 import { applyInvariants } from "./projects.js";
+import type { ScopeOfWorkState } from "../../gen/schema/types.js";
+import type { EditMilestoneAction } from "../../gen/milestones/actions.js";
+import type { ScopeOfWorkMilestonesOperations } from "@powerhousedao/project-management/document-models/scope-of-work";
 
-export const reducer: ScopeOfWorkMilestonesOperations = {
-  editMilestoneOperation(state, action, dispatch) {
+export const scopeOfWorkMilestonesOperations: ScopeOfWorkMilestonesOperations = {
+  editMilestoneOperation(state: ScopeOfWorkState, action: EditMilestoneAction) {
     const foundRoadmap = state.roadmaps.find((roadmap) => String(roadmap.id) === String(action.input.roadmapId));
     if (!foundRoadmap) {
       throw new Error("Roadmap not found");
@@ -34,7 +30,7 @@ export const reducer: ScopeOfWorkMilestonesOperations = {
     });
 
   },
-  addCoordinatorOperation(state, action, dispatch) {
+  addCoordinatorOperation(state, action) {
     const foundRoadmap = state.roadmaps.find((roadmap) => {
       return roadmap.milestones.some((milestone) => String(milestone.id) === String(action.input.milestoneId));
     });
@@ -57,7 +53,7 @@ export const reducer: ScopeOfWorkMilestonesOperations = {
 
 
   },
-  removeCoordinatorOperation(state, action, dispatch) {
+  removeCoordinatorOperation(state, action) {
     const foundRoadmap = state.roadmaps.find((roadmap) => {
       return roadmap.milestones.some((milestone) => String(milestone.id) === String(action.input.milestoneId));
     });
@@ -77,7 +73,7 @@ export const reducer: ScopeOfWorkMilestonesOperations = {
     });
 
   },
-  addMilestoneOperation(state, action, dispatch) {
+  addMilestoneOperation(state, action) {
     if (action.input.id === undefined || action.input.roadmapId === undefined) {
       throw new Error("Invalid input");
     }
@@ -114,7 +110,7 @@ export const reducer: ScopeOfWorkMilestonesOperations = {
     });
 
   },
-  removeMilestoneOperation(state, action, dispatch) {
+  removeMilestoneOperation(state, action) {
     if (action.input.id === undefined || action.input.roadmapId === undefined) {
       throw new Error("Invalid input");
     }
@@ -143,7 +139,7 @@ export const reducer: ScopeOfWorkMilestonesOperations = {
     applyInvariants(state, ["budget", "margin"]);
 
   },
-  addMilestoneDeliverableOperation(state, action, dispatch) {
+  addMilestoneDeliverableOperation(state, action) {
 
     // add deliverable to deliverables 
     const newDeliverable: Deliverable = {
@@ -184,7 +180,7 @@ export const reducer: ScopeOfWorkMilestonesOperations = {
 
 
   },
-  removeMilestoneDeliverableOperation(state, action, dispatch) {
+  removeMilestoneDeliverableOperation(state, action) {
     const roadmap = state.roadmaps.find((roadmap) => {
       return roadmap.milestones.find((milestone => String(milestone.id) === String(action.input.milestoneId)))
     });

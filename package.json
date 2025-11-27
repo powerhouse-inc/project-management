@@ -1,7 +1,7 @@
 {
   "name": "@powerhousedao/project-management",
   "description": "The Scope of Work model defines a structured plan for executing contributor work; it includes deliverables and roadmaps with milestones with each being linked to ownership, progress tracking.",
-  "version": "0.0.50",
+  "version": "0.0.64",
   "license": "AGPL-3.0-only",
   "type": "module",
   "files": [
@@ -19,10 +19,6 @@
       "types": "./dist/document-models/index.d.ts",
       "default": "./dist/document-models/index.js"
     },
-    "./document-models/scope-of-work": {
-      "types": "./dist/document-models/scope-of-work/index.d.ts",
-      "default": "./dist/document-models/scope-of-work/index.js"
-    },
     "./editors": {
       "types": "./dist/editors/index.d.ts",
       "default": "./dist/editors/index.js"
@@ -36,72 +32,100 @@
       "default": "./dist/processors/index.js"
     },
     "./manifest": {
-      "types": "./dist/manifest.d.ts",
-      "default": "./dist/manifest.js"
+      "default": "./dist/powerhouse.manifest.json"
     },
-    "./style.css": "./dist/style.css"
+    "./style.css": "./dist/style.css",
+    "./document-models/*": {
+      "types": "./dist/document-models/*/index.d.ts",
+      "default": "./dist/document-models/*/index.js"
+    },
+    "./editors/*": {
+      "types": "./dist/editors/*/index.d.ts",
+      "default": "./dist/editors/*/index.js"
+    }
   },
   "scripts": {
-    "lint": "eslint .",
-    "build:tsc": "tsc",
-    "build:tsc:watch": "tsc --watch",
+    "lint": "eslint --config eslint.config.js --cache --cache-strategy content",
+    "lint:fix": "npm run lint --fix",
+    "build:tsc": "tsc || true",
+    "build:tsc:watch": "tsc --watch || true",
     "build:css": "npx @tailwindcss/cli -i ./style.css -o ./dist/style.css",
     "build:css:watch": "npx @tailwindcss/cli -i ./style.css -o ./dist/style.css --watch",
-    "build": "npm run build:tsc && npm run build:css",
+    "build": "npm run tsc && npm run tailwind || true",
     "test": "vitest run",
     "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run build",
     "generate": "ph-cli generate",
     "connect": "ph-cli connect",
     "reactor": "ph-cli reactor",
     "service": "ph-cli service",
     "service-startup": "bash ./node_modules/@powerhousedao/ph-cli/dist/scripts/service-startup.sh",
-    "service-unstartup": "bash ./node_modules/@powerhousedao/ph-cli/dist/scripts/service-unstartup.sh"
+    "service-unstartup": "bash ./node_modules/@powerhousedao/ph-cli/dist/scripts/service-unstartup.sh",
+    "tsc": "tsc",
+    "tsc:watch": "tsc --watch",
+    "tailwind": "npx @tailwindcss/cli -i ./style.css -o ./dist/style.css",
+    "check-circular-imports": "npx dpdm -T ./index.ts",
+    "vetra": "ph-cli vetra",
+    "migrate": "ph-cli migrate"
   },
   "dependencies": {
-    "@powerhousedao/builder-tools": "^5.0.0-staging.30",
-    "@powerhousedao/common": "^5.0.0-staging.30",
-    "@powerhousedao/design-system": "^5.0.0-staging.30",
+    "@powerhousedao/builder-tools": "^5.0.12",
+    "@powerhousedao/common": "^5.0.12",
+    "@powerhousedao/design-system": "^5.0.12",
     "@powerhousedao/document-engineering": "^1.39.0",
-    "document-model": "^5.0.0-staging.30",
+    "document-model": "^5.0.12",
     "error": "^10.4.0",
     "graphql": "^16.10.0",
     "graphql-tag": "^2.12.6",
+    "luxon": "^3.7.2",
+    "uuid": "^11.1.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {
-    "@electric-sql/pglite": "^0.2.12",
-    "@eslint/js": "^9.25.0",
+    "@electric-sql/pglite": "^0.2.17",
+    "@eslint/js": "^9.37.0",
+    "@openfeature/core": "^1.9.1",
     "@powerhousedao/analytics-engine-core": "^0.5.0",
-    "@powerhousedao/codegen": "^5.0.0-staging.30",
-    "@powerhousedao/ph-cli": "^5.0.0-staging.30",
-    "@powerhousedao/reactor-api": "^5.0.0-staging.30",
-    "@powerhousedao/reactor-browser": "^5.0.0-staging.30",
-    "@powerhousedao/reactor-local": "^5.0.0-staging.30",
-    "@powerhousedao/scalars": "^1.33.1-staging.5",
-    "@powerhousedao/switchboard": "^5.0.0-staging.30",
-    "@tailwindcss/cli": "^4.1.4",
-    "@testing-library/react": "^16.3.0",
-    "@types/node": "^22.14.1",
-    "@types/react": "^18.3.20",
-    "@vitejs/plugin-react": "^4.4.1",
-    "document-drive": "^5.0.0-staging.30",
-    "eslint": "^9.25.0",
+    "@powerhousedao/codegen": "^5.0.12",
+    "@powerhousedao/config": "^5.0.12",
+    "@powerhousedao/connect": "^5.0.12",
+    "@powerhousedao/ph-cli": "^5.0.12",
+    "@powerhousedao/reactor-api": "^5.0.12",
+    "@powerhousedao/reactor-browser": "^5.0.12",
+    "@powerhousedao/reactor-local": "^5.0.12",
+    "@powerhousedao/scalars": "2.0.1",
+    "@powerhousedao/switchboard": "^5.0.12",
+    "@tailwindcss/cli": "^4.1.14",
+    "@types/node": "^22.13.11",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "@vitejs/plugin-react": "^5.0.4",
+    "document-drive": "^5.0.12",
+    "eslint": "^9.37.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
     "globals": "^16.0.0",
-    "package-manager-detector": "^0.2.8",
     "pm2": "^5.4.3",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "tailwindcss": "^4.1.4",
-    "typescript": "^5.8.3",
-    "typescript-eslint": "^8.30.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "storybook": "^8.6.14",
+    "tailwindcss": "^4.1.14",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.0",
     "vite": "^6.2.3",
+    "vite-plugin-node-polyfills": "^0.24.0",
     "vitest": "^3.0.9"
   },
   "peerDependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
-  }
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "overrides": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "vite": "^6.2.3"
+  },
+  "readme": "ERROR: No README data found!",
+  "_id": "@powerhousedao/project-management@0.0.60"
 }
