@@ -9,5 +9,11 @@
   "reactor": {
     "port": 4001
   },
-  "packages": []
+  "packages": [
+    {
+      "packageName": "@powerhousedao/builder-profile",
+      "version": "latest",
+      "provider": "npm"
+    }
+  ]
 }

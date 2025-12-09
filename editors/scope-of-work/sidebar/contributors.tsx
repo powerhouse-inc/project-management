@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import {
   ObjectSetTable,
   type ColumnDef,
@@ -12,8 +12,10 @@ import {
 import { actions } from "../../../document-models/scope-of-work/index.js";
 import {
   type DocumentDispatch,
-  useDocumentsInSelectedDrive,
+  useDrives,
+  useGetDocuments,
 } from "@powerhousedao/reactor-browser";
+import type { FileNode } from "document-drive";
 
 interface ContributorsProps {
   dispatch: DocumentDispatch<ScopeOfWorkAction>;
@@ -33,42 +35,72 @@ const Contributors: React.FC<ContributorsProps> = ({
     }));
   }, [contributors]);
 
-  const driveDocuments = useDocumentsInSelectedDrive();
+  const drives = useDrives();
 
-  // Helper function to get builder profile documents from the drive
-  const getBuilderProfiles = () => {
-    if (!driveDocuments) return [];
+  // Map all builder profile FileNodes from all drives with their driveId
+  const builderProfileNodesWithDriveId = useMemo(() => {
+    if (!drives) return [];
 
-    return driveDocuments
-      .filter((doc) => doc.header.documentType === "powerhouse/builder-profile")
-      .map((doc) => {
-        const name = (doc.state as any).global?.name || doc.header.id;
+    return drives.flatMap((drive) => {
+      const builderProfileNodes = drive.state.global.nodes.filter(
+        (node): node is FileNode =>
+          node.kind === "file" &&
+          "documentType" in node &&
+          node.documentType === "powerhouse/builder-profile",
+      );
 
-        return {
-          id: doc.header.id,
-          label: name,
-          value: doc.header.id,
-          title: name,
-        };
-      });
-  };
+      return builderProfileNodes.map((node) => ({
+        node,
+        driveId: drive.header.id,
+      }));
+    });
+  }, [drives]);
 
-  // Helper function to get builder profile data by PHID
+  // Get all unique builder PHIDs from the nodes
+  const builderPhids = useMemo(() => {
+    return builderProfileNodesWithDriveId.map(({ node }) => node.id);
+  }, [builderProfileNodesWithDriveId]);
+
+  // Fetch all builder profile documents from all drives
+  const builderProfileDocuments = useGetDocuments(builderPhids);
+
+  // Create a map of PHID to document for quick lookup
+  const builderProfileMap = useMemo(() => {
+    if (!builderProfileDocuments) return new Map();
+
+    const map = new Map();
+    builderProfileDocuments.forEach((doc) => {
+      if (doc.header.documentType === "powerhouse/builder-profile") {
+        map.set(doc.header.id, doc);
+      }
+    });
+    return map;
+  }, [builderProfileDocuments]);
+
+  // Helper function to get builder profile documents from all drives
+  const getBuilderProfiles = useCallback(() => {
+    return builderProfileNodesWithDriveId.map(({ node }) => {
+      const doc = builderProfileMap.get(node.id);
+      const name = doc?.state?.global?.name || node.name || node.id;
+
+      return {
+        id: node.id,
+        label: name,
+        value: node.id,
+        title: name,
+      };
+    });
+  }, [builderProfileNodesWithDriveId, builderProfileMap]);
+
+  // Helper function to get builder profile data by PHID from all drives
   const getBuilderProfileByPhid = (phid: string) => {
-    if (!driveDocuments) return null;
-
-    const doc = driveDocuments.find(
-      (doc) =>
-        doc.header.documentType === "powerhouse/builder-profile" &&
-        doc.header.id === phid
-    );
-
+    const doc = builderProfileMap.get(phid);
     if (!doc) return null;
 
     return {
-      name: (doc.state as any).global?.name || doc.header.id,
-      description: (doc.state as any).global?.description || null,
-      icon: (doc.state as any).global?.icon || null,
+      name: doc.state.global?.name || doc.header.id,
+      description: doc.state.global?.description || null,
+      icon: doc.state.global?.icon || null,
     };
   };
 
@@ -250,7 +282,6 @@ const Contributors: React.FC<ContributorsProps> = ({
         title: "Description",
         editable: true,
         align: "center" as ColumnAlignment,
-        width: 200,
         onSave: (newValue, context) => {
           if (newValue !== context.row.description) {
             dispatch(
@@ -273,7 +304,7 @@ const Contributors: React.FC<ContributorsProps> = ({
         },
       },
     ],
-    [contributors, driveDocuments]
+    [contributors, builderProfileMap, getBuilderProfiles]
   );
 
   return (

@@ -70,10 +70,11 @@
     "migrate": "ph-cli migrate"
   },
   "dependencies": {
+    "@powerhousedao/builder-profile": "^0.0.4",
     "@powerhousedao/builder-tools": "^5.0.12",
     "@powerhousedao/common": "^5.0.12",
     "@powerhousedao/design-system": "^5.0.12",
-    "@powerhousedao/document-engineering": "^1.39.0",
+    "@powerhousedao/document-engineering": "1.40.0",
     "document-model": "^5.0.12",
     "error": "^10.4.0",
     "graphql": "^16.10.0",
