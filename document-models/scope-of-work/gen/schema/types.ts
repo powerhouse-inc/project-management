@@ -120,6 +120,7 @@ export type AddProjectInput = {
   id: Scalars["OID"]["input"];
   imageUrl?: InputMaybe<Scalars["URL"]["input"]>;
   projectOwner?: InputMaybe<Scalars["ID"]["input"]>;
+  slug?: InputMaybe<Scalars["String"]["input"]>;
   title: Scalars["String"]["input"];
 };
 
@@ -318,6 +319,7 @@ export type Project = {
   imageUrl: Maybe<Scalars["URL"]["output"]>;
   projectOwner: Maybe<Scalars["ID"]["output"]>;
   scope: Maybe<DeliverablesSet>;
+  slug: Scalars["String"]["output"];
   title: Scalars["String"]["output"];
 };
 
@@ -448,6 +450,7 @@ export type UpdateProjectInput = {
   currency?: InputMaybe<PmCurrencyInput | `${PmCurrencyInput}`>;
   id: Scalars["OID"]["input"];
   imageUrl?: InputMaybe<Scalars["URL"]["input"]>;
+  slug?: InputMaybe<Scalars["String"]["input"]>;
   title?: InputMaybe<Scalars["String"]["input"]>;
 };
 

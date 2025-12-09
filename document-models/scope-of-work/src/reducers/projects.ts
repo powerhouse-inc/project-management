@@ -7,6 +7,7 @@ export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
       id: action.input.id,
       code: action.input.code,
       title: action.input.title,
+      slug: action.input.slug || "",
       projectOwner: action.input.projectOwner || null,
       abstract: action.input.abstract || null,
       imageUrl: action.input.imageUrl || null,

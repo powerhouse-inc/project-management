@@ -236,7 +236,7 @@ export const schema: DocumentNode = gql`
     title: String
     code: String
     description: String
-    status: ScopeOfWork_PMDeliverableStatusInput
+    status: PMDeliverableStatusInput
   }
 
   input ScopeOfWork_SetDeliverableProgressInput {
@@ -401,6 +401,7 @@ export const schema: DocumentNode = gql`
     id: OID!
     code: String!
     title: String!
+    slug: String
     projectOwner: ID # Initial project owner
     abstract: String
     imageUrl: URL
@@ -426,11 +427,12 @@ export const schema: DocumentNode = gql`
   input ScopeOfWork_UpdateProjectInput {
     id: OID!
     code: String
+    slug: String
     title: String
     abstract: String
     imageUrl: URL
-    budgetType: ScopeOfWork_PMBudgetTypeInput
-    currency: ScopeOfWork_PMCurrencyInput
+    budgetType: PMBudgetTypeInput
+    currency: PMCurrencyInput
     budget: Float
   }
   input ScopeOfWork_UpdateProjectOwnerInput {

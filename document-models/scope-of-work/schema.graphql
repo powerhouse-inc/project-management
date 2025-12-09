@@ -100,6 +100,7 @@ type KeyResult {
 
 type Project {
   id: OID!
+  slug: String!
   code: String!
   title: String!
   projectOwner: ID
@@ -400,6 +401,7 @@ input AddProjectInput {
   id: OID!
   code: String!
   title: String!
+  slug: String
   projectOwner: ID # Initial project owner
   abstract: String
   imageUrl: URL
@@ -427,6 +429,7 @@ enum PMCurrencyInput {
 input UpdateProjectInput {
   id: OID! 
   code: String 
+  slug: String
   title: String 
   abstract: String 
   imageUrl: URL 

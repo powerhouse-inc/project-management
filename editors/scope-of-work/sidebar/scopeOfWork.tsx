@@ -266,11 +266,16 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
           }}
           onAdd={(data) => {
             if (data.title) {
+              const newId = generateId();
               dispatch(
                 actions.addProject({
-                  id: generateId(),
+                  id: newId,
                   code: "",
                   title: data.title as string,
+                  slug: (data.title as string)
+                  .toLowerCase()
+                  .replace(/ /g, "-")
+                  .concat(`-${newId.substring(newId.length - 8)}`),
                 })
               );
             }

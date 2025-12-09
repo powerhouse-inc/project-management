@@ -42,6 +42,7 @@ const Project: React.FC<ProjectProps> = ({
 }) => {
   const [code, setCode] = useState(project?.code);
   const [title, setTitle] = useState(project?.title);
+  const [slug, setSlug] = useState(project?.slug || "");
   const [projectOwner, setProjectOwner] = useState(
     project?.projectOwner as string
   );
@@ -56,6 +57,7 @@ const Project: React.FC<ProjectProps> = ({
     setCode(project?.code || "");
     setBudget(project?.budget || 0);
     setTitle(project?.title || "");
+    setSlug(project?.slug || "");
     setProjectOwner(project?.projectOwner || "");
     setImageUrl(project?.imageUrl || "");
     setProjectAbstract(project?.abstract || "");
@@ -186,8 +188,36 @@ const Project: React.FC<ProjectProps> = ({
         />
       ) : (
         <div className="border border-gray-300 p-4 rounded-md">
-          <div className="mt-2 grid grid-cols-8 gap-2">
-            <div className="col-span-2">
+          <div className="mt-2">
+            <TextInput
+              className="w-full"
+              label="Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              onBlur={(e) => {
+                if (!project) return;
+                const newTitle = e.target.value;
+                if (newTitle === project.title) return;
+                const newSlug = newTitle
+                  .toLowerCase()
+                  .replace(/ /g, "-")
+                  .concat(`-${project.id.substring(project.id.length - 8)}`);
+                
+                dispatch(
+                  actions.updateProject({
+                    id: project.id,
+                    title: newTitle,
+                    slug: newSlug,
+                  })
+                );
+                
+                // Update local state for slug
+                setSlug(newSlug);
+              }}
+            />
+          </div>
+          <div className="mt-2 grid grid-cols-3 gap-2">
+            <div className="col-span-1 max-w-[200px]">
               <TextInput
                 className="w-full"
                 label="Code"
@@ -205,19 +235,19 @@ const Project: React.FC<ProjectProps> = ({
                 }}
               />
             </div>
-            <div className="col-span-6">
+            <div className="col-span-1">
               <TextInput
                 className="w-full"
-                label="Title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                label="Slug"
+                value={slug}
+                onChange={(e) => setSlug(e.target.value)}
                 onBlur={(e) => {
                   if (!project) return;
-                  if (e.target.value === project.title) return;
+                  if (e.target.value === project.slug) return;
                   dispatch(
                     actions.updateProject({
                       id: project.id,
-                      title: e.target.value,
+                      slug: e.target.value,
                     })
                   );
                 }}

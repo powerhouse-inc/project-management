@@ -70,7 +70,6 @@
     "migrate": "ph-cli migrate"
   },
   "dependencies": {
-    "@powerhousedao/builder-profile": "^0.0.4",
     "@powerhousedao/builder-tools": "^5.0.12",
     "@powerhousedao/common": "^5.0.12",
     "@powerhousedao/design-system": "^5.0.12",

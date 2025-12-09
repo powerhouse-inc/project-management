@@ -249,6 +249,7 @@ export function AddProjectInputSchema(): z.ZodObject<
     id: z.string(),
     imageUrl: z.string().url().nullish(),
     projectOwner: z.string().nullish(),
+    slug: z.string().nullish(),
     title: z.string(),
   });
 }
@@ -488,6 +489,7 @@ export function ProjectSchema(): z.ZodObject<Properties<Project>> {
     imageUrl: z.string().url().nullable(),
     projectOwner: z.string().nullable(),
     scope: DeliverablesSetSchema().nullable(),
+    slug: z.string(),
     title: z.string(),
   });
 }
@@ -673,6 +675,7 @@ export function UpdateProjectInputSchema(): z.ZodObject<
     currency: z.lazy(() => PmCurrencyInputSchema.nullish()),
     id: z.string(),
     imageUrl: z.string().url().nullish(),
+    slug: z.string().nullish(),
     title: z.string().nullish(),
   });
 }

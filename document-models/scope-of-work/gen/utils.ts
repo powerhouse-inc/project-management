@@ -29,7 +29,7 @@ export const initialGlobalState: ScopeOfWorkGlobalState = {
 export const initialLocalState: ScopeOfWorkLocalState = {};
 
 export const utils: DocumentModelUtils<ScopeOfWorkPHState> = {
-  fileExtension: ".phdm",
+  fileExtension: "",
   createState(state) {
     return {
       ...defaultBaseState(),

@@ -4,7 +4,7 @@ import { setName } from "document-model";
 import {
   actions,
   scopeOfWorkDocumentType,
-} from "../../document-models/scope-of-work/index.js";
+} from "@powerhousedao/project-management/document-models/scope-of-work";
 
 import type {
   ScopeOfWorkDocument,
@@ -41,7 +41,7 @@ import type {
   SetProjectTotalBudgetInput,
   AddProjectDeliverableInput,
   RemoveProjectDeliverableInput,
-} from "../../document-models/scope-of-work/index.js";
+} from "@powerhousedao/project-management/document-models/scope-of-work";
 
 export const getResolvers = (
   subgraph: BaseSubgraph,
