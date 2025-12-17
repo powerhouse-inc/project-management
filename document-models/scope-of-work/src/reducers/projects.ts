@@ -47,7 +47,7 @@ export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
     if (!project) {
       throw new Error("Project not found");
     }
-    project.projectOwner = action.input.projectOwner || "";
+    project.projectOwner = action.input.projectOwner !== undefined ? action.input.projectOwner : project.projectOwner;
 
   },
   removeProjectOperation(state, action) {
@@ -112,6 +112,7 @@ export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
       id: action.input.deliverableId,
       owner: '',
       title: action.input.title,
+      icon: '',
       code: '',
       description: '',
       status: 'DRAFT',

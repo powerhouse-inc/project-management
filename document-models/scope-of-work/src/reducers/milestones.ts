@@ -145,6 +145,7 @@ export const scopeOfWorkMilestonesOperations: ScopeOfWorkMilestonesOperations = 
     const newDeliverable: Deliverable = {
       id: action.input.deliverableId,
       owner: '',
+      icon: '',
       title: action.input.title,
       code: '',
       description: '',

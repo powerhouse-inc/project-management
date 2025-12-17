@@ -162,6 +162,7 @@ export type Deliverable = {
   budgetAnchor: Maybe<BudgetAnchorProject>;
   code: Scalars["String"]["output"];
   description: Scalars["String"]["output"];
+  icon: Maybe<Scalars["String"]["output"]>;
   id: Scalars["OID"]["output"];
   keyResults: Array<KeyResult>;
   owner: Maybe<Scalars["ID"]["output"]>;
@@ -220,6 +221,7 @@ export type EditAgentInput = {
 export type EditDeliverableInput = {
   code?: InputMaybe<Scalars["String"]["input"]>;
   description?: InputMaybe<Scalars["String"]["input"]>;
+  icon?: InputMaybe<Scalars["String"]["input"]>;
   id: Scalars["OID"]["input"];
   owner?: InputMaybe<Scalars["ID"]["input"]>;
   status?: InputMaybe<PmDeliverableStatusInput | `${PmDeliverableStatusInput}`>;

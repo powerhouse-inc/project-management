@@ -45,6 +45,7 @@ type Agent {
 type Deliverable {
   id: OID!
   owner: ID
+  icon: String
   title: String!
   code: String!
   description: String!
@@ -220,6 +221,7 @@ input RemoveDeliverableInput {
 input EditDeliverableInput {
   id: OID!
   owner: ID
+  icon: String
   title: String
   code: String
   description: String

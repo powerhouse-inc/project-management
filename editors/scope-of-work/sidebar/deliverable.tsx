@@ -6,8 +6,7 @@ import {
   Select,
   Checkbox,
   Icon,
-  AIDField,
-  Form,
+  PHIDInput,
 } from "@powerhousedao/document-engineering";
 import {
   type Deliverable as DeliverableType,
@@ -51,6 +50,37 @@ export const statusStyles = {
   CANCELED: "bg-[#f0f0f0] text-[#999999] rounded px-2 py-1 font-semibold",
 };
 
+const createFetchOptionsCallback = (contributors: Agent[]) => {
+  return async (userInput: string) => {
+    const contributorsFilter = contributors.filter((c) =>
+      c.name.toLowerCase().includes(userInput.toLowerCase())
+    );
+    if (contributorsFilter.length === 0) {
+      return Promise.reject(new Error("No contributors found"));
+    }
+    return contributorsFilter.map((c) => ({
+      value: c.id,
+      title: c.name,
+      description: " ",
+      icon: "Person" as const,
+    }));
+  };
+};
+
+const createFetchSelectedOptionCallback = (contributors: Agent[]) => {
+  return async (agentId: string) => {
+    const agent = contributors.find((c) => c.id === agentId);
+    if (!agent)
+      return Promise.reject(new Error("Agent not found"));
+    return {
+      value: agent.id,
+      title: agent.name,
+      description: " ",
+      icon: "Person" as const,
+    };
+  };
+};
+
 const Deliverable: React.FC<DeliverablesProps> = ({
   deliverables,
   dispatch,
@@ -66,6 +96,42 @@ const Deliverable: React.FC<DeliverablesProps> = ({
     deliverables[0]?.workProgress
   );
   const [budgetCalculatorOpen, setBudgetCalculatorOpen] = useState(false);
+  const [icon, setIcon] = useState(currentDeliverable.icon || "");
+  const [ownerPreview, setOwnerPreview] = useState<{
+    value: string;
+    title: string;
+    description: string;
+    icon: "Person";
+  } | null>(null);
+
+  const fetchOptionsCallback = useMemo(
+    () => createFetchOptionsCallback(contributors),
+    [contributors]
+  );
+
+  const fetchSelectedOptionCallback = useMemo(
+    () => createFetchSelectedOptionCallback(contributors),
+    [contributors]
+  );
+
+  useEffect(() => {
+    const fetchOwnerPreview = async () => {
+      const currentDeliverable = deliverables[0];
+      if (currentDeliverable?.owner) {
+        try {
+          const ownerDetails = await fetchSelectedOptionCallback(
+            currentDeliverable.owner
+          );
+          setOwnerPreview(ownerDetails);
+        } catch (error) {
+          setOwnerPreview(null);
+        }
+      } else {
+        setOwnerPreview(null);
+      }
+    };
+    fetchOwnerPreview();
+  }, [deliverables, fetchSelectedOptionCallback]);
 
   useEffect(() => {
     const currentDeliverable = deliverables[0];
@@ -93,7 +159,8 @@ const Deliverable: React.FC<DeliverablesProps> = ({
     }
     setStateDeliverable(currentDeliverable);
     setWorkProgress(currentDeliverable.workProgress);
-  }, [deliverables, currentDeliverable.owner]);
+    setIcon(currentDeliverable.icon || "");
+  }, [deliverables]);
 
   const columns = useMemo<Array<ColumnDef<KeyResult>>>(() => {
     return [
@@ -209,153 +276,90 @@ const Deliverable: React.FC<DeliverablesProps> = ({
               />
             </div>
           </div>
-          {/* Coordinators and Delivery Target */}
-          <div className="mt-8 grid grid-cols-8 gap-2">
-            <div className="col-span-4">
-              <Form
-                onSubmit={(e) => {
-                  e.preventDefault();
+          {/* Deliverable Owner and Icon and Icon Preview */}
+          <div className="mt-8 flex items-start gap-3">
+            <div className="flex-1 max-w-[350px] min-w-0">
+              <PHIDInput
+                className="w-full"
+                name="owner"
+                label="Deliverable Owner"
+                placeholder="Enter PHID"
+                variant="withValueTitleAndDescription"
+                value={stateDeliverable.owner || ""}
+                autoComplete={true}
+                previewPlaceholder={ownerPreview || undefined}
+                onChange={(newValue) => {
                   if (!stateDeliverable) return;
-                  // Get the current value from the AIDField
-                  const currentValue =
-                    typeof stateDeliverable.owner === "string"
-                      ? stateDeliverable.owner
-                      : (stateDeliverable.owner as unknown as { value: string })
-                          ?.value || "";
-                  const originalValue =
-                    typeof currentDeliverable.owner === "string"
-                      ? currentDeliverable.owner
-                      : (
-                          currentDeliverable.owner as unknown as {
-                            value: string;
-                          }
-                        )?.value || "";
-                  const currentValueStr =
-                    typeof currentValue === "string"
-                      ? currentValue
-                      : (currentValue as unknown as { value: string })?.value ||
-                        "";
-                  if (currentValueStr === originalValue) return;
-                  dispatch(
-                    actions.editDeliverable({
-                      id: currentDeliverable.id,
-                      owner: currentValueStr,
-                    })
-                  );
+                  // Update local state
+                  setStateDeliverable({
+                    ...stateDeliverable,
+                    owner: newValue,
+                  });
                 }}
-              >
-                <AIDField
-                  className="w-full mt-2"
-                  label="Deliverable Owner"
-                  name="owner"
-                  value={stateDeliverable.owner || ""}
-                  initialOptions={contributors.map((c) => ({
-                    value: c.id,
-                    title: c.name,
-                    path: {
-                      text: "Link",
-                      url: "https://powerhouse.inc",
-                    },
-                    description: " ",
-                    icon: "Person",
-                  }))}
-                  onChange={(e) => {
-                    // Handle both object and string cases
-                    let ownerId = "";
+                onBlur={(e) => {
+                  if (!stateDeliverable) return;
 
-                    if (typeof e === "object" && e !== null) {
-                      // Object case - extract the value
-                      ownerId = (e as { value: string }).value || "";
-                    } else if (typeof e === "string") {
-                      // String case - could be typing or selection
-                      const isUUID =
-                        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-                          e
-                        );
+                  const originalValue = currentDeliverable.owner || "";
+                  const targetValue = e.target.value;
 
-                      if (isUUID) {
-                        ownerId = e;
-                      } else {
-                        // This is just typing, don't update state or dispatch
-                        return;
-                      }
-                    }
-
-                    // If we have a valid owner ID, update state and dispatch
-                    if (ownerId) {
-                      setStateDeliverable({
-                        ...stateDeliverable,
-                        owner: ownerId,
-                      });
-
-                      // Check if this is different from the original value
-                      const originalValue = currentDeliverable.owner || "";
-
-                      if (ownerId !== originalValue) {
-                        dispatch(
-                          actions.editDeliverable({
-                            id: currentDeliverable.id,
-                            owner: ownerId,
-                          })
-                        );
-                      }
-                    }
-                  }}
-                  variant="withValueAndTitle"
-                  onBlur={(e) => {
-                    if (!stateDeliverable) return;
-
-                    const originalValue = currentDeliverable.owner || "";
-                    const targetValue = e.target.value;
-
-                    // Check if the input value is different from the original value
-                    if (targetValue === originalValue) {
-                      return;
-                    }
-
-                    // If user typed something new, dispatch with the typed value
+                  // Only dispatch if the value has changed
+                  if (targetValue !== originalValue) {
                     dispatch(
                       actions.editDeliverable({
                         id: currentDeliverable.id,
-                        owner: targetValue,
+                        owner: targetValue || "",
                       })
                     );
-                  }}
-                  fetchOptionsCallback={async (userInput: string) => {
-                    const contributorsFilter = contributors.filter((c) =>
-                      c.name.toLowerCase().includes(userInput.toLowerCase())
+                  }
+                }}
+                fetchOptionsCallback={fetchOptionsCallback}
+                fetchSelectedOptionCallback={fetchSelectedOptionCallback}
+              />
+            </div>
+            <div className="w-[400px] flex-shrink-0">
+              <TextInput
+                className="w-full"
+                label="Icon"
+                value={icon}
+                onChange={(e) => setIcon(e.target.value)}
+                onBlur={(e) => {
+                  if (e.target.value === "") {
+                    dispatch(
+                      actions.editDeliverable({
+                        id: currentDeliverable.id,
+                        icon: "",
+                      })
                     );
-                    if (contributorsFilter.length === 0) {
-                      return Promise.reject(new Error("No contributors found"));
-                    }
-                    return contributorsFilter.map((c) => ({
-                      value: c.id,
-                      title: c.name,
-                      path: {
-                        text: "Link",
-                        url: "https://powerhouse.inc",
-                      },
-                      description: " ",
-                      icon: "Person",
-                    }));
-                  }}
-                  fetchSelectedOptionCallback={async (agentId) => {
-                    const agent = contributors.find((c) => c.id === agentId);
-                    if (!agent)
-                      return Promise.reject(new Error("Agent not found"));
-                    return {
-                      value: agent.id,
-                      title: agent.name,
-                      description: " ",
-                      icon: "Person",
-                      path: {
-                        text: "Link",
-                        url: "https://powerhouse.inc",
-                      },
-                    };
-                  }}
-                />
-              </Form>
+                  }
+                  if (e.target.value === currentDeliverable.icon) return;
+                  dispatch(
+                    actions.editDeliverable({
+                      id: currentDeliverable.id,
+                      icon: e.target.value,
+                    })
+                  );
+                }}
+              />
+            </div>
+            <div className="flex-shrink-0 pt-6">
+              {icon && (
+                <div className="w-[60px] h-[60px] bg-gray-200 rounded-md overflow-hidden">
+                  <img
+                    src={icon}
+                    alt="Icon"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                      e.currentTarget.nextElementSibling?.classList.remove(
+                        "hidden"
+                      );
+                    }}
+                  />
+                  <div className="hidden text-xs text-gray-500 truncate">
+                    {icon}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
           {/* Description */}

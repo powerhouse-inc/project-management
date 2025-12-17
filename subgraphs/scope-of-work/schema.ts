@@ -233,6 +233,7 @@ export const schema: DocumentNode = gql`
   input ScopeOfWork_EditDeliverableInput {
     id: OID!
     owner: ID
+    icon: String
     title: String
     code: String
     description: String

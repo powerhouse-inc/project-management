@@ -13,8 +13,7 @@ import {
   type ColumnDef,
   type ColumnAlignment,
   Textarea,
-  AIDField,
-  Form,
+  PHIDInput,
   Select,
 } from "@powerhousedao/document-engineering";
 import { Icon } from "@powerhousedao/design-system";
@@ -32,6 +31,37 @@ interface ProjectProps {
   setActiveNodeId: (id: string) => void;
   contributors: Agent[];
 }
+
+const createFetchOptionsCallback = (contributors: Agent[]) => {
+  return async (userInput: string) => {
+    const contributorsFilter = contributors.filter((c) =>
+      c.name.toLowerCase().includes(userInput.toLowerCase())
+    );
+    if (contributorsFilter.length === 0) {
+      return Promise.reject(new Error("No contributors found"));
+    }
+    return contributorsFilter.map((c) => ({
+      value: c.id,
+      title: c.name,
+      description: " ",
+      icon: "Person" as const,
+    }));
+  };
+};
+
+const createFetchSelectedOptionCallback = (contributors: Agent[]) => {
+  return async (agentId: string) => {
+    const agent = contributors.find((c) => c.id === agentId);
+    if (!agent)
+      return Promise.reject(new Error("Agent not found"));
+    return {
+      value: agent.id,
+      title: agent.name,
+      description: " ",
+      icon: "Person" as const,
+    };
+  };
+};
 
 const Project: React.FC<ProjectProps> = ({
   project,
@@ -52,17 +82,51 @@ const Project: React.FC<ProjectProps> = ({
   );
   const [budget, setBudget] = useState(project?.budget || 0);
   const [budgetCalculatorOpen, setBudgetCalculatorOpen] = useState(false);
+  const [ownerPreview, setOwnerPreview] = useState<{
+    value: string;
+    title: string;
+    description: string;
+    icon: "Person";
+  } | null>(null);
+
+  const fetchOptionsCallback = useMemo(
+    () => createFetchOptionsCallback(contributors),
+    [contributors]
+  );
+
+  const fetchSelectedOptionCallback = useMemo(
+    () => createFetchSelectedOptionCallback(contributors),
+    [contributors]
+  );
 
   useEffect(() => {
-    setCode(project?.code || "");
-    setBudget(project?.budget || 0);
-    setTitle(project?.title || "");
-    setSlug(project?.slug || "");
-    setProjectOwner(project?.projectOwner || "");
-    setImageUrl(project?.imageUrl || "");
-    setProjectAbstract(project?.abstract || "");
-    setBudget(project?.budget || 0);
-  }, [deliverables, project?.id]);
+    const fetchOwnerPreview = async () => {
+      if (project?.projectOwner) {
+        try {
+          const ownerDetails = await fetchSelectedOptionCallback(
+            project.projectOwner
+          );
+          setOwnerPreview(ownerDetails);
+        } catch (error) {
+          setOwnerPreview(null);
+        }
+      } else {
+        setOwnerPreview(null);
+      }
+    };
+    fetchOwnerPreview();
+  }, [project, fetchSelectedOptionCallback]);
+
+  useEffect(() => {
+    if (!project) return;
+    setCode(project.code || "");
+    setBudget(project.budget || 0);
+    setTitle(project.title || "");
+    setSlug(project.slug || "");
+    setProjectOwner(project.projectOwner || "");
+    setImageUrl(project.imageUrl || "");
+    setProjectAbstract(project.abstract || "");
+  }, [project]);
 
   const projectDeliverablesIds = project?.scope?.deliverables ?? [];
   const projectDeliverables = deliverables.filter(d => projectDeliverablesIds.includes(d.id));
@@ -257,81 +321,38 @@ const Project: React.FC<ProjectProps> = ({
           {/* Project Owner and Image URL */}
           <div className="mt-8 grid grid-cols-3 gap-2">
             <div className="col-span-1">
-              <Form
-                onSubmit={(e: any) => {
-                  e.preventDefault();
-                  if (!project) return;
-                  if (e.target.value === project.projectOwner) return;
-                  dispatch(
-                    actions.updateProjectOwner({
-                      id: project.id,
-                      projectOwner: e.target.value,
-                    })
-                  );
+              <PHIDInput
+                className="w-full"
+                name="projectOwner"
+                label="Project Owner"
+                placeholder="Enter PHID"
+                variant="withValueTitleAndDescription"
+                value={projectOwner || ""}
+                autoComplete={true}
+                previewPlaceholder={ownerPreview || undefined}
+                onChange={(newValue) => {
+                  // Update local state
+                  setProjectOwner(newValue);
                 }}
-              >
-                <AIDField
-                  className="w-full"
-                  label="Project Owner"
-                  name="projectOwner"
-                  value={projectOwner}
-                  initialOptions={contributors.map((c) => ({
-                    value: c.id,
-                    title: c.name,
-                    path: {
-                      text: "Link",
-                      url: "https://powerhouse.inc",
-                    },
-                    description: " ",
-                    icon: "Person",
-                  }))}
-                  onChange={(e) => setProjectOwner(e)}
-                  variant="withValueAndTitle"
-                  onBlur={(e) => {
-                    if (!project) return;
-                    if (e.target.value === project.projectOwner) return;
+                onBlur={(e) => {
+                  if (!project) return;
+
+                  const originalValue = project.projectOwner || "";
+                  const targetValue = e.target.value;
+
+                  // Only dispatch if the value has changed
+                  if (targetValue !== originalValue) {
                     dispatch(
                       actions.updateProjectOwner({
                         id: project.id,
-                        projectOwner: e.target.value,
+                        projectOwner: targetValue || "",
                       })
                     );
-                  }}
-                  fetchOptionsCallback={async (userInput: string) => {
-                    const contributorsFilter = contributors.filter((c) =>
-                      c.name.toLowerCase().includes(userInput.toLowerCase())
-                    );
-                    if (contributorsFilter.length === 0) {
-                      return Promise.reject(new Error("No contributors found"));
-                    }
-                    return contributorsFilter.map((c) => ({
-                      value: c.id,
-                      title: c.name,
-                      path: {
-                        text: "Link",
-                        url: "https://powerhouse.inc",
-                      },
-                      description: " ",
-                      icon: "Person",
-                    }));
-                  }}
-                  fetchSelectedOptionCallback={async (agentId) => {
-                    const agent = contributors.find((c) => c.id === agentId);
-                    if (!agent)
-                      return Promise.reject(new Error("Agent not found"));
-                    return {
-                      value: agent.id,
-                      title: agent.name,
-                      description: " ",
-                      icon: "Person",
-                      path: {
-                        text: "Link",
-                        url: "https://powerhouse.inc",
-                      },
-                    };
-                  }}
-                />
-              </Form>
+                  }
+                }}
+                fetchOptionsCallback={fetchOptionsCallback}
+                fetchSelectedOptionCallback={fetchSelectedOptionCallback}
+              />
             </div>
             <div className="col-span-1">
               <TextInput

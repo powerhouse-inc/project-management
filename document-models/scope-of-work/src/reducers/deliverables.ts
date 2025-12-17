@@ -8,6 +8,7 @@ export const scopeOfWorkDeliverablesOperations: ScopeOfWorkDeliverablesOperation
     const deliverable: Deliverable = {
       id: action.input.id,
       owner: action.input.owner || null,
+      icon: null,
       title: action.input.title || "",
       code: action.input.code || "",
       description: action.input.description || "",
@@ -61,13 +62,14 @@ export const scopeOfWorkDeliverablesOperations: ScopeOfWorkDeliverablesOperation
       throw new Error("Deliverable not found");
     }
 
-    const updatedDeliverable = {
+    const updatedDeliverable: Deliverable = {
       ...deliverable,
-      owner: action.input.owner || deliverable.owner,
-      title: action.input.title || deliverable.title,
-      code: action.input.code || deliverable.code,
-      description: action.input.description || deliverable.description,
-      status: action.input.status || deliverable.status,
+      owner: action.input.owner !== undefined ? action.input.owner : deliverable.owner,
+      icon: action.input.icon !== undefined ? action.input.icon : deliverable.icon,
+      title: action.input.title !== undefined ? (action.input.title ?? "") : deliverable.title,
+      code: action.input.code !== undefined ? (action.input.code ?? "") : deliverable.code,
+      description: action.input.description !== undefined ? (action.input.description ?? "") : deliverable.description,
+      status: action.input.status !== undefined && action.input.status !== null ? action.input.status : deliverable.status,
     }
 
     state.deliverables = state.deliverables.map((deliverable) => String(deliverable.id) === String(action.input.id) ? updatedDeliverable : deliverable);

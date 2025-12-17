@@ -312,6 +312,7 @@ export function DeliverableSchema(): z.ZodObject<Properties<Deliverable>> {
     budgetAnchor: BudgetAnchorProjectSchema().nullable(),
     code: z.string(),
     description: z.string(),
+    icon: z.string().nullable(),
     id: z.string(),
     keyResults: z.array(KeyResultSchema()),
     owner: z.string().nullable(),
@@ -369,6 +370,7 @@ export function EditDeliverableInputSchema(): z.ZodObject<
   return z.object({
     code: z.string().nullish(),
     description: z.string().nullish(),
+    icon: z.string().nullish(),
     id: z.string(),
     owner: z.string().nullish(),
     status: z.lazy(() => PmDeliverableStatusInputSchema.nullish()),
