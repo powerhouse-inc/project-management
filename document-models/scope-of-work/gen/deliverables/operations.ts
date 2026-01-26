@@ -1,15 +1,15 @@
 import { type SignalDispatch } from "document-model";
-import {
-  type AddDeliverableAction,
-  type RemoveDeliverableAction,
-  type EditDeliverableAction,
-  type SetDeliverableProgressAction,
-  type AddKeyResultAction,
-  type RemoveKeyResultAction,
-  type EditKeyResultAction,
-  type SetDeliverableBudgetAnchorProjectAction,
+import type {
+  AddDeliverableAction,
+  RemoveDeliverableAction,
+  EditDeliverableAction,
+  SetDeliverableProgressAction,
+  AddKeyResultAction,
+  RemoveKeyResultAction,
+  EditKeyResultAction,
+  SetDeliverableBudgetAnchorProjectAction,
 } from "./actions.js";
-import { type ScopeOfWorkState } from "../types.js";
+import type { ScopeOfWorkState } from "../types.js";
 
 export interface ScopeOfWorkDeliverablesOperations {
   addDeliverableOperation: (

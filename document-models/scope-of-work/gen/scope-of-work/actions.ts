@@ -1,4 +1,4 @@
-import { type Action } from "document-model";
+import type { Action } from "document-model";
 import type { EditScopeOfWorkInput } from "../types.js";
 
 export type EditScopeOfWorkAction = Action & {

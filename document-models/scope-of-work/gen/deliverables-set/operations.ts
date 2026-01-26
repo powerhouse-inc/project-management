@@ -1,10 +1,10 @@
 import { type SignalDispatch } from "document-model";
-import {
-  type EditDeliverablesSetAction,
-  type AddDeliverableInSetAction,
-  type RemoveDeliverableInSetAction,
+import type {
+  EditDeliverablesSetAction,
+  AddDeliverableInSetAction,
+  RemoveDeliverableInSetAction,
 } from "./actions.js";
-import { type ScopeOfWorkState } from "../types.js";
+import type { ScopeOfWorkState } from "../types.js";
 
 export interface ScopeOfWorkDeliverablesSetOperations {
   editDeliverablesSetOperation: (

@@ -1,10 +1,10 @@
 import { type SignalDispatch } from "document-model";
-import {
-  type AddRoadmapAction,
-  type RemoveRoadmapAction,
-  type EditRoadmapAction,
+import type {
+  AddRoadmapAction,
+  RemoveRoadmapAction,
+  EditRoadmapAction,
 } from "./actions.js";
-import { type ScopeOfWorkState } from "../types.js";
+import type { ScopeOfWorkState } from "../types.js";
 
 export interface ScopeOfWorkRoadmapsOperations {
   addRoadmapOperation: (

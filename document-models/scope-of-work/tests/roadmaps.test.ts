@@ -1,23 +1,18 @@
-/**
- * This is a scaffold file meant for customization:
- * - change it by adding new tests or modifying the existing ones
- */
-
-import { describe, it, expect } from "vitest";
 import { generateMock } from "@powerhousedao/codegen";
+import { describe, expect, it } from "vitest";
 import {
   reducer,
   utils,
   isScopeOfWorkDocument,
   addRoadmap,
-  AddRoadmapInputSchema,
   removeRoadmap,
-  RemoveRoadmapInputSchema,
   editRoadmap,
+  AddRoadmapInputSchema,
+  RemoveRoadmapInputSchema,
   EditRoadmapInputSchema,
-} from "../../index.js";
+} from "@powerhousedao/project-management/document-models/scope-of-work";
 
-describe("Roadmaps Operations", () => {
+describe("RoadmapsOperations", () => {
   it("should handle addRoadmap operation", () => {
     const document = utils.createDocument();
     const input = generateMock(AddRoadmapInputSchema());
@@ -34,6 +29,7 @@ describe("Roadmaps Operations", () => {
     );
     expect(updatedDocument.operations.global[0].index).toEqual(0);
   });
+
   it("should handle removeRoadmap operation", () => {
     const document = utils.createDocument();
     const input = generateMock(RemoveRoadmapInputSchema());
@@ -50,6 +46,7 @@ describe("Roadmaps Operations", () => {
     );
     expect(updatedDocument.operations.global[0].index).toEqual(0);
   });
+
   it("should handle editRoadmap operation", () => {
     const document = utils.createDocument();
     const input = generateMock(EditRoadmapInputSchema());

@@ -1,14 +1,14 @@
 import { type SignalDispatch } from "document-model";
-import {
-  type AddMilestoneAction,
-  type RemoveMilestoneAction,
-  type EditMilestoneAction,
-  type AddCoordinatorAction,
-  type RemoveCoordinatorAction,
-  type AddMilestoneDeliverableAction,
-  type RemoveMilestoneDeliverableAction,
+import type {
+  AddMilestoneAction,
+  RemoveMilestoneAction,
+  EditMilestoneAction,
+  AddCoordinatorAction,
+  RemoveCoordinatorAction,
+  AddMilestoneDeliverableAction,
+  RemoveMilestoneDeliverableAction,
 } from "./actions.js";
-import { type ScopeOfWorkState } from "../types.js";
+import type { ScopeOfWorkState } from "../types.js";
 
 export interface ScopeOfWorkMilestonesOperations {
   addMilestoneOperation: (

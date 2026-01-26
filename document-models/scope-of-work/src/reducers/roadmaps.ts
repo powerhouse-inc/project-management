@@ -2,7 +2,9 @@ import type { ScopeOfWorkRoadmapsOperations } from "@powerhousedao/project-manag
 
 export const scopeOfWorkRoadmapsOperations: ScopeOfWorkRoadmapsOperations = {
   editRoadmapOperation(state, action) {
-    const roadmap = state.roadmaps.find((roadmap) => String(roadmap.id) === String(action.input.id));
+    const roadmap = state.roadmaps.find(
+      (roadmap) => String(roadmap.id) === String(action.input.id),
+    );
     if (!roadmap) {
       throw new Error("Roadmap not found");
     }
@@ -14,8 +16,9 @@ export const scopeOfWorkRoadmapsOperations: ScopeOfWorkRoadmapsOperations = {
       description: action.input.description || roadmap.description,
     };
 
-    state.roadmaps = state.roadmaps.map((roadmap) => String(roadmap.id) === String(action.input.id) ? updatedRoadmap : roadmap);
-
+    state.roadmaps = state.roadmaps.map((roadmap) =>
+      String(roadmap.id) === String(action.input.id) ? updatedRoadmap : roadmap,
+    );
   },
   addRoadmapOperation(state, action) {
     if (action.input.id === undefined || action.input.title === undefined) {
@@ -31,14 +34,15 @@ export const scopeOfWorkRoadmapsOperations: ScopeOfWorkRoadmapsOperations = {
     };
 
     state.roadmaps.push(roadmap);
-
   },
   removeRoadmapOperation(state, action) {
     if (action.input.id === undefined) {
       throw new Error("Invalid roadmap id input");
     }
 
-    const roadmap = state.roadmaps.find((roadmap) => String(roadmap.id) === String(action.input.id));
+    const roadmap = state.roadmaps.find(
+      (roadmap) => String(roadmap.id) === String(action.input.id),
+    );
     if (!roadmap) {
       throw new Error("Roadmap not found");
     }
@@ -47,13 +51,16 @@ export const scopeOfWorkRoadmapsOperations: ScopeOfWorkRoadmapsOperations = {
       roadmap.milestones.forEach((milestone) => {
         if (milestone.scope?.deliverables) {
           milestone.scope.deliverables.forEach((deliverableId) => {
-            state.deliverables = state.deliverables.filter((deliverable) => String(deliverable.id) !== String(deliverableId));
+            state.deliverables = state.deliverables.filter(
+              (deliverable) => String(deliverable.id) !== String(deliverableId),
+            );
           });
         }
       });
     }
 
-    state.roadmaps = state.roadmaps.filter((roadmap) => String(roadmap.id) !== String(action.input.id));
-
+    state.roadmaps = state.roadmaps.filter(
+      (roadmap) => String(roadmap.id) !== String(action.input.id),
+    );
   },
 };

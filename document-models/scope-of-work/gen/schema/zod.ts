@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod";
 import type {
   AddAgentInput,
   AddCoordinatorInput,
@@ -64,7 +64,7 @@ import type {
 } from "./types.js";
 
 type Properties<T> = Required<{
-  [K in keyof T]: z.ZodType<T[K], any, T[K]>;
+  [K in keyof T]: z.ZodType<T[K]>;
 }>;
 
 type definedNonNullAny = {};
@@ -188,7 +188,7 @@ export function AddDeliverableInputSchema(): z.ZodObject<
     description: z.string().nullish(),
     id: z.string(),
     owner: z.string().nullish(),
-    status: z.lazy(() => PmDeliverableStatusInputSchema.nullish()),
+    status: PmDeliverableStatusInputSchema.nullish(),
     title: z.string().nullish(),
   });
 }
@@ -243,9 +243,9 @@ export function AddProjectInputSchema(): z.ZodObject<
   return z.object({
     abstract: z.string().nullish(),
     budget: z.number().nullish(),
-    budgetType: z.lazy(() => PmBudgetTypeInputSchema.nullish()),
+    budgetType: PmBudgetTypeInputSchema.nullish(),
     code: z.string(),
-    currency: z.lazy(() => PmCurrencyInputSchema.nullish()),
+    currency: PmCurrencyInputSchema.nullish(),
     id: z.string(),
     imageUrl: z.string().url().nullish(),
     projectOwner: z.string().nullish(),
@@ -268,8 +268,8 @@ export function AddRoadmapInputSchema(): z.ZodObject<
 export function AgentSchema(): z.ZodObject<Properties<Agent>> {
   return z.object({
     __typename: z.literal("Agent").optional(),
-    description: z.string().nullable(),
-    icon: z.string().url().nullable(),
+    description: z.string().nullish(),
+    icon: z.string().url().nullish(),
     id: z.string(),
     name: z.string(),
   });
@@ -278,7 +278,7 @@ export function AgentSchema(): z.ZodObject<Properties<Agent>> {
 export function BinarySchema(): z.ZodObject<Properties<Binary>> {
   return z.object({
     __typename: z.literal("Binary").optional(),
-    done: z.boolean().nullable(),
+    done: z.boolean().nullish(),
   });
 }
 
@@ -288,9 +288,9 @@ export function BudgetAnchorProjectSchema(): z.ZodObject<
   return z.object({
     __typename: z.literal("BudgetAnchorProject").optional(),
     margin: z.number(),
-    project: z.string().nullable(),
+    project: z.string().nullish(),
     quantity: z.number(),
-    unit: UnitSchema.nullable(),
+    unit: UnitSchema.nullish(),
     unitCost: z.number(),
   });
 }
@@ -309,16 +309,16 @@ export function BudgetExpenditureSchema(): z.ZodObject<
 export function DeliverableSchema(): z.ZodObject<Properties<Deliverable>> {
   return z.object({
     __typename: z.literal("Deliverable").optional(),
-    budgetAnchor: BudgetAnchorProjectSchema().nullable(),
+    budgetAnchor: z.lazy(() => BudgetAnchorProjectSchema().nullish()),
     code: z.string(),
     description: z.string(),
-    icon: z.string().nullable(),
+    icon: z.string().nullish(),
     id: z.string(),
-    keyResults: z.array(KeyResultSchema()),
-    owner: z.string().nullable(),
+    keyResults: z.array(z.lazy(() => KeyResultSchema())),
+    owner: z.string().nullish(),
     status: DeliverableStatusSchema,
     title: z.string(),
-    workProgress: ProgressSchema().nullable(),
+    workProgress: z.lazy(() => ProgressSchema().nullish()),
   });
 }
 
@@ -347,8 +347,8 @@ export function DeliverablesSetSchema(): z.ZodObject<
   return z.object({
     __typename: z.literal("DeliverablesSet").optional(),
     deliverables: z.array(z.string()),
-    deliverablesCompleted: DeliverablesCompletedSchema(),
-    progress: ProgressSchema(),
+    deliverablesCompleted: z.lazy(() => DeliverablesCompletedSchema()),
+    progress: z.lazy(() => ProgressSchema()),
     status: DeliverableSetStatusSchema,
   });
 }
@@ -373,7 +373,7 @@ export function EditDeliverableInputSchema(): z.ZodObject<
     icon: z.string().nullish(),
     id: z.string(),
     owner: z.string().nullish(),
-    status: z.lazy(() => PmDeliverableStatusInputSchema.nullish()),
+    status: PmDeliverableStatusInputSchema.nullish(),
     title: z.string().nullish(),
   });
 }
@@ -387,7 +387,7 @@ export function EditDeliverablesSetInputSchema(): z.ZodObject<
     ),
     milestoneId: z.string().nullish(),
     projectId: z.string().nullish(),
-    status: z.lazy(() => DeliverableSetStatusInputSchema.nullish()),
+    status: DeliverableSetStatusInputSchema.nullish(),
   });
 }
 
@@ -431,7 +431,7 @@ export function EditScopeOfWorkInputSchema(): z.ZodObject<
 > {
   return z.object({
     description: z.string().nullish(),
-    status: z.lazy(() => ScopeOfWorkStatusInputSchema.nullish()),
+    status: ScopeOfWorkStatusInputSchema.nullish(),
     title: z.string().nullish(),
   });
 }
@@ -448,12 +448,12 @@ export function KeyResultSchema(): z.ZodObject<Properties<KeyResult>> {
 export function MilestoneSchema(): z.ZodObject<Properties<Milestone>> {
   return z.object({
     __typename: z.literal("Milestone").optional(),
-    budget: z.number().nullable(),
+    budget: z.number().nullish(),
     coordinators: z.array(z.string()),
     deliveryTarget: z.string(),
     description: z.string(),
     id: z.string(),
-    scope: DeliverablesSetSchema().nullable(),
+    scope: z.lazy(() => DeliverablesSetSchema().nullish()),
     sequenceCode: z.string(),
     title: z.string(),
   });
@@ -481,16 +481,16 @@ export function ProgressInputSchema(): z.ZodObject<Properties<ProgressInput>> {
 export function ProjectSchema(): z.ZodObject<Properties<Project>> {
   return z.object({
     __typename: z.literal("Project").optional(),
-    abstract: z.string().nullable(),
-    budget: z.number().nullable(),
-    budgetType: BudgetTypeSchema.nullable(),
+    abstract: z.string().nullish(),
+    budget: z.number().nullish(),
+    budgetType: BudgetTypeSchema.nullish(),
     code: z.string(),
-    currency: PmCurrencySchema.nullable(),
-    expenditure: BudgetExpenditureSchema().nullable(),
+    currency: PmCurrencySchema.nullish(),
+    expenditure: z.lazy(() => BudgetExpenditureSchema().nullish()),
     id: z.string(),
-    imageUrl: z.string().url().nullable(),
-    projectOwner: z.string().nullable(),
-    scope: DeliverablesSetSchema().nullable(),
+    imageUrl: z.string().url().nullish(),
+    projectOwner: z.string().nullish(),
+    scope: z.lazy(() => DeliverablesSetSchema().nullish()),
     slug: z.string(),
     title: z.string(),
   });
@@ -588,7 +588,7 @@ export function RoadmapSchema(): z.ZodObject<Properties<Roadmap>> {
     __typename: z.literal("Roadmap").optional(),
     description: z.string(),
     id: z.string(),
-    milestones: z.array(MilestoneSchema()),
+    milestones: z.array(z.lazy(() => MilestoneSchema())),
     slug: z.string(),
     title: z.string(),
   });
@@ -599,11 +599,11 @@ export function ScopeOfWorkStateSchema(): z.ZodObject<
 > {
   return z.object({
     __typename: z.literal("ScopeOfWorkState").optional(),
-    contributors: z.array(AgentSchema()),
-    deliverables: z.array(DeliverableSchema()),
+    contributors: z.array(z.lazy(() => AgentSchema())),
+    deliverables: z.array(z.lazy(() => DeliverableSchema())),
     description: z.string(),
-    projects: z.array(ProjectSchema()),
-    roadmaps: z.array(RoadmapSchema()),
+    projects: z.array(z.lazy(() => ProjectSchema())),
+    roadmaps: z.array(z.lazy(() => RoadmapSchema())),
     status: ScopeOfWorkStatusSchema,
     title: z.string(),
   });
@@ -672,9 +672,9 @@ export function UpdateProjectInputSchema(): z.ZodObject<
   return z.object({
     abstract: z.string().nullish(),
     budget: z.number().nullish(),
-    budgetType: z.lazy(() => PmBudgetTypeInputSchema.nullish()),
+    budgetType: PmBudgetTypeInputSchema.nullish(),
     code: z.string().nullish(),
-    currency: z.lazy(() => PmCurrencyInputSchema.nullish()),
+    currency: PmCurrencyInputSchema.nullish(),
     id: z.string(),
     imageUrl: z.string().url().nullish(),
     slug: z.string().nullish(),

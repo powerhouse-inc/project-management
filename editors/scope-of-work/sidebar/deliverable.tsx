@@ -526,6 +526,12 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                     <label>Completed</label>
                     <input
                       type="number"
+                      min={0}
+                      max={
+                        workProgress && "total" in workProgress
+                          ? workProgress.total
+                          : 0
+                      }
                       className="w-16 h-8 border border-gray-300 rounded px-2 flex items-end bg-white"
                       value={
                         workProgress && "completed" in workProgress
@@ -533,11 +539,21 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                           : 0
                       }
                       onChange={(e) => {
+                        const newCompleted = parseInt(e.target.value) || 0;
+                        const total =
+                          workProgress && "total" in workProgress
+                            ? workProgress.total
+                            : 0;
+                        // Ensure completed doesn't exceed total
+                        const clampedCompleted = Math.min(
+                          Math.max(0, newCompleted),
+                          total,
+                        );
                         setWorkProgress((prev) => {
                           if (prev && "completed" in prev) {
                             return {
                               ...prev,
-                              completed: parseInt(e.target.value),
+                              completed: clampedCompleted,
                             };
                           }
                           return prev;
@@ -545,19 +561,26 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                       }}
                       onBlur={(e) => {
                         if (workProgress && "completed" in workProgress) {
+                          const total =
+                            workProgress && "total" in workProgress
+                              ? workProgress.total
+                              : 0;
+                          const newCompleted = parseInt(e.target.value) || 0;
+                          // Ensure completed doesn't exceed total
+                          const clampedCompleted = Math.min(
+                            Math.max(0, newCompleted),
+                            total,
+                          );
                           dispatch(
                             actions.setDeliverableProgress({
                               id: currentDeliverable.id,
                               workProgress: {
                                 storyPoints: {
-                                  total:
-                                    workProgress && "total" in workProgress
-                                      ? workProgress.total
-                                      : 0,
-                                  completed: parseInt(e.target.value),
+                                  total,
+                                  completed: clampedCompleted,
                                 },
                               },
-                            })
+                            }),
                           );
                         }
                       }}
@@ -567,6 +590,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                     <label>Total</label>
                     <input
                       type="number"
+                      min={0}
                       className="w-16 h-8 border border-gray-300 rounded px-2 flex items-end bg-white"
                       value={
                         workProgress && "total" in workProgress
@@ -574,11 +598,24 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                           : 0
                       }
                       onChange={(e) => {
+                        const newTotal = parseInt(e.target.value) || 0;
                         setWorkProgress((prev) => {
+                          if (prev && "total" in prev && "completed" in prev) {
+                            // If completed exceeds new total, clamp it
+                            const clampedCompleted = Math.min(
+                              prev.completed,
+                              newTotal,
+                            );
+                            return {
+                              ...prev,
+                              total: newTotal,
+                              completed: clampedCompleted,
+                            };
+                          }
                           if (prev && "total" in prev) {
                             return {
                               ...prev,
-                              total: parseInt(e.target.value),
+                              total: newTotal,
                             };
                           }
                           return prev;
@@ -586,16 +623,26 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                       }}
                       onBlur={(e) => {
                         if (workProgress && "total" in workProgress) {
+                          const newTotal = parseInt(e.target.value) || 0;
+                          const currentCompleted =
+                            workProgress && "completed" in workProgress
+                              ? workProgress.completed
+                              : 0;
+                          // Ensure completed doesn't exceed new total
+                          const clampedCompleted = Math.min(
+                            currentCompleted,
+                            newTotal,
+                          );
                           dispatch(
                             actions.setDeliverableProgress({
                               id: currentDeliverable.id,
                               workProgress: {
                                 storyPoints: {
-                                  total: parseInt(e.target.value),
-                                  completed: workProgress?.completed || 0,
+                                  total: newTotal,
+                                  completed: clampedCompleted,
                                 },
                               },
-                            })
+                            }),
                           );
                         }
                       }}

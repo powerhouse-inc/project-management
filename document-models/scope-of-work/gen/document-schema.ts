@@ -8,9 +8,10 @@ import { ScopeOfWorkStateSchema } from "./schema/zod.js";
 import type { ScopeOfWorkDocument, ScopeOfWorkPHState } from "./types.js";
 
 /** Schema for validating the header object of a ScopeOfWork document */
-export const ScopeOfWorkDocumentHeaderSchema = BaseDocumentHeaderSchema.extend({
-  documentType: z.literal(scopeOfWorkDocumentType),
-});
+export const ScopeOfWorkDocumentHeaderSchema =
+  BaseDocumentHeaderSchema.extend({
+    documentType: z.literal(scopeOfWorkDocumentType),
+  });
 
 /** Schema for validating the state object of a ScopeOfWork document */
 export const ScopeOfWorkPHStateSchema = BaseDocumentStateSchema.extend({

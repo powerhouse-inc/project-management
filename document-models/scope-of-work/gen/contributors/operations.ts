@@ -1,10 +1,10 @@
 import { type SignalDispatch } from "document-model";
-import {
-  type AddAgentAction,
-  type RemoveAgentAction,
-  type EditAgentAction,
+import type {
+  AddAgentAction,
+  RemoveAgentAction,
+  EditAgentAction,
 } from "./actions.js";
-import { type ScopeOfWorkState } from "../types.js";
+import type { ScopeOfWorkState } from "../types.js";
 
 export interface ScopeOfWorkContributorsOperations {
   addAgentOperation: (

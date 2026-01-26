@@ -17,7 +17,7 @@ import {
   assertIsScopeOfWorkDocument,
   isScopeOfWorkState,
   assertIsScopeOfWorkState,
-} from "../../index.js";
+} from "@powerhousedao/project-management/document-models/scope-of-work";
 import { ZodError } from "zod";
 
 describe("ScopeOfWork Document Model", () => {

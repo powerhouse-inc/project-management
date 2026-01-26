@@ -10,6 +10,7 @@ import {
 } from "./gen/creators.js";
 
 /** Actions for the ScopeOfWork document model */
+
 export const actions = {
   ...baseActions,
   ...scopeOfWorkActions,

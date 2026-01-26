@@ -180,7 +180,7 @@ const BudgetCalculator = ({
               if (!project) return;
               dispatch(
                 actions.updateProject({
-                  id: project!.id,
+                  id: project.id,
                   currency: value as PmCurrencyInput,
                 })
               );

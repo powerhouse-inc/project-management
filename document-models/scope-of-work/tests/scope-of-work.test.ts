@@ -1,19 +1,14 @@
-/**
- * This is a scaffold file meant for customization:
- * - change it by adding new tests or modifying the existing ones
- */
-
-import { describe, it, expect } from "vitest";
 import { generateMock } from "@powerhousedao/codegen";
+import { describe, expect, it } from "vitest";
 import {
   reducer,
   utils,
   isScopeOfWorkDocument,
   editScopeOfWork,
   EditScopeOfWorkInputSchema,
-} from "../../index.js";
+} from "@powerhousedao/project-management/document-models/scope-of-work";
 
-describe("ScopeOfWork Operations", () => {
+describe("ScopeOfWorkOperations", () => {
   it("should handle editScopeOfWork operation", () => {
     const document = utils.createDocument();
     const input = generateMock(EditScopeOfWorkInputSchema());

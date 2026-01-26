@@ -1,7 +1,8 @@
 import { actions, type ScopeOfWorkAction } from "../../../document-models/scope-of-work/index.js";
 import type { Roadmap as RoadmapType, Milestone as MilestoneType } from "../../../document-models/scope-of-work/gen/types.js";
 import { Textarea, TextInput } from "@powerhousedao/document-engineering";
-import React, { useState, useEffect, useMemo } from "react";
+import type React from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Icon } from "@powerhousedao/design-system";
 import { generateId } from "document-model/core";
 import {

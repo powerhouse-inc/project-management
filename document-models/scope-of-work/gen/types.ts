@@ -3,6 +3,7 @@ import type { ScopeOfWorkAction } from "./actions.js";
 import type { ScopeOfWorkState as ScopeOfWorkGlobalState } from "./schema/types.js";
 
 type ScopeOfWorkLocalState = Record<PropertyKey, never>;
+
 type ScopeOfWorkPHState = PHBaseState & {
   global: ScopeOfWorkGlobalState;
   local: ScopeOfWorkLocalState;

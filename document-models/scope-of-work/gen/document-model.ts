@@ -6,7 +6,7 @@ export const documentModel: DocumentModelGlobalState = {
     website: "https://powerhouse.inc",
   },
   description:
-    "The Scope of Work v2 model defines a structured plan for executing contributor work; on top of deliverables and roadmaps with milestones it now also includes projects as budget anchors for project based budgeting. ",
+    "The Scope of Work v2 model defines a structured plan for executing contributor work; on top of deliverables and roadmaps with milestones it now also includes projects as budget anchors for project based budgeting.",
   extension: "",
   id: "powerhouse/scopeofwork",
   name: "ScopeOfWork",
@@ -30,7 +30,8 @@ export const documentModel: DocumentModelGlobalState = {
               schema:
                 "input EditScopeOfWorkInput {\n    title: String\n    description: String\n\tstatus: ScopeOfWorkStatusInput #defaults to DRAFT\n}\n\nenum ScopeOfWorkStatusInput {\n  DRAFT\n  SUBMITTED\n  IN_PROGRESS\n  REJECTED\n  APPROVED\n  DELIVERED\n  CANCELED\n}",
               scope: "global",
-              template: "",
+              template:
+                "This operation allows a user to edit the basic details of a Scope of Work (SoW) document. ",
             },
           ],
         },
@@ -50,7 +51,7 @@ export const documentModel: DocumentModelGlobalState = {
               schema:
                 "input AddDeliverableInput {\n  id: OID!\n  owner: ID\n  title: String\n  code: String\n  description: String\n  status: PMDeliverableStatusInput\n}\n\nenum PMDeliverableStatusInput {\n  WONT_DO\n  DRAFT\n  TODO\n  BLOCKED\n  IN_PROGRESS\n  DELIVERED\n  CANCELED\n}",
               scope: "global",
-              template: "",
+              template: "This operation is used to create a new deliverable. ",
             },
             {
               description: "",
@@ -74,7 +75,8 @@ export const documentModel: DocumentModelGlobalState = {
               schema:
                 "input EditDeliverableInput {\n  id: OID!\n  owner: ID\n  icon: String\n  title: String\n  code: String\n  description: String\n  status: PMDeliverableStatusInput\n}\n\n",
               scope: "global",
-              template: "",
+              template:
+                "This operation allows a user to edit the core attributes of a deliverable, a concrete piece of work within a project or a milestone. Deliverables are the building blocks of execution, typically assigned to contributors or teams.",
             },
             {
               description: "",
@@ -99,7 +101,8 @@ export const documentModel: DocumentModelGlobalState = {
               schema:
                 "input AddKeyResultInput {\n  id: OID!\n  deliverableId:OID!\n  title: String!\n  link: String\n}",
               scope: "global",
-              template: "",
+              template:
+                "This operation allows a user to add a key result to a specific deliverable. Key results are measurable outcomes or indicators that help track progress on a deliverable. ",
             },
             {
               description: "",
@@ -178,7 +181,8 @@ export const documentModel: DocumentModelGlobalState = {
               schema:
                 'input EditRoadmapInput {\n  id: OID!\n  title: String \n  slug: String #computed title: "The Logical Structure of  Atlas"\n              # id: "abcd1234" #=> slug: "the-logical-structure-of-atlas-abcd1234"\n  description: String\n}',
               scope: "global",
-              template: "",
+              template:
+                "This operation allows a user to edit the details of a roadmap document, which outlines the structure ",
             },
           ],
         },
@@ -225,7 +229,7 @@ export const documentModel: DocumentModelGlobalState = {
             },
             {
               description:
-                "This operation allows a user to assign a contributor as a coordinator for a specific milestone. Coordinators are the people responsible for ensuring the milestone gets delivered; they’re often leads, facilitators, or project managers.\n\n",
+                "This operation allows a user to assign a contributor as a coordinator for a specific milestone. Coordinators are the people responsible for ensuring the milestone gets delivered; they're often leads, facilitators, or project managers.\n\n",
               errors: [],
               examples: [],
               id: "0db5f01b-33b5-486b-9e67-a95ebea85107",
@@ -234,7 +238,8 @@ export const documentModel: DocumentModelGlobalState = {
               schema:
                 "input AddCoordinatorInput {\n  id: ID! \n  milestoneId: OID!\n}",
               scope: "global",
-              template: "",
+              template:
+                "This operation allows a user to assign a contributor as a coordinator for a specific milestone. Coordinators are the people responsible for ensuring the milestone gets delivered; they're often leads, facilitators, or project managers.\n\n",
             },
             {
               description: "",
@@ -386,7 +391,8 @@ export const documentModel: DocumentModelGlobalState = {
               schema:
                 "input AddProjectInput {\n  id: OID!\n  code: String!\n  title: String!\n  slug: String\n  projectOwner: ID # Initial project owner\n  abstract: String\n  imageUrl: URL\n  budgetType: PMBudgetTypeInput\n  currency: PMCurrencyInput\n  budget: Float\n}\n\nenum PMBudgetTypeInput {\n  CONTINGENCY\n  OPEX\n  CAPEX\n  OVERHEAD\n}\n\nenum PMCurrencyInput {\n  DAI\n  USDS\n  EUR\n  USD\n}\n\n",
               scope: "global",
-              template: "",
+              template:
+                "Creates a new project in a DRAFT status, initializing its core fields. The status of the new project defaults to DRAFT. The Deliverables list (scope) is initialized as empty.",
             },
             {
               description:
@@ -399,7 +405,8 @@ export const documentModel: DocumentModelGlobalState = {
               schema:
                 "input UpdateProjectInput {\n  id: OID! \n  code: String \n  slug: String\n  title: String \n  abstract: String \n  imageUrl: URL \n  budgetType:  PMBudgetTypeInput\n  currency:  PMCurrencyInput\n  budget: Float \n}",
               scope: "global",
-              template: "",
+              template:
+                "Updates general, non-status-related fields of an existing project. This operation is for minor content adjustments. Project must exist; only allowed if the project status is DRAFT or REJECTED. For projects in other statuses, specific operations for status transitions or scope management should be used.\n\nIf code is updated, it must remain unique.",
             },
             {
               description:
@@ -412,7 +419,8 @@ export const documentModel: DocumentModelGlobalState = {
               schema:
                 "input UpdateProjectOwnerInput {\n  id: OID! # The ID of the project\n  projectOwner: ID! # The ID of the new owner (Agent)\n}",
               scope: "global",
-              template: "",
+              template:
+                "Changes the primary owner of a project. This is a specific update due to its potential impact on permissions and responsibilities. Project must exist. The projectOwner must correspond to a valid existing Agent.\nOnly allowed if the project status is DRAFT, REJECTED, APPROVED, or IN_PROGRESS. Requires appropriate permissions (e.g., current owner, admin, or coordinator).",
             },
             {
               description: "",
@@ -480,13 +488,13 @@ export const documentModel: DocumentModelGlobalState = {
         global: {
           examples: [],
           initialValue:
-            '"{\\n  \\"title\\": \\"\\",\\n  \\"description\\": \\"\\",\\n  \\"status\\": \\"DRAFT\\",\\n  \\"deliverables\\": [],\\n  \\"projects\\": [],\\n  \\"roadmaps\\": [],\\n  \\"contributors\\": []\\n}"',
+            '{\n  "title": "",\n  "description": "",\n  "status": "DRAFT",\n  "deliverables": [],\n  "projects": [],\n  "roadmaps": [],\n  "contributors": []\n}',
           schema:
             "type ScopeOfWorkState {\n  title: String!\n  description: String!\n  status: ScopeOfWorkStatus!\n  deliverables: [Deliverable!]!\n  projects: [Project!]!\n  roadmaps: [Roadmap!]!\n  contributors: [Agent!]!\n}\n\nenum ScopeOfWorkStatus {\n  DRAFT\n  SUBMITTED\n  IN_PROGRESS\n  REJECTED\n  APPROVED\n  DELIVERED\n  CANCELED\n}\n\ntype Agent {\n  id: PHID!\n  name: String!\n  icon: URL\n  description: String\n}\n\ntype Deliverable {\n  id: OID!\n  owner: ID\n  icon: String\n  title: String!\n  code: String!\n  description: String!\n  status: DeliverableStatus!\n  workProgress: Progress\n  keyResults: [KeyResult!]!\n  budgetAnchor: BudgetAnchorProject\n}\n\ntype BudgetAnchorProject {\n  project: OID\n  unit: Unit\n  unitCost: Float!\n  quantity: Float!\n  margin: Float!\n}\n\nenum Unit {\n  StoryPoints\n  Hours\n}\n\nenum DeliverableStatus {\n  WONT_DO\n  DRAFT\n  TODO\n  BLOCKED\n  IN_PROGRESS\n  DELIVERED\n  CANCELED\n}\n\nunion Progress = StoryPoint | Percentage | Binary\n\ntype Percentage {\n  value: Float!\n}\n\ntype Binary {\n  done: Boolean\n}\n\ntype StoryPoint {\n  total: Int!\n  completed: Int!\n}\n\ntype KeyResult {\n  id: OID!\n  title: String!\n  link: String!\n}\n\ntype Project {\n  id: OID!\n  slug: String!\n  code: String!\n  title: String!\n  projectOwner: ID\n  abstract: String\n  imageUrl: URL\n  scope: DeliverablesSet\n  budgetType: BudgetType\n  currency: PMCurrency\n  budget: Float\n  expenditure: BudgetExpenditure\n}\n\nenum PMCurrency {\n  DAI\n  USDS\n  EUR\n  USD\n}\n\nenum BudgetType {\n  CONTINGENCY\n  OPEX\n  CAPEX\n  OVERHEAD\n}\n\ntype BudgetExpenditure {\n  percentage: Float!\n  actuals: Float!\n  cap: Float!\n}\n\ntype Roadmap {\n  id: OID!\n  slug: String!\n  title: String!\n  description: String!\n  milestones: [Milestone!]!\n}\n\ntype Milestone {\n  id: OID!\n  sequenceCode: String!\n  title: String!\n  description: String!\n  deliveryTarget: String!\n  scope: DeliverablesSet\n  coordinators: [ID!]!\n  budget: Float\n}\n\ntype DeliverablesSet {\n  deliverables: [OID!]!\n  status: DeliverableSetStatus!\n  progress: Progress!\n  deliverablesCompleted: DeliverablesCompleted!\n}\n\ntype DeliverablesCompleted {\n  total: Int!\n  completed: Int!\n}\n\nenum DeliverableSetStatus {\n  DRAFT\n  TODO\n  IN_PROGRESS\n  FINISHED\n  CANCELED\n}",
         },
         local: {
           examples: [],
-          initialValue: '""',
+          initialValue: "",
           schema: "",
         },
       },

@@ -1,15 +1,15 @@
 import { type SignalDispatch } from "document-model";
-import {
-  type AddProjectAction,
-  type UpdateProjectAction,
-  type UpdateProjectOwnerAction,
-  type RemoveProjectAction,
-  type SetProjectMarginAction,
-  type SetProjectTotalBudgetAction,
-  type AddProjectDeliverableAction,
-  type RemoveProjectDeliverableAction,
+import type {
+  AddProjectAction,
+  UpdateProjectAction,
+  UpdateProjectOwnerAction,
+  RemoveProjectAction,
+  SetProjectMarginAction,
+  SetProjectTotalBudgetAction,
+  AddProjectDeliverableAction,
+  RemoveProjectDeliverableAction,
 } from "./actions.js";
-import { type ScopeOfWorkState } from "../types.js";
+import type { ScopeOfWorkState } from "../types.js";
 
 export interface ScopeOfWorkProjectsOperations {
   addProjectOperation: (

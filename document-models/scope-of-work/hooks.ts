@@ -1,15 +1,18 @@
 import type { DocumentDispatch } from "@powerhousedao/reactor-browser";
 import {
+  useDocumentById,
   useDocumentsInSelectedDrive,
   useDocumentsInSelectedFolder,
-  useDocumentById,
   useSelectedDocument,
 } from "@powerhousedao/reactor-browser";
 import type {
-  ScopeOfWorkDocument,
   ScopeOfWorkAction,
+  ScopeOfWorkDocument,
 } from "@powerhousedao/project-management/document-models/scope-of-work";
-import { isScopeOfWorkDocument } from "./gen/document-schema.js";
+import {
+  assertIsScopeOfWorkDocument,
+  isScopeOfWorkDocument,
+} from "./gen/document-schema.js";
 
 /** Hook to get a ScopeOfWork document by its id */
 export function useScopeOfWorkDocumentById(
@@ -23,12 +26,14 @@ export function useScopeOfWorkDocumentById(
 }
 
 /** Hook to get the selected ScopeOfWork document */
-export function useSelectedScopeOfWorkDocument():
-  | [ScopeOfWorkDocument, DocumentDispatch<ScopeOfWorkAction>]
-  | [undefined, undefined] {
+export function useSelectedScopeOfWorkDocument(): [
+  ScopeOfWorkDocument,
+  DocumentDispatch<ScopeOfWorkAction>,
+] {
   const [document, dispatch] = useSelectedDocument();
-  if (!isScopeOfWorkDocument(document)) return [undefined, undefined];
-  return [document, dispatch];
+
+  assertIsScopeOfWorkDocument(document);
+  return [document, dispatch] as const;
 }
 
 /** Hook to get all ScopeOfWork documents in the selected drive */

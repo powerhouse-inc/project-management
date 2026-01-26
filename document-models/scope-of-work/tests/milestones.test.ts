@@ -1,31 +1,26 @@
-/**
- * This is a scaffold file meant for customization:
- * - change it by adding new tests or modifying the existing ones
- */
-
-import { describe, it, expect } from "vitest";
 import { generateMock } from "@powerhousedao/codegen";
+import { describe, expect, it } from "vitest";
 import {
   reducer,
   utils,
   isScopeOfWorkDocument,
   addMilestone,
-  AddMilestoneInputSchema,
   removeMilestone,
-  RemoveMilestoneInputSchema,
   editMilestone,
-  EditMilestoneInputSchema,
   addCoordinator,
-  AddCoordinatorInputSchema,
   removeCoordinator,
-  RemoveCoordinatorInputSchema,
   addMilestoneDeliverable,
-  AddMilestoneDeliverableInputSchema,
   removeMilestoneDeliverable,
+  AddMilestoneInputSchema,
+  RemoveMilestoneInputSchema,
+  EditMilestoneInputSchema,
+  AddCoordinatorInputSchema,
+  RemoveCoordinatorInputSchema,
+  AddMilestoneDeliverableInputSchema,
   RemoveMilestoneDeliverableInputSchema,
-} from "../../index.js";
+} from "@powerhousedao/project-management/document-models/scope-of-work";
 
-describe("Milestones Operations", () => {
+describe("MilestonesOperations", () => {
   it("should handle addMilestone operation", () => {
     const document = utils.createDocument();
     const input = generateMock(AddMilestoneInputSchema());
@@ -42,6 +37,7 @@ describe("Milestones Operations", () => {
     );
     expect(updatedDocument.operations.global[0].index).toEqual(0);
   });
+
   it("should handle removeMilestone operation", () => {
     const document = utils.createDocument();
     const input = generateMock(RemoveMilestoneInputSchema());
@@ -58,6 +54,7 @@ describe("Milestones Operations", () => {
     );
     expect(updatedDocument.operations.global[0].index).toEqual(0);
   });
+
   it("should handle editMilestone operation", () => {
     const document = utils.createDocument();
     const input = generateMock(EditMilestoneInputSchema());
@@ -74,6 +71,7 @@ describe("Milestones Operations", () => {
     );
     expect(updatedDocument.operations.global[0].index).toEqual(0);
   });
+
   it("should handle addCoordinator operation", () => {
     const document = utils.createDocument();
     const input = generateMock(AddCoordinatorInputSchema());
@@ -90,6 +88,7 @@ describe("Milestones Operations", () => {
     );
     expect(updatedDocument.operations.global[0].index).toEqual(0);
   });
+
   it("should handle removeCoordinator operation", () => {
     const document = utils.createDocument();
     const input = generateMock(RemoveCoordinatorInputSchema());
@@ -106,6 +105,7 @@ describe("Milestones Operations", () => {
     );
     expect(updatedDocument.operations.global[0].index).toEqual(0);
   });
+
   it("should handle addMilestoneDeliverable operation", () => {
     const document = utils.createDocument();
     const input = generateMock(AddMilestoneDeliverableInputSchema());
@@ -122,6 +122,7 @@ describe("Milestones Operations", () => {
     );
     expect(updatedDocument.operations.global[0].index).toEqual(0);
   });
+
   it("should handle removeMilestoneDeliverable operation", () => {
     const document = utils.createDocument();
     const input = generateMock(RemoveMilestoneDeliverableInputSchema());
