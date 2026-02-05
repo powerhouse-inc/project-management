@@ -144,7 +144,7 @@ export const UnitSchema = z.enum(["Hours", "StoryPoints"]);
 export function AddAgentInputSchema(): z.ZodObject<Properties<AddAgentInput>> {
   return z.object({
     description: z.string().nullish(),
-    icon: z.string().url().nullish(),
+    icon: z.url().nullish(),
     id: z.string(),
     name: z.string(),
   });
@@ -236,7 +236,7 @@ export function AddProjectInputSchema(): z.ZodObject<
     code: z.string(),
     currency: PmCurrencyInputSchema.nullish(),
     id: z.string(),
-    imageUrl: z.string().url().nullish(),
+    imageUrl: z.url().nullish(),
     projectOwner: z.string().nullish(),
     slug: z.string().nullish(),
     title: z.string(),
@@ -258,7 +258,7 @@ export function AgentSchema(): z.ZodObject<Properties<Agent>> {
   return z.object({
     __typename: z.literal("Agent").optional(),
     description: z.string().nullish(),
-    icon: z.string().url().nullish(),
+    icon: z.url().nullish(),
     id: z.string(),
     name: z.string(),
   });
@@ -347,7 +347,7 @@ export function EditAgentInputSchema(): z.ZodObject<
 > {
   return z.object({
     description: z.string().nullish(),
-    icon: z.string().url().nullish(),
+    icon: z.url().nullish(),
     id: z.string(),
     name: z.string().nullish(),
   });
@@ -386,7 +386,7 @@ export function EditKeyResultInputSchema(): z.ZodObject<
   return z.object({
     deliverableId: z.string(),
     id: z.string(),
-    link: z.string().url().nullish(),
+    link: z.url().nullish(),
     title: z.string().nullish(),
   });
 }
@@ -477,7 +477,7 @@ export function ProjectSchema(): z.ZodObject<Properties<Project>> {
     currency: PmCurrencySchema.nullish(),
     expenditure: z.lazy(() => BudgetExpenditureSchema().nullish()),
     id: z.string(),
-    imageUrl: z.string().url().nullish(),
+    imageUrl: z.url().nullish(),
     projectOwner: z.string().nullish(),
     scope: z.lazy(() => DeliverablesSetSchema().nullish()),
     slug: z.string(),
@@ -665,7 +665,7 @@ export function UpdateProjectInputSchema(): z.ZodObject<
     code: z.string().nullish(),
     currency: PmCurrencyInputSchema.nullish(),
     id: z.string(),
-    imageUrl: z.string().url().nullish(),
+    imageUrl: z.url().nullish(),
     slug: z.string().nullish(),
     title: z.string().nullish(),
   });
