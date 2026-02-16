@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/powerhouse-inc/project-management/compare/v1.0.0...v1.0.1) (2026-02-16)
+
+
+### Bug Fixes
+
+* correct semantic-release plugin order ([57f9264](https://github.com/powerhouse-inc/project-management/commit/57f92643d68cbe13963f1ce564b966f15418859d))
+
 # 1.0.0 (2026-02-16)
 
 
