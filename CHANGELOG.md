@@ -1,3 +1,10 @@
+# [1.0.0-staging.3](https://github.com/powerhouse-inc/project-management/compare/v1.0.0-staging.2...v1.0.0-staging.3) (2026-02-16)
+
+
+### Bug Fixes
+
+* add repository url for npm trusted publishing ([f3e2d58](https://github.com/powerhouse-inc/project-management/commit/f3e2d5815fd66bfe1750857b832677c40067c27f))
+
 # [1.0.0-staging.2](https://github.com/powerhouse-inc/project-management/compare/v1.0.0-staging.1...v1.0.0-staging.2) (2026-02-16)
 
 
