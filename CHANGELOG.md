@@ -1,3 +1,10 @@
+# [1.0.0-staging.2](https://github.com/powerhouse-inc/project-management/compare/v1.0.0-staging.1...v1.0.0-staging.2) (2026-02-16)
+
+
+### Bug Fixes
+
+* correct semantic-release plugin order ([8fc905d](https://github.com/powerhouse-inc/project-management/commit/8fc905da2010cc70b3526486d2c26a852c1d95de))
+
 # 1.0.0-staging.1 (2026-02-16)
 
 
