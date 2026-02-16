@@ -1,3 +1,10 @@
+# [1.0.0-dev.3](https://github.com/powerhouse-inc/project-management/compare/v1.0.0-dev.2...v1.0.0-dev.3) (2026-02-16)
+
+
+### Bug Fixes
+
+* release on all commit types via semantic-release releaseRules ([82da008](https://github.com/powerhouse-inc/project-management/commit/82da0081c047f80b78a1d5acbef6f89b62f111ee))
+
 # [1.0.0-dev.2](https://github.com/powerhouse-inc/project-management/compare/v1.0.0-dev.1...v1.0.0-dev.2) (2026-02-16)
 
 
