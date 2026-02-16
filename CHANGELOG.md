@@ -1,3 +1,10 @@
+# [1.0.0-staging.4](https://github.com/powerhouse-inc/project-management/compare/v1.0.0-staging.3...v1.0.0-staging.4) (2026-02-16)
+
+
+### Bug Fixes
+
+* release on all commit types via semantic-release releaseRules ([e9437c4](https://github.com/powerhouse-inc/project-management/commit/e9437c41cc14490e59835d240b7ea8a85216b5c4))
+
 # [1.0.0-staging.3](https://github.com/powerhouse-inc/project-management/compare/v1.0.0-staging.2...v1.0.0-staging.3) (2026-02-16)
 
 
