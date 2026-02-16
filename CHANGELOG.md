@@ -1,3 +1,10 @@
+# [1.0.0-dev.2](https://github.com/powerhouse-inc/project-management/compare/v1.0.0-dev.1...v1.0.0-dev.2) (2026-02-16)
+
+
+### Bug Fixes
+
+* add repository url for npm trusted publishing ([d2d12f0](https://github.com/powerhouse-inc/project-management/commit/d2d12f0326e4446624226a36c9f6f37a60f95348))
+
 # 1.0.0-dev.1 (2026-02-16)
 
 
