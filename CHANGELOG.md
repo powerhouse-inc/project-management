@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/powerhouse-inc/project-management/compare/v1.0.2...v1.0.3) (2026-02-16)
+
+
+### Bug Fixes
+
+* release on all commit types via semantic-release releaseRules ([77019db](https://github.com/powerhouse-inc/project-management/commit/77019db4fc1fee5a372600e6aee3ab945e6a6736))
+
 ## [1.0.2](https://github.com/powerhouse-inc/project-management/compare/v1.0.1...v1.0.2) (2026-02-16)
 
 
