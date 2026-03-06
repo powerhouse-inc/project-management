@@ -1,3 +1,5 @@
+# [1.0.0-dev.5](https://github.com/powerhouse-inc/project-management/compare/v1.0.0-dev.4...v1.0.0-dev.5) (2026-03-06)
+
 # [1.0.0-dev.4](https://github.com/powerhouse-inc/project-management/compare/v1.0.0-dev.3...v1.0.0-dev.4) (2026-02-25)
 
 # [1.0.0-dev.3](https://github.com/powerhouse-inc/project-management/compare/v1.0.0-dev.2...v1.0.0-dev.3) (2026-02-16)
