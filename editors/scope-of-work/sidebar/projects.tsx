@@ -3,7 +3,7 @@ import {
   type Agent,
   type Project,
   type ScopeOfWorkAction,
-} from "../../../document-models/scope-of-work/gen/types.js";
+} from "../../../document-models/scope-of-work/v1/gen/types.js";
 import {
   ObjectSetTable,
   type ColumnDef,
@@ -67,7 +67,7 @@ const Projects: React.FC<ProjectsProps> = ({
           }
           return false;
         },
-        renderCell: (value, context) => {
+        renderCell: (value) => {
           if (value === "") {
             return (
               <div className="font-light italic text-left text-gray-500">

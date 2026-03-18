@@ -1,12 +1,17 @@
 {
-    "name": "",
+    "name": "v6-project-management",
     "description": "",
     "category": "",
     "publisher": {
         "name": "",
         "url": ""
     },
-    "documentModels": [],
+    "documentModels": [
+        {
+            "id": "powerhouse/scopeofwork",
+            "name": "ScopeOfWork"
+        }
+    ],
     "editors": [],
     "apps": [],
     "subgraphs": [],

@@ -1,2 +1,1 @@
-export {};
-export { module as ScopeOfWork } from "./scope-of-work/index.js";
+export { ScopeOfWork as ScopeOfWorkV1 } from "./scope-of-work/v1/module.js";

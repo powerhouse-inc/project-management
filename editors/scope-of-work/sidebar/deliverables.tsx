@@ -6,7 +6,7 @@ import {
   type PmDeliverableStatusInput,
   type ScopeOfWorkAction,
   type ScopeOfWorkDocument,
-} from "../../../document-models/scope-of-work/gen/types.js";
+} from "../../../document-models/scope-of-work/v1/gen/types.js";
 import {
   ObjectSetTable,
   type ColumnDef,
@@ -27,7 +27,7 @@ import {
   type AddMilestoneDeliverableAction,
   type AddDeliverableInSetAction,
   type RemoveDeliverableInSetAction,
-} from "../../../document-models/scope-of-work/gen/actions.js";
+} from "../../../document-models/scope-of-work/v1/gen/actions.js";
 
 interface ProjectsProps {
   deliverables: Deliverable[] | undefined;
@@ -68,7 +68,7 @@ const Deliverables: React.FC<ProjectsProps> = ({
     setStateProjects(projects);
   }, [milestones, projects, deliverables]);
 
-  const latestActivity = document.operations.global.filter((operation) => {
+  const latestActivity = (document.operations.global ?? []).filter((operation) => {
     const typedOperation = operation as Operation & {
       timestampUtcMs: string;
       action:
@@ -243,7 +243,7 @@ const Deliverables: React.FC<ProjectsProps> = ({
           }
           return false;
         },
-        renderCell: (value, context) => {
+        renderCell: (value) => {
           if (value === "") {
             return (
               <div className="font-light italic text-left text-gray-500">

@@ -69,7 +69,7 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
           }
           return false;
         },
-        renderCell: (value, context) => {
+        renderCell: (value) => {
           if (value === "") {
             return (
               <div className="font-light italic text-left text-gray-500">
@@ -125,7 +125,7 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
           }
           return false;
         },
-        renderCell: (value, context) => {
+        renderCell: (value) => {
           if (value === "") {
             return (
               <div className="font-light italic text-left text-gray-500">
@@ -179,28 +179,6 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
     }
   }, [editRowId]);
 
-  const handleInputBlur = () => {
-    if (editRowId !== null) {
-      if (state.roadmaps.find((row: Roadmap) => row.id === editRowId)) {
-        dispatch(
-          actions.editRoadmap({ id: editRowId.toString(), title: editValue })
-        );
-      } else {
-        dispatch(
-          actions.addRoadmap({
-            id: editRowId,
-            title: editValue,
-            slug: editValue
-              .toLowerCase()
-              .replace(/ /g, "-")
-              .concat(`-${editRowId.substring(editRowId.length - 8)}`),
-          })
-        );
-      }
-      setEditRowId(null);
-      setEditValue("");
-    }
-  };
 
   return (
     <div className="border border-gray-300 p-4 rounded-md ">
@@ -288,11 +266,16 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
           }}
           onAdd={(data) => {
             if (data.title) {
+              const newId = generateId();
               dispatch(
                 actions.addProject({
-                  id: generateId(),
+                  id: newId,
                   code: "",
                   title: data.title as string,
+                  slug: (data.title as string)
+                  .toLowerCase()
+                  .replace(/ /g, "-")
+                  .concat(`-${newId.substring(newId.length - 8)}`),
                 })
               );
             }

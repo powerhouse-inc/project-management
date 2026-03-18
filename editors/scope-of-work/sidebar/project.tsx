@@ -5,7 +5,7 @@ import {
   type PmCurrencyInput,
   type Agent,
   type ScopeOfWorkAction,
-} from "../../../document-models/scope-of-work/gen/types.js";
+} from "../../../document-models/scope-of-work/v1/gen/types.js";
 import { useMemo, useState, useEffect } from "react";
 import {
   TextInput,
@@ -13,8 +13,7 @@ import {
   type ColumnDef,
   type ColumnAlignment,
   Textarea,
-  AIDField,
-  Form,
+  PHIDInput,
   Select,
 } from "@powerhousedao/document-engineering";
 import { Icon } from "@powerhousedao/design-system";
@@ -24,6 +23,8 @@ import BudgetCalculator from "./budgetCalculator.js";
 import ProgressBar from "../components/progressBar.js";
 import { statusStyles } from "./deliverable.js";
 import { type DocumentDispatch } from "@powerhousedao/reactor-browser";
+import { useRemoteBuilderProfiles } from "../hooks/useRemoteBuilderProfiles.js";
+import type { RemoteBuilderProfile } from "../utils/graphql-client.js";
 
 interface ProjectProps {
   project: ProjectType | undefined;
@@ -32,6 +33,37 @@ interface ProjectProps {
   setActiveNodeId: (id: string) => void;
   contributors: Agent[];
 }
+
+type IconName = "Person" | "Project";
+
+type PHIDOption = {
+  value: string;
+  title: string;
+  description?: string;
+  path?: string;
+  icon: IconName | React.ReactElement;
+};
+
+const convertContributorToOption = (contributor: Agent): PHIDOption => ({
+  value: contributor.id,
+  title: contributor.name,
+  description: "Local contributor",
+  icon: "Person",
+});
+
+const convertRemoteProfileToOption = (profile: RemoteBuilderProfile): PHIDOption => ({
+  value: profile.id,
+  title: profile.state.name || profile.id,
+  path: "powerhouse/builder-profile",
+  description: profile.state.description || undefined,
+  icon: profile.state.icon ? (
+    <img
+      src={profile.state.icon}
+      alt=""
+      className="w-6 h-6 rounded-full object-cover"
+    />
+  ) : "Person",
+});
 
 const Project: React.FC<ProjectProps> = ({
   project,
@@ -42,6 +74,7 @@ const Project: React.FC<ProjectProps> = ({
 }) => {
   const [code, setCode] = useState(project?.code);
   const [title, setTitle] = useState(project?.title);
+  const [slug, setSlug] = useState(project?.slug || "");
   const [projectOwner, setProjectOwner] = useState(
     project?.projectOwner as string
   );
@@ -51,16 +84,108 @@ const Project: React.FC<ProjectProps> = ({
   );
   const [budget, setBudget] = useState(project?.budget || 0);
   const [budgetCalculatorOpen, setBudgetCalculatorOpen] = useState(false);
+  const [ownerPreview, setOwnerPreview] = useState<PHIDOption | null>(null);
+
+  // Create a map of local contributor IDs for the remote profiles hook
+  const localProfileMap = useMemo(() => {
+    const map = new Map<string, Agent>();
+    contributors.forEach((c) => map.set(c.id, c));
+    return map;
+  }, [contributors]);
+
+  // Fetch remote builder profiles
+  const { allProfiles: remoteProfiles, isLoading: isLoadingRemote, profileMap: remoteProfileMap } =
+    useRemoteBuilderProfiles(localProfileMap);
+
+  // Combine local contributors and remote profiles into initial options
+  const initialOptions = useMemo<PHIDOption[]>(() => {
+    const localOptions = contributors.map(convertContributorToOption);
+    const remoteOptions = remoteProfiles.map(convertRemoteProfileToOption);
+    return [...localOptions, ...remoteOptions];
+  }, [contributors, remoteProfiles]);
+
+  // Fetch options callback for searching
+  const fetchOptionsCallback = useMemo(() => {
+    return async (userInput: string): Promise<PHIDOption[]> => {
+      const searchTerm = userInput.toLowerCase();
+
+      // Search local contributors
+      const localMatches = contributors
+        .filter((c) => c.name.toLowerCase().includes(searchTerm))
+        .map(convertContributorToOption);
+
+      // Search remote profiles
+      const remoteMatches = remoteProfiles
+        .filter((p) =>
+          p.state.name?.toLowerCase().includes(searchTerm) ||
+          p.id.toLowerCase().includes(searchTerm)
+        )
+        .map(convertRemoteProfileToOption);
+
+      const allMatches = [...localMatches, ...remoteMatches];
+
+      if (allMatches.length === 0) {
+        return Promise.reject(new Error("No profiles found"));
+      }
+
+      return allMatches;
+    };
+  }, [contributors, remoteProfiles]);
+
+  // Fetch selected option callback for displaying selected value
+  const fetchSelectedOptionCallback = useMemo(() => {
+    return async (phid: string): Promise<PHIDOption> => {
+      // Check local contributors first
+      const localContributor = contributors.find((c) => c.id === phid);
+      if (localContributor) {
+        return convertContributorToOption(localContributor);
+      }
+
+      // Check remote profiles
+      const remoteProfile = remoteProfileMap.get(phid);
+      if (remoteProfile) {
+        return convertRemoteProfileToOption(remoteProfile);
+      }
+
+      return Promise.reject(new Error("Profile not found"));
+    };
+  }, [contributors, remoteProfileMap]);
+
+  // Helper to check if a PHID is known (local or remote)
+  const isKnownPhid = useMemo(() => {
+    return (phid: string): boolean => {
+      return localProfileMap.has(phid) || remoteProfileMap.has(phid);
+    };
+  }, [localProfileMap, remoteProfileMap]);
 
   useEffect(() => {
-    setCode(project?.code || "");
-    setBudget(project?.budget || 0);
-    setTitle(project?.title || "");
-    setProjectOwner(project?.projectOwner || "");
-    setImageUrl(project?.imageUrl || "");
-    setProjectAbstract(project?.abstract || "");
-    setBudget(project?.budget || 0);
-  }, [deliverables, project?.id]);
+    const fetchOwnerPreview = async () => {
+      if (project?.projectOwner) {
+        try {
+          const ownerDetails = await fetchSelectedOptionCallback(
+            project.projectOwner
+          );
+          setOwnerPreview(ownerDetails);
+        } catch {
+          setOwnerPreview(null);
+        }
+      } else {
+        setOwnerPreview(null);
+      }
+    };
+    fetchOwnerPreview();
+  }, [project, fetchSelectedOptionCallback]);
+
+  useEffect(() => {
+    if (!project) return;
+    setCode(project.code || "");
+    setBudget(project.budget || 0);
+    setTitle(project.title || "");
+    setSlug(project.slug || "");
+    setProjectOwner(project.projectOwner || "");
+    setImageUrl(project.imageUrl || "");
+    setProjectAbstract(project.abstract || "");
+  }, [project]);
 
   const projectDeliverablesIds = project?.scope?.deliverables ?? [];
   const projectDeliverables = deliverables.filter(d => projectDeliverablesIds.includes(d.id));
@@ -109,7 +234,7 @@ const Project: React.FC<ProjectProps> = ({
           }
           return false;
         },
-        renderCell: (value, context) => {
+        renderCell: (value) => {
           if (value === "") {
             return (
               <div className="font-light italic text-left text-gray-500">
@@ -165,7 +290,7 @@ const Project: React.FC<ProjectProps> = ({
         editable: false,
         align: "center" as ColumnAlignment,
         width: 100,
-        renderCell: (value, context) => {
+        renderCell: (value) => {
           return (
             <span className={`flex items-center justify-center ${statusStyles[value as keyof typeof statusStyles]}`}>{value}</span>
           );
@@ -186,8 +311,36 @@ const Project: React.FC<ProjectProps> = ({
         />
       ) : (
         <div className="border border-gray-300 p-4 rounded-md">
-          <div className="mt-2 grid grid-cols-8 gap-2">
-            <div className="col-span-2">
+          <div className="mt-2">
+            <TextInput
+              className="w-full"
+              label="Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              onBlur={(e) => {
+                if (!project) return;
+                const newTitle = e.target.value;
+                if (newTitle === project.title) return;
+                const newSlug = newTitle
+                  .toLowerCase()
+                  .replace(/ /g, "-")
+                  .concat(`-${project.id.substring(project.id.length - 8)}`);
+                
+                dispatch(
+                  actions.updateProject({
+                    id: project.id,
+                    title: newTitle,
+                    slug: newSlug,
+                  })
+                );
+                
+                // Update local state for slug
+                setSlug(newSlug);
+              }}
+            />
+          </div>
+          <div className="mt-2 grid grid-cols-3 gap-2">
+            <div className="col-span-1 max-w-[200px]">
               <TextInput
                 className="w-full"
                 label="Code"
@@ -205,19 +358,19 @@ const Project: React.FC<ProjectProps> = ({
                 }}
               />
             </div>
-            <div className="col-span-6">
+            <div className="col-span-1">
               <TextInput
                 className="w-full"
-                label="Title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                label="Slug"
+                value={slug}
+                onChange={(e) => setSlug(e.target.value)}
                 onBlur={(e) => {
                   if (!project) return;
-                  if (e.target.value === project.title) return;
+                  if (e.target.value === project.slug) return;
                   dispatch(
                     actions.updateProject({
                       id: project.id,
-                      title: e.target.value,
+                      slug: e.target.value,
                     })
                   );
                 }}
@@ -227,81 +380,56 @@ const Project: React.FC<ProjectProps> = ({
           {/* Project Owner and Image URL */}
           <div className="mt-8 grid grid-cols-3 gap-2">
             <div className="col-span-1">
-              <Form
-                onSubmit={(e: any) => {
-                  e.preventDefault();
-                  if (!project) return;
-                  if (e.target.value === project.projectOwner) return;
-                  dispatch(
-                    actions.updateProjectOwner({
-                      id: project.id,
-                      projectOwner: e.target.value,
-                    })
-                  );
+              <PHIDInput
+                className="w-full"
+                name="projectOwner"
+                label="Project Owner"
+                placeholder={
+                  isLoadingRemote
+                    ? "Loading profiles..."
+                    : "Search builder name or enter PHID"
+                }
+                variant="withValueTitleAndDescription"
+                value={projectOwner || ""}
+                autoComplete={true}
+                previewPlaceholder={ownerPreview || undefined}
+                initialOptions={initialOptions}
+                onChange={(newValue) => {
+                  // Update local state
+                  setProjectOwner(newValue);
+
+                  // If user selected a known profile, save immediately
+                  if (newValue && isKnownPhid(newValue) && project) {
+                    const originalValue = project.projectOwner || "";
+                    if (newValue !== originalValue) {
+                      dispatch(
+                        actions.updateProjectOwner({
+                          id: project.id,
+                          projectOwner: newValue,
+                        })
+                      );
+                    }
+                  }
                 }}
-              >
-                <AIDField
-                  className="w-full"
-                  label="Project Owner"
-                  name="projectOwner"
-                  value={projectOwner}
-                  initialOptions={contributors.map((c) => ({
-                    value: c.id,
-                    title: c.name,
-                    path: {
-                      text: "Link",
-                      url: "https://powerhouse.inc",
-                    },
-                    description: " ",
-                    icon: "Person",
-                  }))}
-                  onChange={(e) => setProjectOwner(e)}
-                  variant="withValueAndTitle"
-                  onBlur={(e) => {
-                    if (!project) return;
-                    if (e.target.value === project.projectOwner) return;
+                onBlur={(e) => {
+                  if (!project) return;
+
+                  const originalValue = project.projectOwner || "";
+                  const targetValue = e.target.value;
+
+                  // Only dispatch if the value has changed
+                  if (targetValue !== originalValue) {
                     dispatch(
                       actions.updateProjectOwner({
                         id: project.id,
-                        projectOwner: e.target.value,
+                        projectOwner: targetValue || "",
                       })
                     );
-                  }}
-                  fetchOptionsCallback={async (userInput: string) => {
-                    const contributorsFilter = contributors.filter((c) =>
-                      c.name.toLowerCase().includes(userInput.toLowerCase())
-                    );
-                    if (contributorsFilter.length === 0) {
-                      return Promise.reject(new Error("No contributors found"));
-                    }
-                    return contributorsFilter.map((c) => ({
-                      value: c.id,
-                      title: c.name,
-                      path: {
-                        text: "Link",
-                        url: "https://powerhouse.inc",
-                      },
-                      description: " ",
-                      icon: "Person",
-                    }));
-                  }}
-                  fetchSelectedOptionCallback={async (agentId) => {
-                    const agent = contributors.find((c) => c.id === agentId);
-                    if (!agent)
-                      return Promise.reject(new Error("Agent not found"));
-                    return {
-                      value: agent.id,
-                      title: agent.name,
-                      description: " ",
-                      icon: "Person",
-                      path: {
-                        text: "Link",
-                        url: "https://powerhouse.inc",
-                      },
-                    };
-                  }}
-                />
-              </Form>
+                  }
+                }}
+                fetchOptionsCallback={fetchOptionsCallback}
+                fetchSelectedOptionCallback={fetchSelectedOptionCallback}
+              />
             </div>
             <div className="col-span-1">
               <TextInput

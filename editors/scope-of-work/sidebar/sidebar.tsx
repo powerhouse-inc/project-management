@@ -17,13 +17,13 @@ import Deliverables from "./deliverables.js";
 import Roadmaps from "./roadmaps.js";
 import Contributors from "./contributors.js";
 import BreadCrumbs from "../components/breadCrumbs.js";
-import { useSelectedScopeOfWorkDocument } from "../../hooks/useScopeOfWorkDocument.js";
+import { useSelectedScopeOfWorkDocument } from "../../../document-models/scope-of-work/v1/hooks.js";
 import {
   type Milestone as MilestoneType,
   type Roadmap as RoadmapType,
   type Project as ProjectType,
   type Deliverable as DeliverableType,
-} from "../../../document-models/scope-of-work/gen/types.js";
+} from "../../../document-models/scope-of-work/v1/gen/types.js";
 
 type SidebarNode = {
   id: string;
@@ -109,6 +109,8 @@ const useSidebarWidth = () => {
 
 export default function SidebarMenu() {
   const [doc, dispatch] = useSelectedScopeOfWorkDocument();
+
+  if (!doc) return null;
 
   const state = doc.state.global;
 

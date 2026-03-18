@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import type { Roadmap, ScopeOfWorkAction } from "../../../document-models/scope-of-work/gen/types.js";
+import type { Roadmap, ScopeOfWorkAction } from "../../../document-models/scope-of-work/v1/gen/types.js";
 import {
   ObjectSetTable,
   type ColumnDef,
@@ -60,7 +60,7 @@ const Roadmaps: React.FC<ProjectsProps> = ({
           }
           return false;
         },
-        renderCell: (value, context) => {
+        renderCell: (value) => {
           if (value === "") {
             return (
               <div className="font-light italic text-left text-gray-500">
@@ -95,7 +95,7 @@ const Roadmaps: React.FC<ProjectsProps> = ({
               const newId = generateId();
               dispatch(
                 actions.addRoadmap({
-                  id: generateId(),
+                  id: newId,
                   title: data.title as string,
                   slug: (data.title as string)
                     .toLowerCase()

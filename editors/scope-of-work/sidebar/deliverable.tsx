@@ -6,8 +6,7 @@ import {
   Select,
   Checkbox,
   Icon,
-  AIDField,
-  Form,
+  PHIDInput,
 } from "@powerhousedao/document-engineering";
 import {
   type Deliverable as DeliverableType,
@@ -22,6 +21,8 @@ import { useEffect, useMemo, useState } from "react";
 import { generateId } from "document-model/core";
 import BudgetCalculator from "./budgetCalculator.js";
 import { type DocumentDispatch } from "@powerhousedao/reactor-browser";
+import { useRemoteBuilderProfiles } from "../hooks/useRemoteBuilderProfiles.js";
+import type { RemoteBuilderProfile } from "../utils/graphql-client.js";
 interface DeliverablesProps {
   deliverables: DeliverableType[];
   dispatch: DocumentDispatch<ScopeOfWorkAction>;
@@ -44,12 +45,42 @@ export const statusStyles = {
   DRAFT: "bg-[#f0f0f0] text-[#999999] rounded px-2 py-1 font-semibold",
   IN_PROGRESS: "bg-[#bfdffd] text-[#339cff] rounded px-2 py-1 font-semibold",
   FINISHED: "bg-[#f0f0f0] text-[#999999] rounded px-2 py-1 font-semibold",
-  CANCELLED: "bg-[#f0f0f0] text-[#999999] rounded px-2 py-1 font-semibold",
   BLOCKED: "bg-[#ffaea8] text-[#de3333] rounded px-2 py-1 font-semibold",
   WONT_DO: "bg-[#f0f0f0] text-[#999999] rounded px-2 py-1 font-semibold",
   DELIVERED: "bg-[#c8ecd1] text-[#4fc86f] rounded px-2 py-1 font-semibold",
   CANCELED: "bg-[#f0f0f0] text-[#999999] rounded px-2 py-1 font-semibold",
 };
+
+type IconName = "Person" | "Project";
+
+type PHIDOption = {
+  value: string;
+  title: string;
+  description?: string;
+  path?: string;
+  icon: IconName | React.ReactElement;
+};
+
+const convertContributorToOption = (contributor: Agent): PHIDOption => ({
+  value: contributor.id,
+  title: contributor.name,
+  description: "Local contributor",
+  icon: "Person",
+});
+
+const convertRemoteProfileToOption = (profile: RemoteBuilderProfile): PHIDOption => ({
+  value: profile.id,
+  title: profile.state.name || profile.id,
+  path: "powerhouse/builder-profile",
+  description: profile.state.description || undefined,
+  icon: profile.state.icon ? (
+    <img
+      src={profile.state.icon}
+      alt=""
+      className="w-6 h-6 rounded-full object-cover"
+    />
+  ) : "Person",
+});
 
 const Deliverable: React.FC<DeliverablesProps> = ({
   deliverables,
@@ -66,6 +97,99 @@ const Deliverable: React.FC<DeliverablesProps> = ({
     deliverables[0]?.workProgress
   );
   const [budgetCalculatorOpen, setBudgetCalculatorOpen] = useState(false);
+  const [icon, setIcon] = useState(currentDeliverable.icon || "");
+  const [ownerPreview, setOwnerPreview] = useState<PHIDOption | null>(null);
+
+  // Create a map of local contributor IDs for the remote profiles hook
+  const localProfileMap = useMemo(() => {
+    const map = new Map<string, Agent>();
+    contributors.forEach((c) => map.set(c.id, c));
+    return map;
+  }, [contributors]);
+
+  // Fetch remote builder profiles
+  const { allProfiles: remoteProfiles, isLoading: isLoadingRemote, profileMap: remoteProfileMap } =
+    useRemoteBuilderProfiles(localProfileMap);
+
+  // Combine local contributors and remote profiles into initial options
+  const initialOptions = useMemo<PHIDOption[]>(() => {
+    const localOptions = contributors.map(convertContributorToOption);
+    const remoteOptions = remoteProfiles.map(convertRemoteProfileToOption);
+    return [...localOptions, ...remoteOptions];
+  }, [contributors, remoteProfiles]);
+
+  // Fetch options callback for searching
+  const fetchOptionsCallback = useMemo(() => {
+    return async (userInput: string): Promise<PHIDOption[]> => {
+      const searchTerm = userInput.toLowerCase();
+
+      // Search local contributors
+      const localMatches = contributors
+        .filter((c) => c.name.toLowerCase().includes(searchTerm))
+        .map(convertContributorToOption);
+
+      // Search remote profiles
+      const remoteMatches = remoteProfiles
+        .filter((p) =>
+          p.state.name?.toLowerCase().includes(searchTerm) ||
+          p.id.toLowerCase().includes(searchTerm)
+        )
+        .map(convertRemoteProfileToOption);
+
+      const allMatches = [...localMatches, ...remoteMatches];
+
+      if (allMatches.length === 0) {
+        return Promise.reject(new Error("No profiles found"));
+      }
+
+      return allMatches;
+    };
+  }, [contributors, remoteProfiles]);
+
+  // Fetch selected option callback for displaying selected value
+  const fetchSelectedOptionCallback = useMemo(() => {
+    return async (phid: string): Promise<PHIDOption> => {
+      // Check local contributors first
+      const localContributor = contributors.find((c) => c.id === phid);
+      if (localContributor) {
+        return convertContributorToOption(localContributor);
+      }
+
+      // Check remote profiles
+      const remoteProfile = remoteProfileMap.get(phid);
+      if (remoteProfile) {
+        return convertRemoteProfileToOption(remoteProfile);
+      }
+
+      return Promise.reject(new Error("Profile not found"));
+    };
+  }, [contributors, remoteProfileMap]);
+
+  // Helper to check if a PHID is known (local or remote)
+  const isKnownPhid = useMemo(() => {
+    return (phid: string): boolean => {
+      return localProfileMap.has(phid) || remoteProfileMap.has(phid);
+    };
+  }, [localProfileMap, remoteProfileMap]);
+
+  useEffect(() => {
+    const fetchOwnerPreview = async () => {
+      const currentDeliverable = deliverables[0];
+      if (currentDeliverable?.owner) {
+        try {
+          const ownerDetails = await fetchSelectedOptionCallback(
+            currentDeliverable.owner
+          );
+          setOwnerPreview(ownerDetails);
+        } catch {
+          setOwnerPreview(null);
+        }
+      } else {
+        setOwnerPreview(null);
+      }
+    };
+    fetchOwnerPreview();
+  }, [deliverables, fetchSelectedOptionCallback]);
 
   useEffect(() => {
     const currentDeliverable = deliverables[0];
@@ -93,7 +217,8 @@ const Deliverable: React.FC<DeliverablesProps> = ({
     }
     setStateDeliverable(currentDeliverable);
     setWorkProgress(currentDeliverable.workProgress);
-  }, [deliverables, currentDeliverable.owner]);
+    setIcon(currentDeliverable.icon || "");
+  }, [deliverables]);
 
   const columns = useMemo<Array<ColumnDef<KeyResult>>>(() => {
     return [
@@ -209,153 +334,108 @@ const Deliverable: React.FC<DeliverablesProps> = ({
               />
             </div>
           </div>
-          {/* Coordinators and Delivery Target */}
-          <div className="mt-8 grid grid-cols-8 gap-2">
-            <div className="col-span-4">
-              <Form
-                onSubmit={(e) => {
-                  e.preventDefault();
+          {/* Deliverable Owner and Icon and Icon Preview */}
+          <div className="mt-8 flex items-start gap-3">
+            <div className="flex-1 max-w-[350px] min-w-0">
+              <PHIDInput
+                className="w-full"
+                name="owner"
+                label="Deliverable Owner"
+                placeholder={
+                  isLoadingRemote
+                    ? "Loading profiles..."
+                    : "Search builder name or enter PHID"
+                }
+                variant="withValueTitleAndDescription"
+                value={stateDeliverable.owner || ""}
+                autoComplete={true}
+                previewPlaceholder={ownerPreview || undefined}
+                initialOptions={initialOptions}
+                onChange={(newValue) => {
                   if (!stateDeliverable) return;
-                  // Get the current value from the AIDField
-                  const currentValue =
-                    typeof stateDeliverable.owner === "string"
-                      ? stateDeliverable.owner
-                      : (stateDeliverable.owner as unknown as { value: string })
-                          ?.value || "";
-                  const originalValue =
-                    typeof currentDeliverable.owner === "string"
-                      ? currentDeliverable.owner
-                      : (
-                          currentDeliverable.owner as unknown as {
-                            value: string;
-                          }
-                        )?.value || "";
-                  const currentValueStr =
-                    typeof currentValue === "string"
-                      ? currentValue
-                      : (currentValue as unknown as { value: string })?.value ||
-                        "";
-                  if (currentValueStr === originalValue) return;
-                  dispatch(
-                    actions.editDeliverable({
-                      id: currentDeliverable.id,
-                      owner: currentValueStr,
-                    })
-                  );
-                }}
-              >
-                <AIDField
-                  className="w-full mt-2"
-                  label="Deliverable Owner"
-                  name="owner"
-                  value={stateDeliverable.owner || ""}
-                  initialOptions={contributors.map((c) => ({
-                    value: c.id,
-                    title: c.name,
-                    path: {
-                      text: "Link",
-                      url: "https://powerhouse.inc",
-                    },
-                    description: " ",
-                    icon: "Person",
-                  }))}
-                  onChange={(e) => {
-                    // Handle both object and string cases
-                    let ownerId = "";
+                  // Update local state
+                  setStateDeliverable({
+                    ...stateDeliverable,
+                    owner: newValue,
+                  });
 
-                    if (typeof e === "object" && e !== null) {
-                      // Object case - extract the value
-                      ownerId = (e as { value: string }).value || "";
-                    } else if (typeof e === "string") {
-                      // String case - could be typing or selection
-                      const isUUID =
-                        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-                          e
-                        );
-
-                      if (isUUID) {
-                        ownerId = e;
-                      } else {
-                        // This is just typing, don't update state or dispatch
-                        return;
-                      }
-                    }
-
-                    // If we have a valid owner ID, update state and dispatch
-                    if (ownerId) {
-                      setStateDeliverable({
-                        ...stateDeliverable,
-                        owner: ownerId,
-                      });
-
-                      // Check if this is different from the original value
-                      const originalValue = currentDeliverable.owner || "";
-
-                      if (ownerId !== originalValue) {
-                        dispatch(
-                          actions.editDeliverable({
-                            id: currentDeliverable.id,
-                            owner: ownerId,
-                          })
-                        );
-                      }
-                    }
-                  }}
-                  variant="withValueAndTitle"
-                  onBlur={(e) => {
-                    if (!stateDeliverable) return;
-
+                  // If user selected a known profile, save immediately
+                  if (newValue && isKnownPhid(newValue)) {
                     const originalValue = currentDeliverable.owner || "";
-                    const targetValue = e.target.value;
-
-                    // Check if the input value is different from the original value
-                    if (targetValue === originalValue) {
-                      return;
+                    if (newValue !== originalValue) {
+                      dispatch(
+                        actions.editDeliverable({
+                          id: currentDeliverable.id,
+                          owner: newValue,
+                        })
+                      );
                     }
+                  }
+                }}
+                onBlur={(e) => {
+                  if (!stateDeliverable) return;
 
-                    // If user typed something new, dispatch with the typed value
+                  const originalValue = currentDeliverable.owner || "";
+                  const targetValue = e.target.value;
+
+                  // Only dispatch if the value has changed
+                  if (targetValue !== originalValue) {
                     dispatch(
                       actions.editDeliverable({
                         id: currentDeliverable.id,
-                        owner: targetValue,
+                        owner: targetValue || "",
                       })
                     );
-                  }}
-                  fetchOptionsCallback={async (userInput: string) => {
-                    const contributorsFilter = contributors.filter((c) =>
-                      c.name.toLowerCase().includes(userInput.toLowerCase())
+                  }
+                }}
+                fetchOptionsCallback={fetchOptionsCallback}
+                fetchSelectedOptionCallback={fetchSelectedOptionCallback}
+              />
+            </div>
+            <div className="w-[400px] flex-shrink-0">
+              <TextInput
+                className="w-full"
+                label="Icon"
+                value={icon}
+                onChange={(e) => setIcon(e.target.value)}
+                onBlur={(e) => {
+                  if (e.target.value === "") {
+                    dispatch(
+                      actions.editDeliverable({
+                        id: currentDeliverable.id,
+                        icon: "",
+                      })
                     );
-                    if (contributorsFilter.length === 0) {
-                      return Promise.reject(new Error("No contributors found"));
-                    }
-                    return contributorsFilter.map((c) => ({
-                      value: c.id,
-                      title: c.name,
-                      path: {
-                        text: "Link",
-                        url: "https://powerhouse.inc",
-                      },
-                      description: " ",
-                      icon: "Person",
-                    }));
-                  }}
-                  fetchSelectedOptionCallback={async (agentId) => {
-                    const agent = contributors.find((c) => c.id === agentId);
-                    if (!agent)
-                      return Promise.reject(new Error("Agent not found"));
-                    return {
-                      value: agent.id,
-                      title: agent.name,
-                      description: " ",
-                      icon: "Person",
-                      path: {
-                        text: "Link",
-                        url: "https://powerhouse.inc",
-                      },
-                    };
-                  }}
-                />
-              </Form>
+                  }
+                  if (e.target.value === currentDeliverable.icon) return;
+                  dispatch(
+                    actions.editDeliverable({
+                      id: currentDeliverable.id,
+                      icon: e.target.value,
+                    })
+                  );
+                }}
+              />
+            </div>
+            <div className="flex-shrink-0 pt-6">
+              {icon && (
+                <div className="w-[60px] h-[60px] bg-gray-200 rounded-md overflow-hidden">
+                  <img
+                    src={icon}
+                    alt="Icon"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                      e.currentTarget.nextElementSibling?.classList.remove(
+                        "hidden"
+                      );
+                    }}
+                  />
+                  <div className="hidden text-xs text-gray-500 truncate">
+                    {icon}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
           {/* Description */}
@@ -522,6 +602,12 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                     <label>Completed</label>
                     <input
                       type="number"
+                      min={0}
+                      max={
+                        workProgress && "total" in workProgress
+                          ? workProgress.total
+                          : 0
+                      }
                       className="w-16 h-8 border border-gray-300 rounded px-2 flex items-end bg-white"
                       value={
                         workProgress && "completed" in workProgress
@@ -529,11 +615,21 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                           : 0
                       }
                       onChange={(e) => {
+                        const newCompleted = parseInt(e.target.value) || 0;
+                        const total =
+                          workProgress && "total" in workProgress
+                            ? workProgress.total
+                            : 0;
+                        // Ensure completed doesn't exceed total
+                        const clampedCompleted = Math.min(
+                          Math.max(0, newCompleted),
+                          total,
+                        );
                         setWorkProgress((prev) => {
                           if (prev && "completed" in prev) {
                             return {
                               ...prev,
-                              completed: parseInt(e.target.value),
+                              completed: clampedCompleted,
                             };
                           }
                           return prev;
@@ -541,19 +637,26 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                       }}
                       onBlur={(e) => {
                         if (workProgress && "completed" in workProgress) {
+                          const total =
+                            workProgress && "total" in workProgress
+                              ? workProgress.total
+                              : 0;
+                          const newCompleted = parseInt(e.target.value) || 0;
+                          // Ensure completed doesn't exceed total
+                          const clampedCompleted = Math.min(
+                            Math.max(0, newCompleted),
+                            total,
+                          );
                           dispatch(
                             actions.setDeliverableProgress({
                               id: currentDeliverable.id,
                               workProgress: {
                                 storyPoints: {
-                                  total:
-                                    workProgress && "total" in workProgress
-                                      ? workProgress.total
-                                      : 0,
-                                  completed: parseInt(e.target.value),
+                                  total,
+                                  completed: clampedCompleted,
                                 },
                               },
-                            })
+                            }),
                           );
                         }
                       }}
@@ -563,6 +666,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                     <label>Total</label>
                     <input
                       type="number"
+                      min={0}
                       className="w-16 h-8 border border-gray-300 rounded px-2 flex items-end bg-white"
                       value={
                         workProgress && "total" in workProgress
@@ -570,11 +674,24 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                           : 0
                       }
                       onChange={(e) => {
+                        const newTotal = parseInt(e.target.value) || 0;
                         setWorkProgress((prev) => {
+                          if (prev && "total" in prev && "completed" in prev) {
+                            // If completed exceeds new total, clamp it
+                            const clampedCompleted = Math.min(
+                              prev.completed,
+                              newTotal,
+                            );
+                            return {
+                              ...prev,
+                              total: newTotal,
+                              completed: clampedCompleted,
+                            };
+                          }
                           if (prev && "total" in prev) {
                             return {
                               ...prev,
-                              total: parseInt(e.target.value),
+                              total: newTotal,
                             };
                           }
                           return prev;
@@ -582,16 +699,26 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                       }}
                       onBlur={(e) => {
                         if (workProgress && "total" in workProgress) {
+                          const newTotal = parseInt(e.target.value) || 0;
+                          const currentCompleted =
+                            workProgress && "completed" in workProgress
+                              ? workProgress.completed
+                              : 0;
+                          // Ensure completed doesn't exceed new total
+                          const clampedCompleted = Math.min(
+                            currentCompleted,
+                            newTotal,
+                          );
                           dispatch(
                             actions.setDeliverableProgress({
                               id: currentDeliverable.id,
                               workProgress: {
                                 storyPoints: {
-                                  total: parseInt(e.target.value),
-                                  completed: workProgress?.completed || 0,
+                                  total: newTotal,
+                                  completed: clampedCompleted,
                                 },
                               },
-                            })
+                            }),
                           );
                         }
                       }}

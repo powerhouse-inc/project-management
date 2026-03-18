@@ -1,7 +1,14 @@
-import { actions, type ScopeOfWorkAction } from "../../../document-models/scope-of-work/index.js";
-import type { Roadmap as RoadmapType, Milestone as MilestoneType } from "../../../document-models/scope-of-work/gen/types.js";
+import {
+  actions,
+  type ScopeOfWorkAction,
+} from "../../../document-models/scope-of-work/v1/index.js";
+import type {
+  Roadmap as RoadmapType,
+  Milestone as MilestoneType,
+} from "../../../document-models/scope-of-work/v1/gen/types.js";
 import { Textarea, TextInput } from "@powerhousedao/document-engineering";
-import React, { useState, useEffect, useMemo } from "react";
+import type React from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Icon } from "@powerhousedao/design-system";
 import { generateId } from "document-model/core";
 import {
@@ -10,7 +17,6 @@ import {
   type ColumnDef,
 } from "@powerhousedao/document-engineering";
 import { type DocumentDispatch } from "@powerhousedao/reactor-browser";
-
 
 interface RoadmapsProps {
   roadmaps: RoadmapType[];
@@ -71,13 +77,13 @@ const Roadmap: React.FC<RoadmapsProps> = ({
                 id: context.row.id,
                 roadmapId: roadmap.id,
                 title: newValue as string,
-              })
+              }),
             );
             return true;
           }
           return false;
         },
-        renderCell: (value, context) => {
+        renderCell: (value) => {
           if (value === "") {
             return (
               <div className="font-light italic text-left text-gray-500">
@@ -98,17 +104,17 @@ const Roadmap: React.FC<RoadmapsProps> = ({
           if (Array.isArray(newValue)) {
             newValue.forEach((id) => {
               if (typeof id !== "string") {
-                throw new Error(`Invalid id: ${id}`)
+                throw new Error(`Invalid id: ${id}`);
               }
               const coordinator = context.row.coordinators.find(
-                (c) => c === id
+                (c) => c === id,
               );
               if (!coordinator) {
                 dispatch(
                   actions.addCoordinator({
-                    id:  id,
+                    id: id,
                     milestoneId: context.row.id,
-                  })
+                  }),
                 );
               }
             });
@@ -121,7 +127,7 @@ const Roadmap: React.FC<RoadmapsProps> = ({
                   actions.removeCoordinator({
                     id: c,
                     milestoneId: context.row.id,
-                  })
+                  }),
                 );
               });
               return true;
@@ -131,14 +137,14 @@ const Roadmap: React.FC<RoadmapsProps> = ({
               .map((value) => value.trim());
             multipleValues.forEach((value) => {
               const coordinator = context.row.coordinators.find(
-                (c) => c === value
+                (c) => c === value,
               );
               if (!coordinator) {
                 dispatch(
                   actions.addCoordinator({
                     id: value,
                     milestoneId: context.row.id,
-                  })
+                  }),
                 );
               }
               return true;
@@ -160,7 +166,7 @@ const Roadmap: React.FC<RoadmapsProps> = ({
                 id: context.row.id,
                 roadmapId: roadmap.id,
                 deliveryTarget: " ",
-              })
+              }),
             );
             return true;
           }
@@ -170,14 +176,14 @@ const Roadmap: React.FC<RoadmapsProps> = ({
                 id: context.row.id,
                 roadmapId: roadmap.id,
                 deliveryTarget: newValue as string,
-              })
+              }),
             );
             return true;
           }
           return false;
         },
-        renderCell: (value, context) => {
-          if (!value) return null
+        renderCell: (value) => {
+          if (!value) return null;
           return (
             <div className="text-center">
               {new Date(value as string).toLocaleDateString("en-US", {
@@ -190,7 +196,7 @@ const Roadmap: React.FC<RoadmapsProps> = ({
         },
       },
     ],
-    []
+    [],
   );
 
   return (
@@ -207,15 +213,15 @@ const Roadmap: React.FC<RoadmapsProps> = ({
               .toLowerCase()
               .replace(/ /g, "-")
               .concat(`-${roadmap.id.substring(roadmap.id.length - 8)}`);
-            
+
             dispatch(
-              actions.editRoadmap({ 
-                id: roadmap.id, 
+              actions.editRoadmap({
+                id: roadmap.id,
                 title: newTitle,
-                slug: newSlug
-              })
+                slug: newSlug,
+              }),
             );
-            
+
             // Update local state for slug
             setSlug(newSlug);
           }}
@@ -229,7 +235,10 @@ const Roadmap: React.FC<RoadmapsProps> = ({
           onChange={(e) => setSlug(e.target.value)}
           onBlur={(e) => {
             dispatch(
-              actions.editRoadmap({ id: roadmap.id, slug: e.target.value })
+              actions.editRoadmap({
+                id: roadmap.id,
+                slug: e.target.value,
+              }),
             );
           }}
         />
@@ -246,7 +255,7 @@ const Roadmap: React.FC<RoadmapsProps> = ({
               actions.editRoadmap({
                 id: roadmap.id,
                 description: e.target.value,
-              })
+              }),
             );
           }}
         />
@@ -262,7 +271,10 @@ const Roadmap: React.FC<RoadmapsProps> = ({
           onDelete={(data) => {
             if (!roadmap) return;
             dispatch(
-              actions.removeMilestone({ id: data[0].id, roadmapId: roadmap.id })
+              actions.removeMilestone({
+                id: data[0].id,
+                roadmapId: roadmap.id,
+              }),
             );
           }}
           onAdd={(data) => {
@@ -273,7 +285,7 @@ const Roadmap: React.FC<RoadmapsProps> = ({
                   id: generateId(),
                   roadmapId: roadmap.id,
                   title: data.title as string,
-                })
+                }),
               );
             } else if (data.deliveryTarget) {
               console.log("deliveryTarget", data.deliveryTarget);
@@ -282,7 +294,7 @@ const Roadmap: React.FC<RoadmapsProps> = ({
                   id: generateId(),
                   roadmapId: roadmap.id,
                   deliveryTarget: data.deliveryTarget as string,
-                })
+                }),
               );
             }
           }}
