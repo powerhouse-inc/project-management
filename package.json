@@ -1,7 +1,7 @@
 {
   "name": "@powerhousedao/project-management",
   "description": "The Scope of Work model defines a structured plan for executing contributor work; it includes deliverables and roadmaps with milestones with each being linked to ownership, progress tracking.",
-  "version": "1.0.0-dev.0",
+  "version": "1.0.0-dev.6",
   "license": "AGPL-3.0-only",
   "repository": {
     "type": "git",
@@ -187,6 +187,5 @@
       "@semantic-release/git"
     ]
   },
-  "readme": "ERROR: No README data found!",
-  "_id": "v6-project-management@1.0.0"
+  "readme": "ERROR: No README data found!"
 }
