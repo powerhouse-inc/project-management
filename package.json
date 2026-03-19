@@ -5,7 +5,7 @@
   "license": "AGPL-3.0-only",
   "repository": {
     "type": "git",
-    "url": "https://github.com/powerhouse-inc/project-management"
+    "url": "git+https://github.com/powerhouse-inc/project-management.git"
   },
   "type": "module",
   "files": [
@@ -75,33 +75,35 @@
   },
   "dependencies": {
     "@electric-sql/pglite": "0.3.15",
-    "@powerhousedao/builder-tools": "6.0.0-dev.98",
-    "@powerhousedao/common": "6.0.0-dev.98",
-    "@powerhousedao/design-system": "6.0.0-dev.98",
+    "@powerhousedao/builder-tools": "6.0.0-staging.0",
+    "@powerhousedao/common": "6.0.0-staging.0",
+    "@powerhousedao/design-system": "6.0.0-staging.0",
     "@powerhousedao/document-engineering": "1.40.1",
-    "@powerhousedao/vetra": "6.0.0-dev.98",
-    "document-model": "6.0.0-dev.98",
+    "@powerhousedao/vetra": "6.0.0-staging.0",
+    "document-model": "6.0.0-staging.0",
     "graphql": "16.12.0",
     "graphql-tag": "^2.12.6",
     "zod": "^4.3.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.38.0",
-    "@powerhousedao/analytics-engine-core": "6.0.0-dev.98",
-    "@powerhousedao/config": "6.0.0-dev.98",
-    "@powerhousedao/connect": "6.0.0-dev.98",
-    "@powerhousedao/ph-cli": "6.0.0-dev.98",
-    "@powerhousedao/reactor-api": "6.0.0-dev.98",
-    "@powerhousedao/reactor-browser": "6.0.0-dev.98",
-    "@powerhousedao/reactor-local": "6.0.0-dev.98",
-    "@powerhousedao/switchboard": "6.0.0-dev.98",
+    "@powerhousedao/analytics-engine-core": "6.0.0-staging.0",
+    "@powerhousedao/config": "6.0.0-staging.0",
+    "@powerhousedao/connect": "6.0.0-staging.0",
+    "@powerhousedao/ph-cli": "6.0.0-staging.0",
+    "@powerhousedao/reactor-api": "6.0.0-staging.0",
+    "@powerhousedao/reactor-browser": "6.0.0-staging.0",
+    "@powerhousedao/reactor-local": "6.0.0-staging.0",
+    "@powerhousedao/switchboard": "6.0.0-staging.0",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
     "@tailwindcss/cli": "^4.1.18",
     "@tailwindcss/vite": "4.1.18",
     "@testing-library/react": "^16.3.0",
     "@types/node": "^24.9.2",
     "@types/react": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.0",
-    "document-drive": "6.0.0-dev.98",
+    "document-drive": "6.0.0-staging.0",
     "eslint": "^9.38.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
@@ -112,6 +114,7 @@
     "pm2": "^5.4.3",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
+    "semantic-release": "^25.0.2",
     "tailwindcss": "^4.1.16",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.2",
@@ -119,10 +122,7 @@
     "vite-plugin-html": "3.2.2",
     "vite-plugin-node-polyfills": "^0.24.0",
     "vite-plugin-svgr": "4.5.0",
-    "vitest": "^3.0.9",
-    "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/git": "^10.0.1",
-    "semantic-release": "^25.0.2"
+    "vitest": "^3.0.9"
   },
   "peerDependencies": {
     "react": ">=19.0.0",
@@ -188,5 +188,9 @@
     ]
   },
   "readme": "ERROR: No README data found!",
-  "_id": "v6-project-management@1.0.0"
+  "_id": "@powerhousedao/project-management@1.0.0-dev.0",
+  "bugs": {
+    "url": "https://github.com/powerhouse-inc/project-management/issues"
+  },
+  "homepage": "https://github.com/powerhouse-inc/project-management#readme"
 }
