@@ -2,7 +2,7 @@ import type { Deliverable } from "../../gen/types.js";
 import { applyInvariants } from "./projects.js";
 import type { ScopeOfWorkState } from "../../gen/schema/types.js";
 import type { EditMilestoneAction } from "../../gen/milestones/actions.js";
-import type { ScopeOfWorkMilestonesOperations } from "@powerhousedao/project-management/document-models/scope-of-work/v1";
+import type { ScopeOfWorkMilestonesOperations } from "document-models/scope-of-work/v1";
 
 export const scopeOfWorkMilestonesOperations: ScopeOfWorkMilestonesOperations =
   {

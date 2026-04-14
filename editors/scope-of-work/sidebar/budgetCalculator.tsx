@@ -39,7 +39,7 @@ const BudgetCalculator = ({
     // Only update margin from deliverables if we're not skipping updates
     if (!skipMarginUpdateRef.current) {
       const margin = deliverables?.map(
-        (deliverable) => deliverable.budgetAnchor?.margin
+        (deliverable) => deliverable.budgetAnchor?.margin,
       );
       if (margin && margin.every((m) => m === margin[0])) {
         setMargin(margin[0] ?? 0);
@@ -61,14 +61,14 @@ const BudgetCalculator = ({
           (deliverable.budgetAnchor?.quantity ?? 0) *
           (deliverable.budgetAnchor?.unitCost ?? 0),
       })),
-    [deliverables]
+    [deliverables],
   );
 
   useEffect(() => {
     const getTotalBudget = () => {
       const subtotal = richDeliverables?.reduce(
         (acc, deliverable) => acc + deliverable.subtotal,
-        0
+        0,
       ) as number;
       const total = subtotal * (1 + margin / 100);
       return isNaN(total) ? "0" : total.toFixed(2);
@@ -88,7 +88,7 @@ const BudgetCalculator = ({
               actions.editDeliverable({
                 id: context.row.id,
                 title: newValue as string,
-              })
+              }),
             );
             return true;
           }
@@ -107,7 +107,7 @@ const BudgetCalculator = ({
                 deliverableId: context.row.id,
                 project: project?.id ?? "",
                 quantity: parseFloat(newValue),
-              })
+              }),
             );
             return true;
           }
@@ -126,7 +126,7 @@ const BudgetCalculator = ({
                 deliverableId: context.row.id,
                 project: project?.id ?? "",
                 unitCost: parseFloat(newValue),
-              })
+              }),
             );
             return true;
           }
@@ -154,7 +154,7 @@ const BudgetCalculator = ({
         },
       },
     ],
-    []
+    [],
   );
 
   return (
@@ -182,7 +182,7 @@ const BudgetCalculator = ({
                 actions.updateProject({
                   id: project.id,
                   currency: value as PmCurrencyInput,
-                })
+                }),
               );
             }}
           />
@@ -208,8 +208,8 @@ const BudgetCalculator = ({
           {Intl.NumberFormat("en-US").format(
             richDeliverables?.reduce(
               (acc, deliverable) => acc + deliverable.subtotal,
-              0
-            ) || 0
+              0,
+            ) || 0,
           )}
         </div>
       </div>
@@ -252,7 +252,7 @@ const BudgetCalculator = ({
                     deliverableId: deliverable.id,
                     project: project?.id ?? "",
                     margin: margin,
-                  })
+                  }),
                 );
               });
 

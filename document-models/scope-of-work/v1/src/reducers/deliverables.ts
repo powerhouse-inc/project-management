@@ -4,7 +4,7 @@ import type {
   KeyResult,
   Progress,
 } from "../../gen/schema/types.js";
-import type { ScopeOfWorkDeliverablesOperations } from "@powerhousedao/project-management/document-models/scope-of-work/v1";
+import type { ScopeOfWorkDeliverablesOperations } from "document-models/scope-of-work/v1";
 
 export const scopeOfWorkDeliverablesOperations: ScopeOfWorkDeliverablesOperations =
   {

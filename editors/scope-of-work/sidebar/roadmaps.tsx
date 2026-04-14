@@ -1,5 +1,8 @@
 import { useMemo } from "react";
-import type { Roadmap, ScopeOfWorkAction } from "../../../document-models/scope-of-work/v1/gen/types.js";
+import type {
+  Roadmap,
+  ScopeOfWorkAction,
+} from "../../../document-models/scope-of-work/v1/gen/types.js";
 import {
   ObjectSetTable,
   type ColumnDef,
@@ -54,7 +57,7 @@ const Roadmaps: React.FC<ProjectsProps> = ({
               actions.editRoadmap({
                 id: context.row.id,
                 title: newValue as string,
-              })
+              }),
             );
             return true;
           }
@@ -73,7 +76,7 @@ const Roadmaps: React.FC<ProjectsProps> = ({
         },
       },
     ],
-    []
+    [],
   );
 
   return (
@@ -101,7 +104,7 @@ const Roadmaps: React.FC<ProjectsProps> = ({
                     .toLowerCase()
                     .replace(/ /g, "-")
                     .concat(`-${newId.substring(newId.length - 8)}`),
-                })
+                }),
               );
             }
           }}

@@ -1,4 +1,4 @@
-import type { ScopeOfWorkRoadmapsOperations } from "@powerhousedao/project-management/document-models/scope-of-work/v1";
+import type { ScopeOfWorkRoadmapsOperations } from "document-models/scope-of-work/v1";
 
 export const scopeOfWorkRoadmapsOperations: ScopeOfWorkRoadmapsOperations = {
   editRoadmapOperation(state, action) {

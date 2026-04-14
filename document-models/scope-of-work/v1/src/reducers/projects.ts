@@ -8,7 +8,7 @@ import type {
   Binary,
   DeliverableStatus,
 } from "../../gen/schema/types.js";
-import type { ScopeOfWorkProjectsOperations } from "@powerhousedao/project-management/document-models/scope-of-work/v1";
+import type { ScopeOfWorkProjectsOperations } from "document-models/scope-of-work/v1";
 
 export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
   addProjectOperation(state, action) {

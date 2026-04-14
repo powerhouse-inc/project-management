@@ -1,4 +1,4 @@
-import { createAction } from "document-model/core";
+import { createAction } from "document-model";
 import { EditScopeOfWorkInputSchema } from "../schema/zod.js";
 import type { EditScopeOfWorkInput } from "../types.js";
 import type { EditScopeOfWorkAction } from "./actions.js";

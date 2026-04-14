@@ -68,28 +68,30 @@ const Deliverables: React.FC<ProjectsProps> = ({
     setStateProjects(projects);
   }, [milestones, projects, deliverables]);
 
-  const latestActivity = (document.operations.global ?? []).filter((operation) => {
-    const typedOperation = operation as Operation & {
-      timestampUtcMs: string;
-      action:
-        | EditDeliverableAction
-        | AddDeliverableAction
-        | RemoveDeliverableAction
-        | AddProjectDeliverableAction
-        | AddMilestoneDeliverableAction
-        | AddDeliverableInSetAction
-        | RemoveDeliverableInSetAction;
-    };
-    return (
-      typedOperation.action.type === "EDIT_DELIVERABLE" ||
-      typedOperation.action.type === "ADD_DELIVERABLE" ||
-      typedOperation.action.type === "REMOVE_DELIVERABLE" ||
-      typedOperation.action.type === "ADD_PROJECT_DELIVERABLE" ||
-      typedOperation.action.type === "ADD_MILESTONE_DELIVERABLE" ||
-      typedOperation.action.type === "ADD_DELIVERABLE_IN_SET" ||
-      typedOperation.action.type === "REMOVE_DELIVERABLE_IN_SET"
-    );
-  }) as (Operation & {
+  const latestActivity = (document.operations.global ?? []).filter(
+    (operation) => {
+      const typedOperation = operation as Operation & {
+        timestampUtcMs: string;
+        action:
+          | EditDeliverableAction
+          | AddDeliverableAction
+          | RemoveDeliverableAction
+          | AddProjectDeliverableAction
+          | AddMilestoneDeliverableAction
+          | AddDeliverableInSetAction
+          | RemoveDeliverableInSetAction;
+      };
+      return (
+        typedOperation.action.type === "EDIT_DELIVERABLE" ||
+        typedOperation.action.type === "ADD_DELIVERABLE" ||
+        typedOperation.action.type === "REMOVE_DELIVERABLE" ||
+        typedOperation.action.type === "ADD_PROJECT_DELIVERABLE" ||
+        typedOperation.action.type === "ADD_MILESTONE_DELIVERABLE" ||
+        typedOperation.action.type === "ADD_DELIVERABLE_IN_SET" ||
+        typedOperation.action.type === "REMOVE_DELIVERABLE_IN_SET"
+      );
+    },
+  ) as (Operation & {
     timestampUtcMs: string;
     action:
       | EditDeliverableAction
@@ -133,7 +135,7 @@ const Deliverables: React.FC<ProjectsProps> = ({
       milestoneId: string | null,
       milestoneTitle: string | null,
       projectId: string | null,
-      projectTitle: string | null
+      projectTitle: string | null,
     ) => {
       if (!deliverable || processedIds.has(deliverable.id)) return;
 
@@ -156,7 +158,7 @@ const Deliverables: React.FC<ProjectsProps> = ({
 
         // Check if this deliverable is also in a project
         const project = projects?.find((p) =>
-          p.scope?.deliverables?.includes(deliverableId)
+          p.scope?.deliverables?.includes(deliverableId),
         );
 
         addDeliverableIfNotProcessed(
@@ -164,7 +166,7 @@ const Deliverables: React.FC<ProjectsProps> = ({
           milestone.id,
           milestone.title,
           project?.id || null,
-          project?.title || null
+          project?.title || null,
         );
       });
     });
@@ -177,7 +179,7 @@ const Deliverables: React.FC<ProjectsProps> = ({
 
         // Check if this deliverable is also in a milestone
         const milestone = milestones?.find((m) =>
-          m.scope?.deliverables?.includes(deliverableId)
+          m.scope?.deliverables?.includes(deliverableId),
         );
 
         addDeliverableIfNotProcessed(
@@ -185,7 +187,7 @@ const Deliverables: React.FC<ProjectsProps> = ({
           milestone?.id || null,
           milestone?.title || null,
           project.id,
-          project.title
+          project.title,
         );
       });
     });
@@ -237,7 +239,7 @@ const Deliverables: React.FC<ProjectsProps> = ({
               actions.editDeliverable({
                 id: context.row.id,
                 title: newValue as string,
-              })
+              }),
             );
             return true;
           }
@@ -283,7 +285,7 @@ const Deliverables: React.FC<ProjectsProps> = ({
               actions.editDeliverable({
                 id: context.row.id,
                 status: newValue as PmDeliverableStatusInput,
-              })
+              }),
             );
             return true;
           }
@@ -305,14 +307,14 @@ const Deliverables: React.FC<ProjectsProps> = ({
                 actions.removeDeliverableInSet({
                   deliverableId: context.row.id,
                   milestoneId: context.row.milestoneId,
-                })
+                }),
               );
             }
             actionsToDispatch.push(
               actions.addDeliverableInSet({
                 deliverableId: context.row.id,
                 milestoneId: newValue as string,
-              })
+              }),
             );
             dispatch(actionsToDispatch);
             return true;
@@ -364,14 +366,14 @@ const Deliverables: React.FC<ProjectsProps> = ({
                 actions.removeDeliverableInSet({
                   deliverableId: context.row.id,
                   projectId: context.row.projectId,
-                })
+                }),
               );
             }
             dispatch(
               actions.addDeliverableInSet({
                 deliverableId: context.row.id,
                 projectId: newValue as string,
-              })
+              }),
             );
             return true;
           }
@@ -424,7 +426,7 @@ const Deliverables: React.FC<ProjectsProps> = ({
         },
       },
     ],
-    []
+    [],
   );
 
   return (
@@ -451,7 +453,7 @@ const Deliverables: React.FC<ProjectsProps> = ({
                 actions.addDeliverable({
                   id: deliverableId,
                   title: data.title as string,
-                })
+                }),
               );
             }
           }}
