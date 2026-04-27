@@ -1,7 +1,7 @@
 {
   "name": "@powerhousedao/project-management",
   "description": "The Scope of Work model defines a structured plan for executing contributor work; it includes deliverables and roadmaps with milestones with each being linked to ownership, progress tracking.",
-  "version": "1.0.0-dev.8",
+  "version": "1.0.0-dev.9",
   "license": "AGPL-3.0-only",
   "repository": {
     "type": "git",
@@ -63,7 +63,7 @@
     "check-circular-imports": "npx dpdm -T ./index.ts",
     "generate": "ph-cli generate",
     "connect": "ph-cli connect",
-    "build": "ph-cli build",
+    "build": "bun run build.ts",
     "reactor": "ph-cli reactor",
     "service": "ph-cli service",
     "vetra": "ph-cli vetra",
@@ -71,39 +71,40 @@
     "service-unstartup": "bash ./node_modules/@powerhousedao/ph-cli/dist/scripts/service-unstartup.sh"
   },
   "dependencies": {
-    "document-model": "6.0.0-dev.171",
-    "@powerhousedao/design-system": "6.0.0-dev.171",
-    "@powerhousedao/reactor-api": "6.0.0-dev.171",
-    "@powerhousedao/reactor-browser": "6.0.0-dev.171",
-    "@powerhousedao/connect": "6.0.0-dev.171",
-    "@powerhousedao/analytics-engine-core": "6.0.0-dev.171",
-    "@powerhousedao/document-engineering": "1.40.1",
+    "@powerhousedao/analytics-engine-core": "6.0.0-dev.195",
+    "@powerhousedao/connect": "6.0.0-dev.195",
+    "@powerhousedao/design-system": "6.0.0-dev.195",
+    "@powerhousedao/document-engineering": "1.40.2",
+    "@powerhousedao/reactor-api": "6.0.0-dev.195",
+    "@powerhousedao/reactor-browser": "6.0.0-dev.195",
+    "@powerhousedao/shared": "6.0.0-dev.195",
+    "document-model": "6.0.0-dev.195",
     "graphql": "^16.10.0",
     "graphql-tag": "^2.12.6",
     "zod": "^4.3.5"
   },
   "devDependencies": {
-    "@powerhousedao/ph-cli": "6.0.0-dev.171",
-    "@powerhousedao/reactor": "6.0.0-dev.171",
     "@electric-sql/pglite": "0.3.15",
     "@electric-sql/pglite-tools": "0.2.20",
     "@eslint/js": "^9.38.0",
+    "@powerhousedao/ph-cli": "6.0.0-dev.195",
+    "@powerhousedao/reactor": "6.0.0-dev.195",
     "@tailwindcss/cli": "^4.1.18",
     "@types/node": "^24.9.2",
     "@types/react": "^19.2.3",
+    "@vitejs/plugin-react": "6.0.1",
     "eslint": "^9.38.0",
-    "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
     "globals": "^16.4.0",
     "tailwindcss": "^4.1.16",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.2",
     "vite": "8.0.2",
-    "vitest": "4.1.1",
-    "@vitejs/plugin-react": "6.0.1",
-    "vite-tsconfig-paths": "6.1.1"
+    "vite-tsconfig-paths": "6.1.1",
+    "vitest": "4.1.1"
   },
   "peerDependencies": {
     "react": ">=19.0.0",
@@ -165,5 +166,10 @@
       "@semantic-release/git"
     ]
   },
-  "readme": "ERROR: No README data found!"
+  "readme": "ERROR: No README data found!",
+  "bugs": {
+    "url": "https://github.com/powerhouse-inc/project-management/issues"
+  },
+  "homepage": "https://github.com/powerhouse-inc/project-management#readme",
+  "_id": "@powerhousedao/project-management@1.0.0-dev.8"
 }
