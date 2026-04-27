@@ -51,7 +51,9 @@ const convertContributorToOption = (contributor: Agent): PHIDOption => ({
   icon: "Person",
 });
 
-const convertRemoteProfileToOption = (profile: RemoteBuilderProfile): PHIDOption => ({
+const convertRemoteProfileToOption = (
+  profile: RemoteBuilderProfile,
+): PHIDOption => ({
   value: profile.id,
   title: profile.state.name || profile.id,
   path: "powerhouse/builder-profile",
@@ -62,7 +64,9 @@ const convertRemoteProfileToOption = (profile: RemoteBuilderProfile): PHIDOption
       alt=""
       className="w-6 h-6 rounded-full object-cover"
     />
-  ) : "Person",
+  ) : (
+    "Person"
+  ),
 });
 
 const Project: React.FC<ProjectProps> = ({
@@ -76,11 +80,11 @@ const Project: React.FC<ProjectProps> = ({
   const [title, setTitle] = useState(project?.title);
   const [slug, setSlug] = useState(project?.slug || "");
   const [projectOwner, setProjectOwner] = useState(
-    project?.projectOwner as string
+    project?.projectOwner as string,
   );
   const [imageUrl, setImageUrl] = useState(project?.imageUrl || "");
   const [projectAbstract, setProjectAbstract] = useState(
-    project?.abstract as string
+    project?.abstract as string,
   );
   const [budget, setBudget] = useState(project?.budget || 0);
   const [budgetCalculatorOpen, setBudgetCalculatorOpen] = useState(false);
@@ -94,8 +98,11 @@ const Project: React.FC<ProjectProps> = ({
   }, [contributors]);
 
   // Fetch remote builder profiles
-  const { allProfiles: remoteProfiles, isLoading: isLoadingRemote, profileMap: remoteProfileMap } =
-    useRemoteBuilderProfiles(localProfileMap);
+  const {
+    allProfiles: remoteProfiles,
+    isLoading: isLoadingRemote,
+    profileMap: remoteProfileMap,
+  } = useRemoteBuilderProfiles(localProfileMap);
 
   // Combine local contributors and remote profiles into initial options
   const initialOptions = useMemo<PHIDOption[]>(() => {
@@ -116,9 +123,10 @@ const Project: React.FC<ProjectProps> = ({
 
       // Search remote profiles
       const remoteMatches = remoteProfiles
-        .filter((p) =>
-          p.state.name?.toLowerCase().includes(searchTerm) ||
-          p.id.toLowerCase().includes(searchTerm)
+        .filter(
+          (p) =>
+            p.state.name?.toLowerCase().includes(searchTerm) ||
+            p.id.toLowerCase().includes(searchTerm),
         )
         .map(convertRemoteProfileToOption);
 
@@ -163,7 +171,7 @@ const Project: React.FC<ProjectProps> = ({
       if (project?.projectOwner) {
         try {
           const ownerDetails = await fetchSelectedOptionCallback(
-            project.projectOwner
+            project.projectOwner,
           );
           setOwnerPreview(ownerDetails);
         } catch {
@@ -188,7 +196,9 @@ const Project: React.FC<ProjectProps> = ({
   }, [project]);
 
   const projectDeliverablesIds = project?.scope?.deliverables ?? [];
-  const projectDeliverables = deliverables.filter(d => projectDeliverablesIds.includes(d.id));
+  const projectDeliverables = deliverables.filter((d) =>
+    projectDeliverablesIds.includes(d.id),
+  );
 
   // Validate image URL by checking file extension
   const isValidImageUrl = (url: string): boolean => {
@@ -228,7 +238,7 @@ const Project: React.FC<ProjectProps> = ({
               actions.editDeliverable({
                 id: context.row.id,
                 title: newValue as string,
-              })
+              }),
             );
             return true;
           }
@@ -256,7 +266,7 @@ const Project: React.FC<ProjectProps> = ({
               actions.editDeliverable({
                 id: context.row.id,
                 owner: newValue as string,
-              })
+              }),
             );
             return true;
           }
@@ -292,12 +302,16 @@ const Project: React.FC<ProjectProps> = ({
         width: 100,
         renderCell: (value) => {
           return (
-            <span className={`flex items-center justify-center ${statusStyles[value as keyof typeof statusStyles]}`}>{value}</span>
+            <span
+              className={`flex items-center justify-center ${statusStyles[value as keyof typeof statusStyles]}`}
+            >
+              {value}
+            </span>
           );
         },
       },
     ],
-    []
+    [],
   );
 
   return (
@@ -325,15 +339,15 @@ const Project: React.FC<ProjectProps> = ({
                   .toLowerCase()
                   .replace(/ /g, "-")
                   .concat(`-${project.id.substring(project.id.length - 8)}`);
-                
+
                 dispatch(
                   actions.updateProject({
                     id: project.id,
                     title: newTitle,
                     slug: newSlug,
-                  })
+                  }),
                 );
-                
+
                 // Update local state for slug
                 setSlug(newSlug);
               }}
@@ -353,7 +367,7 @@ const Project: React.FC<ProjectProps> = ({
                     actions.updateProject({
                       id: project.id,
                       code: e.target.value,
-                    })
+                    }),
                   );
                 }}
               />
@@ -371,7 +385,7 @@ const Project: React.FC<ProjectProps> = ({
                     actions.updateProject({
                       id: project.id,
                       slug: e.target.value,
-                    })
+                    }),
                   );
                 }}
               />
@@ -406,7 +420,7 @@ const Project: React.FC<ProjectProps> = ({
                         actions.updateProjectOwner({
                           id: project.id,
                           projectOwner: newValue,
-                        })
+                        }),
                       );
                     }
                   }
@@ -423,7 +437,7 @@ const Project: React.FC<ProjectProps> = ({
                       actions.updateProjectOwner({
                         id: project.id,
                         projectOwner: targetValue || "",
-                      })
+                      }),
                     );
                   }
                 }}
@@ -444,7 +458,7 @@ const Project: React.FC<ProjectProps> = ({
                       actions.updateProject({
                         id: project.id,
                         imageUrl: e.target.value,
-                      })
+                      }),
                     );
                   }
                 }}
@@ -490,7 +504,7 @@ const Project: React.FC<ProjectProps> = ({
                   actions.updateProject({
                     id: project.id,
                     abstract: e.target.value,
-                  })
+                  }),
                 );
               }}
             />
@@ -511,7 +525,7 @@ const Project: React.FC<ProjectProps> = ({
                     actions.updateProject({
                       id: project?.id as string,
                       budgetType: value as PmBudgetTypeInput,
-                    })
+                    }),
                   );
                 }}
               />
@@ -531,7 +545,7 @@ const Project: React.FC<ProjectProps> = ({
                     actions.updateProject({
                       id: project?.id as string,
                       currency: value as PmCurrencyInput,
-                    })
+                    }),
                   );
                 }}
               />
@@ -541,7 +555,7 @@ const Project: React.FC<ProjectProps> = ({
                 name="budget"
                 label="Budget"
                 value={Intl.NumberFormat("en-US").format(
-                  parseFloat(budget.toFixed(2))
+                  parseFloat(budget.toFixed(2)),
                 )}
                 disabled={true}
                 onChange={(e) => setBudget(e.target.value as any)}
@@ -600,7 +614,7 @@ const Project: React.FC<ProjectProps> = ({
                       actions.removeProjectDeliverable({
                         projectId: project?.id,
                         deliverableId: d.id,
-                      })
+                      }),
                     );
                   });
                 }
@@ -614,7 +628,7 @@ const Project: React.FC<ProjectProps> = ({
                       projectId: project.id,
                       deliverableId: deliverableId,
                       title: data.title as string,
-                    })
+                    }),
                   );
                 }
               }}

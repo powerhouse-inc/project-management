@@ -1,4 +1,4 @@
-import { PHDocumentController } from "document-model/core";
+import { PHDocumentController } from "document-model";
 import { ScopeOfWork } from "../module.js";
 import type { ScopeOfWorkAction, ScopeOfWorkPHState } from "./types.js";
 

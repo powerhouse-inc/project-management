@@ -116,17 +116,17 @@ export default function SidebarMenu() {
 
   const { roadmaps, deliverables, projects, contributors } = state;
   const milestones: MilestoneType[] = state.roadmaps.flatMap(
-    (r: RoadmapType) => r.milestones
+    (r: RoadmapType) => r.milestones,
   );
   const [activeNodeId, setActiveNodeId] = useState<string | undefined>(
-    undefined
+    undefined,
   );
 
   const { sidebarWidth, isSidebarOpen } = useSidebarWidth();
 
   // Generate breadcrumbs based on activeNodeId
   const generateBreadcrumbs = (
-    activeNodeId: string | undefined
+    activeNodeId: string | undefined,
   ): BreadcrumbItem[] => {
     const breadcrumbs: BreadcrumbItem[] = [
       {
@@ -170,14 +170,14 @@ export default function SidebarMenu() {
               "Unknown Roadmap",
             type: "roadmap",
             isActive: true,
-          }
+          },
         );
         break;
 
       case "milestone": {
         const milestone = milestones.find((m) => m.id === id);
         const roadmap = roadmaps.find((r: RoadmapType) =>
-          r.milestones.some((m) => m.id === id)
+          r.milestones.some((m) => m.id === id),
         );
 
         breadcrumbs.push(
@@ -200,7 +200,7 @@ export default function SidebarMenu() {
               : milestone?.title || "Unknown Milestone",
             type: "milestone",
             isActive: true,
-          }
+          },
         );
         break;
       }
@@ -229,7 +229,7 @@ export default function SidebarMenu() {
               : project?.title || "Unknown Project",
             type: "project",
             isActive: true,
-          }
+          },
         );
         break;
       }
@@ -244,7 +244,7 @@ export default function SidebarMenu() {
 
       case "deliverable": {
         const deliverable = deliverables.find(
-          (d: DeliverableType) => d.id === id
+          (d: DeliverableType) => d.id === id,
         );
         breadcrumbs.push(
           {
@@ -258,7 +258,7 @@ export default function SidebarMenu() {
             title: deliverable?.title || "Unknown Deliverable",
             type: "deliverable",
             isActive: true,
-          }
+          },
         );
         break;
       }
@@ -336,7 +336,7 @@ export default function SidebarMenu() {
         children: [],
       },
     ],
-    [roadmaps, deliverables, state]
+    [roadmaps, deliverables, state],
   ); // Dependencies that should trigger recalculation
 
   // Component that updates sidebar nodes when state changes
@@ -398,7 +398,7 @@ export default function SidebarMenu() {
           <Deliverable
             dispatch={dispatch}
             deliverables={deliverables.filter(
-              (d: DeliverableType) => d.id === id
+              (d: DeliverableType) => d.id === id,
             )}
             projects={projects}
             contributors={contributors}

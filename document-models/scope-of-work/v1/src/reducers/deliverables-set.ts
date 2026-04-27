@@ -1,7 +1,7 @@
 import { applyInvariants } from "./projects.js";
 import type { ScopeOfWorkState } from "../../gen/schema/types.js";
 import type { EditDeliverablesSetAction } from "../../gen/deliverables-set/actions.js";
-import type { ScopeOfWorkDeliverablesSetOperations } from "@powerhousedao/project-management/document-models/scope-of-work/v1";
+import type { ScopeOfWorkDeliverablesSetOperations } from "document-models/scope-of-work/v1";
 
 export const scopeOfWorkDeliverablesSetOperations: ScopeOfWorkDeliverablesSetOperations =
   {
@@ -119,11 +119,11 @@ export const scopeOfWorkDeliverablesSetOperations: ScopeOfWorkDeliverablesSetOpe
         }
 
         if (
-          !foundMilestone.scope.deliverables.includes(
+          !foundMilestone.scope?.deliverables.includes(
             action.input.deliverableId,
           )
         ) {
-          foundMilestone.scope.deliverables.push(action.input.deliverableId);
+          foundMilestone.scope?.deliverables.push(action.input.deliverableId);
         }
 
         state.roadmaps = state.roadmaps.map((roadmap) => {
@@ -156,9 +156,9 @@ export const scopeOfWorkDeliverablesSetOperations: ScopeOfWorkDeliverablesSetOpe
         }
 
         if (
-          !foundProject.scope.deliverables.includes(action.input.deliverableId)
+          !foundProject.scope?.deliverables.includes(action.input.deliverableId)
         ) {
-          foundProject.scope.deliverables.push(action.input.deliverableId);
+          foundProject.scope?.deliverables.push(action.input.deliverableId);
         }
 
         state.projects = state.projects.map((project) => {

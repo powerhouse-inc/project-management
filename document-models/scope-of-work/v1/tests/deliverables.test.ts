@@ -1,4 +1,4 @@
-import { generateMock } from "@powerhousedao/common/utils";
+import { generateMock } from "document-model";
 import { describe, expect, it } from "vitest";
 import {
   reducer,
@@ -20,7 +20,7 @@ import {
   RemoveKeyResultInputSchema,
   EditKeyResultInputSchema,
   SetDeliverableBudgetAnchorProjectInputSchema,
-} from "@powerhousedao/project-management/document-models/scope-of-work/v1";
+} from "document-models/scope-of-work/v1";
 
 describe("DeliverablesOperations", () => {
   it("should handle addDeliverable operation", () => {

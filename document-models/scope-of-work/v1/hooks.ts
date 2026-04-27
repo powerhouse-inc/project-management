@@ -8,7 +8,7 @@ import {
 import type {
   ScopeOfWorkAction,
   ScopeOfWorkDocument,
-} from "@powerhousedao/project-management/document-models/scope-of-work/v1";
+} from "document-models/scope-of-work/v1";
 import {
   assertIsScopeOfWorkDocument,
   isScopeOfWorkDocument,
