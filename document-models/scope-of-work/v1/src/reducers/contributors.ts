@@ -2,7 +2,7 @@ import {
   AgentDuplicateIdError,
   AgentNotFoundError,
 } from "../../gen/contributors/error.js";
-import type { ScopeOfWorkContributorsOperations } from "@powerhousedao/project-management/document-models/scope-of-work/v1";
+import type { ScopeOfWorkContributorsOperations } from "document-models/scope-of-work/v1";
 
 export const scopeOfWorkContributorsOperations: ScopeOfWorkContributorsOperations =
   {

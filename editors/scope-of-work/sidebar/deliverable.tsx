@@ -68,7 +68,9 @@ const convertContributorToOption = (contributor: Agent): PHIDOption => ({
   icon: "Person",
 });
 
-const convertRemoteProfileToOption = (profile: RemoteBuilderProfile): PHIDOption => ({
+const convertRemoteProfileToOption = (
+  profile: RemoteBuilderProfile,
+): PHIDOption => ({
   value: profile.id,
   title: profile.state.name || profile.id,
   path: "powerhouse/builder-profile",
@@ -79,7 +81,9 @@ const convertRemoteProfileToOption = (profile: RemoteBuilderProfile): PHIDOption
       alt=""
       className="w-6 h-6 rounded-full object-cover"
     />
-  ) : "Person",
+  ) : (
+    "Person"
+  ),
 });
 
 const Deliverable: React.FC<DeliverablesProps> = ({
@@ -94,7 +98,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
   const [isPercentage, setIsPercentage] = useState(false);
   const [isSP, setIsSP] = useState(false);
   const [workProgress, setWorkProgress] = useState(
-    deliverables[0]?.workProgress
+    deliverables[0]?.workProgress,
   );
   const [budgetCalculatorOpen, setBudgetCalculatorOpen] = useState(false);
   const [icon, setIcon] = useState(currentDeliverable.icon || "");
@@ -108,8 +112,11 @@ const Deliverable: React.FC<DeliverablesProps> = ({
   }, [contributors]);
 
   // Fetch remote builder profiles
-  const { allProfiles: remoteProfiles, isLoading: isLoadingRemote, profileMap: remoteProfileMap } =
-    useRemoteBuilderProfiles(localProfileMap);
+  const {
+    allProfiles: remoteProfiles,
+    isLoading: isLoadingRemote,
+    profileMap: remoteProfileMap,
+  } = useRemoteBuilderProfiles(localProfileMap);
 
   // Combine local contributors and remote profiles into initial options
   const initialOptions = useMemo<PHIDOption[]>(() => {
@@ -130,9 +137,10 @@ const Deliverable: React.FC<DeliverablesProps> = ({
 
       // Search remote profiles
       const remoteMatches = remoteProfiles
-        .filter((p) =>
-          p.state.name?.toLowerCase().includes(searchTerm) ||
-          p.id.toLowerCase().includes(searchTerm)
+        .filter(
+          (p) =>
+            p.state.name?.toLowerCase().includes(searchTerm) ||
+            p.id.toLowerCase().includes(searchTerm),
         )
         .map(convertRemoteProfileToOption);
 
@@ -178,7 +186,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
       if (currentDeliverable?.owner) {
         try {
           const ownerDetails = await fetchSelectedOptionCallback(
-            currentDeliverable.owner
+            currentDeliverable.owner,
           );
           setOwnerPreview(ownerDetails);
         } catch {
@@ -232,7 +240,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                 id: context.row.id,
                 deliverableId: currentDeliverable.id,
                 title: newValue as string,
-              })
+              }),
             );
             return true;
           }
@@ -249,7 +257,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                 id: context.row.id,
                 deliverableId: currentDeliverable.id,
                 link: newValue as string,
-              })
+              }),
             );
             return true;
           }
@@ -265,7 +273,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
         <BudgetCalculator
           setBudgetCalculatorOpen={setBudgetCalculatorOpen}
           project={projects.find(
-            (p) => p.id === stateDeliverable.budgetAnchor?.project
+            (p) => p.id === stateDeliverable.budgetAnchor?.project,
           )}
           deliverables={[stateDeliverable]}
           dispatch={dispatch}
@@ -290,7 +298,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                       actions.editDeliverable({
                         id: currentDeliverable.id,
                         code: " ",
-                      })
+                      }),
                     );
                   }
                   if (e.target.value === currentDeliverable.code) return;
@@ -298,7 +306,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                     actions.editDeliverable({
                       id: currentDeliverable.id,
                       code: e.target.value,
-                    })
+                    }),
                   );
                 }}
               />
@@ -320,7 +328,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                       actions.editDeliverable({
                         id: currentDeliverable.id,
                         title: " ",
-                      })
+                      }),
                     );
                   }
                   if (e.target.value === currentDeliverable.title) return;
@@ -328,7 +336,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                     actions.editDeliverable({
                       id: currentDeliverable.id,
                       title: e.target.value,
-                    })
+                    }),
                   );
                 }}
               />
@@ -367,7 +375,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                         actions.editDeliverable({
                           id: currentDeliverable.id,
                           owner: newValue,
-                        })
+                        }),
                       );
                     }
                   }
@@ -384,7 +392,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                       actions.editDeliverable({
                         id: currentDeliverable.id,
                         owner: targetValue || "",
-                      })
+                      }),
                     );
                   }
                 }}
@@ -404,7 +412,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                       actions.editDeliverable({
                         id: currentDeliverable.id,
                         icon: "",
-                      })
+                      }),
                     );
                   }
                   if (e.target.value === currentDeliverable.icon) return;
@@ -412,7 +420,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                     actions.editDeliverable({
                       id: currentDeliverable.id,
                       icon: e.target.value,
-                    })
+                    }),
                   );
                 }}
               />
@@ -427,7 +435,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                     onError={(e) => {
                       e.currentTarget.style.display = "none";
                       e.currentTarget.nextElementSibling?.classList.remove(
-                        "hidden"
+                        "hidden",
                       );
                     }}
                   />
@@ -457,7 +465,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                     actions.editDeliverable({
                       id: currentDeliverable.id,
                       description: " ",
-                    })
+                    }),
                   );
                 }
                 if (e.target.value === currentDeliverable.description) return;
@@ -465,7 +473,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                   actions.editDeliverable({
                     id: currentDeliverable.id,
                     description: e.target.value,
-                  })
+                  }),
                 );
               }}
             />
@@ -482,7 +490,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                     actions.editDeliverable({
                       id: currentDeliverable.id,
                       status: value as PmDeliverableStatusInput,
-                    })
+                    }),
                   );
                 }}
               />
@@ -500,7 +508,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                       workProgress: {
                         done: false,
                       },
-                    })
+                    }),
                   );
                 }}
               >
@@ -518,7 +526,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                       workProgress: {
                         percentage: 0,
                       },
-                    })
+                    }),
                   );
                 }}
               >
@@ -539,7 +547,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                           completed: 0,
                         },
                       },
-                    })
+                    }),
                   );
                 }}
               >
@@ -567,7 +575,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                         workProgress: {
                           done: e,
                         },
-                      })
+                      }),
                     );
                   }}
                 />
@@ -590,7 +598,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                           workProgress: {
                             percentage: parseFloat(e.target.value),
                           },
-                        })
+                        }),
                       );
                     }}
                   />
@@ -746,7 +754,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                       unitCost: 0,
                       quantity: 0,
                       margin: 0,
-                    })
+                    }),
                   );
                 }}
               />
@@ -777,7 +785,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                         id: generateId(),
                         deliverableId: currentDeliverable.id,
                         title: typeof data.title === "string" ? data.title : "",
-                      })
+                      }),
                     );
                   }
                 }}
@@ -788,7 +796,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                         actions.removeKeyResult({
                           id: d.id,
                           deliverableId: currentDeliverable.id,
-                        })
+                        }),
                       );
                     });
                   }

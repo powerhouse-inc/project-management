@@ -1,1 +1,1 @@
-export { ScopeOfWorkEditor } from "./scope-of-work/module.js";
+export { ScopeOfWork } from "./scope-of-work/module.js";

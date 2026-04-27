@@ -1,4 +1,4 @@
-import { generateMock } from "@powerhousedao/common/utils";
+import { generateMock } from "document-model";
 import { describe, expect, it } from "vitest";
 import {
   reducer,
@@ -6,7 +6,7 @@ import {
   isScopeOfWorkDocument,
   editScopeOfWork,
   EditScopeOfWorkInputSchema,
-} from "@powerhousedao/project-management/document-models/scope-of-work/v1";
+} from "document-models/scope-of-work/v1";
 
 describe("ScopeOfWorkOperations", () => {
   it("should handle editScopeOfWork operation", () => {

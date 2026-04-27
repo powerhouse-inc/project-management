@@ -61,7 +61,7 @@ const Projects: React.FC<ProjectsProps> = ({
               actions.updateProject({
                 id: context.row.id,
                 title: newValue as string,
-              })
+              }),
             );
             return true;
           }
@@ -113,13 +113,14 @@ const Projects: React.FC<ProjectsProps> = ({
           if (value == 0 || value == undefined) return null;
           return (
             <div className="text-center">
-              {context.row.currency} {Intl.NumberFormat("en-US").format(value as number)}
+              {context.row.currency}{" "}
+              {Intl.NumberFormat("en-US").format(value as number)}
             </div>
           );
         },
       },
     ],
-    []
+    [],
   );
 
   return (
@@ -148,7 +149,7 @@ const Projects: React.FC<ProjectsProps> = ({
                   id: generateId(),
                   code: "",
                   title: data.title as string,
-                })
+                }),
               );
             }
           }}

@@ -2,14 +2,14 @@
  * Factory methods for creating ScopeOfWorkDocument instances
  */
 import type { PHAuthState, PHDocumentState, PHBaseState } from "document-model";
-import { createBaseState, defaultBaseState } from "document-model/core";
+import { createBaseState, defaultBaseState } from "document-model";
 import type {
   ScopeOfWorkDocument,
-  ScopeOfWorkLocalState,
   ScopeOfWorkGlobalState,
+  ScopeOfWorkLocalState,
   ScopeOfWorkPHState,
 } from "./types.js";
-import { createDocument } from "./utils.js";
+import { utils } from "./utils.js";
 
 export function defaultGlobalState(): ScopeOfWorkGlobalState {
   return {
@@ -79,7 +79,7 @@ export function createScopeOfWorkDocument(
     local?: Partial<ScopeOfWorkLocalState>;
   }>,
 ): ScopeOfWorkDocument {
-  const document = createDocument(
+  const document = utils.createDocument(
     state
       ? createState(
           createBaseState(state.auth, state.document),

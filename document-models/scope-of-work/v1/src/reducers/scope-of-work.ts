@@ -1,4 +1,4 @@
-import type { ScopeOfWorkScopeOfWorkOperations } from "@powerhousedao/project-management/document-models/scope-of-work/v1";
+import type { ScopeOfWorkScopeOfWorkOperations } from "document-models/scope-of-work/v1";
 
 export const scopeOfWorkScopeOfWorkOperations: ScopeOfWorkScopeOfWorkOperations =
   {

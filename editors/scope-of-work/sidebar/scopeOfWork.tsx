@@ -63,7 +63,7 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
               actions.editRoadmap({
                 id: context.row.id,
                 title: newValue as string,
-              })
+              }),
             );
             return true;
           }
@@ -82,7 +82,7 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
         },
       },
     ],
-    []
+    [],
   );
 
   const projectColumns = useMemo<Array<ColumnDef<Project>>>(
@@ -119,7 +119,7 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
               actions.updateProject({
                 id: context.row.id,
                 title: newValue as string,
-              })
+              }),
             );
             return true;
           }
@@ -148,7 +148,7 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
         },
       },
     ],
-    []
+    [],
   );
 
   const statusOptions = [
@@ -179,7 +179,6 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
     }
   }, [editRowId]);
 
-
   return (
     <div className="border border-gray-300 p-4 rounded-md ">
       <div className="mt-2">
@@ -205,7 +204,7 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
               dispatch(
                 actions.editScopeOfWork({
                   description: e.target.value,
-                })
+                }),
               );
             }
           }}
@@ -220,7 +219,7 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
             dispatch(
               actions.editScopeOfWork({
                 status: value as ScopeOfWorkStatusInput,
-              })
+              }),
             );
           }}
         />
@@ -246,7 +245,7 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
                     .toLowerCase()
                     .replace(/ /g, "-")
                     .concat(`-${newId.substring(newId.length - 8)}`),
-                })
+                }),
               );
             }
           }}
@@ -273,10 +272,10 @@ const ScopeOfWork = (props: ScopeOfWorkProps) => {
                   code: "",
                   title: data.title as string,
                   slug: (data.title as string)
-                  .toLowerCase()
-                  .replace(/ /g, "-")
-                  .concat(`-${newId.substring(newId.length - 8)}`),
-                })
+                    .toLowerCase()
+                    .replace(/ /g, "-")
+                    .concat(`-${newId.substring(newId.length - 8)}`),
+                }),
               );
             }
           }}

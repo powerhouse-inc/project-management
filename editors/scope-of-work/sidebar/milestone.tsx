@@ -46,7 +46,7 @@ const Milestone: React.FC<MilestonesProps> = ({
   });
   const milestoneDeliverablesIds = milestone.scope?.deliverables ?? [];
   const milestoneDeliverables = deliverables.filter((m) =>
-    milestoneDeliverablesIds.includes(m.id)
+    milestoneDeliverablesIds.includes(m.id),
   );
 
   const [stateMilestone, setStateMilestone] = useState(milestone);
@@ -86,7 +86,7 @@ const Milestone: React.FC<MilestonesProps> = ({
               actions.editDeliverable({
                 id: context.row.id,
                 title: newValue as string,
-              })
+              }),
             );
             return true;
           }
@@ -114,7 +114,7 @@ const Milestone: React.FC<MilestonesProps> = ({
               actions.editDeliverable({
                 id: context.row.id,
                 owner: newValue as string,
-              })
+              }),
             );
             return true;
           }
@@ -158,7 +158,7 @@ const Milestone: React.FC<MilestonesProps> = ({
         },
       },
     ],
-    []
+    [],
   );
 
   return (
@@ -183,7 +183,7 @@ const Milestone: React.FC<MilestonesProps> = ({
                   id: milestone.id,
                   roadmapId: roadmap.id,
                   sequenceCode: e.target.value,
-                })
+                }),
               );
             }}
           />
@@ -207,7 +207,7 @@ const Milestone: React.FC<MilestonesProps> = ({
                   id: milestone.id,
                   roadmapId: roadmap.id,
                   title: e.target.value,
-                })
+                }),
               );
             }}
           />
@@ -229,7 +229,7 @@ const Milestone: React.FC<MilestonesProps> = ({
                 actions.editDeliverablesSet({
                   milestoneId: milestone.id,
                   status: value as DeliverableSetStatusInput,
-                })
+                }),
               );
             }}
           />
@@ -257,7 +257,7 @@ const Milestone: React.FC<MilestonesProps> = ({
                     actions.removeCoordinator({
                       id: c,
                       milestoneId: milestone.id,
-                    })
+                    }),
                   );
                 });
                 return;
@@ -266,7 +266,7 @@ const Milestone: React.FC<MilestonesProps> = ({
                 actions.addCoordinator({
                   id: e.target.value,
                   milestoneId: milestone.id,
-                })
+                }),
               );
             }}
           />
@@ -286,7 +286,7 @@ const Milestone: React.FC<MilestonesProps> = ({
                   id: milestone.id,
                   roadmapId: roadmap.id,
                   deliveryTarget: e.target.value,
-                })
+                }),
               );
             }}
           />
@@ -313,7 +313,7 @@ const Milestone: React.FC<MilestonesProps> = ({
                 id: milestone.id,
                 roadmapId: roadmap.id,
                 description: e.target.value,
-              })
+              }),
             );
           }}
         />
@@ -367,7 +367,7 @@ const Milestone: React.FC<MilestonesProps> = ({
                   actions.removeMilestoneDeliverable({
                     milestoneId: milestone.id,
                     deliverableId: d.id,
-                  })
+                  }),
                 );
               });
             }
@@ -381,7 +381,7 @@ const Milestone: React.FC<MilestonesProps> = ({
                   milestoneId: milestone.id,
                   deliverableId: deliverableId,
                   title: data.title as string,
-                })
+                }),
               );
             }
           }}

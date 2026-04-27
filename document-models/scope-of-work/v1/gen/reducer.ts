@@ -1,9 +1,8 @@
-// TODO: remove eslint-disable rules once refactor is done
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-import type { StateReducer } from "document-model";
-import { isDocumentAction, createReducer } from "document-model/core";
-import type { ScopeOfWorkPHState } from "@powerhousedao/project-management/document-models/scope-of-work/v1";
+import type { Reducer, StateReducer } from "document-model";
+import { isDocumentAction, createReducer } from "document-model";
+import type { ScopeOfWorkPHState } from "document-models/scope-of-work/v1";
 
 import { scopeOfWorkScopeOfWorkOperations } from "../src/reducers/scope-of-work.js";
 import { scopeOfWorkDeliverablesOperations } from "../src/reducers/deliverables.js";
@@ -459,4 +458,4 @@ const stateReducer: StateReducer<ScopeOfWorkPHState> = (
   }
 };
 
-export const reducer = createReducer<ScopeOfWorkPHState>(stateReducer);
+export const reducer: Reducer<ScopeOfWorkPHState> = createReducer(stateReducer);

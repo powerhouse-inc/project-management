@@ -5,17 +5,20 @@ import {
   baseLoadFromInput,
   defaultBaseState,
   generateId,
-} from "document-model/core";
-import type { ScopeOfWorkGlobalState, ScopeOfWorkLocalState } from "./types.js";
-import type { ScopeOfWorkPHState } from "./types.js";
+} from "document-model";
 import { reducer } from "./reducer.js";
 import { scopeOfWorkDocumentType } from "./document-type.js";
 import {
-  isScopeOfWorkDocument,
   assertIsScopeOfWorkDocument,
-  isScopeOfWorkState,
   assertIsScopeOfWorkState,
+  isScopeOfWorkDocument,
+  isScopeOfWorkState,
 } from "./document-schema.js";
+import type {
+  ScopeOfWorkGlobalState,
+  ScopeOfWorkLocalState,
+  ScopeOfWorkPHState,
+} from "./types.js";
 
 export const initialGlobalState: ScopeOfWorkGlobalState = {
   title: "Scope of Work",
@@ -67,12 +70,3 @@ export const utils: DocumentModelUtils<ScopeOfWorkPHState> = {
     return assertIsScopeOfWorkDocument(document);
   },
 };
-
-export const createDocument = utils.createDocument;
-export const createState = utils.createState;
-export const saveToFileHandle = utils.saveToFileHandle;
-export const loadFromInput = utils.loadFromInput;
-export const isStateOfType = utils.isStateOfType;
-export const assertIsStateOfType = utils.assertIsStateOfType;
-export const isDocumentOfType = utils.isDocumentOfType;
-export const assertIsDocumentOfType = utils.assertIsDocumentOfType;
