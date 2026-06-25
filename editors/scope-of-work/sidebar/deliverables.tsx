@@ -6,7 +6,7 @@ import {
   type PmDeliverableStatusInput,
   type ScopeOfWorkAction,
   type ScopeOfWorkDocument,
-} from "../../../document-models/scope-of-work/gen/types.js";
+} from "document-models/scope-of-work";
 import {
   ObjectSetTable,
   type ColumnDef,
@@ -14,7 +14,7 @@ import {
   buildEnumCellEditor,
 } from "@powerhousedao/document-engineering";
 import { Icon } from "@powerhousedao/design-system";
-import { actions } from "../../../document-models/scope-of-work/index.js";
+import { actions } from "document-models/scope-of-work";
 import { generateId } from "document-model/core";
 import type { Operation } from "document-model";
 import { statusOptions, statusStyles } from "./deliverable.js";
@@ -27,7 +27,7 @@ import {
   type AddMilestoneDeliverableAction,
   type AddDeliverableInSetAction,
   type RemoveDeliverableInSetAction,
-} from "../../../document-models/scope-of-work/gen/actions.js";
+} from "document-models/scope-of-work";
 
 interface ProjectsProps {
   deliverables: Deliverable[] | undefined;

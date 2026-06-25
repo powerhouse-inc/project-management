@@ -3,7 +3,7 @@ import {
   setSelectedNode,
   useParentFolderForSelectedNode,
 } from "@powerhousedao/reactor-browser";
-import { useSelectedScopeOfWorkDocument } from "../../document-models/scope-of-work/hooks.js";
+import { useSelectedScopeOfWorkDocument } from "document-models/scope-of-work";
 import SidebarMenu from "./sidebar/sidebar.js";
 
 /** Implement your editor behavior here */
@@ -22,7 +22,7 @@ export default function Editor() {
 
   return (
     <div>
-      <DocumentToolbar document={document} onClose={handleClose} />
+      <DocumentToolbar />
       <SidebarMenu />
     </div>
   );

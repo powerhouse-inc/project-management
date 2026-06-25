@@ -1,4 +1,4 @@
-import { generateMock } from "@powerhousedao/codegen";
+import { generateMock } from "document-model";
 import { describe, expect, it } from "vitest";
 import {
   reducer,
@@ -20,7 +20,7 @@ import {
   SetProjectTotalBudgetInputSchema,
   AddProjectDeliverableInputSchema,
   RemoveProjectDeliverableInputSchema,
-} from "@powerhousedao/project-management/document-models/scope-of-work";
+} from "document-models/scope-of-work";
 
 describe("ProjectsOperations", () => {
   it("should handle addProject operation", () => {

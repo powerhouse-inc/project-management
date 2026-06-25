@@ -8,8 +8,8 @@ import {
 import {
   type Agent,
   type ScopeOfWorkAction,
-} from "../../../document-models/scope-of-work/gen/types.js";
-import { actions } from "../../../document-models/scope-of-work/index.js";
+} from "document-models/scope-of-work";
+import { actions } from "document-models/scope-of-work";
 import {
   type DocumentDispatch,
   useDrives,

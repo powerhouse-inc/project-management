@@ -5,7 +5,7 @@ import {
   type PmCurrencyInput,
   type Agent,
   type ScopeOfWorkAction,
-} from "../../../document-models/scope-of-work/gen/types.js";
+} from "document-models/scope-of-work";
 import { useMemo, useState, useEffect } from "react";
 import {
   TextInput,
@@ -17,7 +17,7 @@ import {
   Select,
 } from "@powerhousedao/document-engineering";
 import { Icon } from "@powerhousedao/design-system";
-import { actions } from "../../../document-models/scope-of-work/index.js";
+import { actions } from "document-models/scope-of-work";
 import { generateId } from "document-model/core";
 import BudgetCalculator from "./budgetCalculator.js";
 import ProgressBar from "../components/progressBar.js";
