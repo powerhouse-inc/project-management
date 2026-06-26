@@ -3,14 +3,14 @@ import {
   type Agent,
   type Project,
   type ScopeOfWorkAction,
-} from "../../../document-models/scope-of-work/gen/types.js";
+} from "document-models/scope-of-work";
 import {
   ObjectSetTable,
   type ColumnDef,
   type ColumnAlignment,
 } from "@powerhousedao/document-engineering";
 import { Icon } from "@powerhousedao/design-system";
-import { actions } from "../../../document-models/scope-of-work/index.js";
+import { actions } from "document-models/scope-of-work";
 import { generateId } from "document-model/core";
 import ProgressBar from "../components/progressBar.js";
 import { type DocumentDispatch } from "@powerhousedao/reactor-browser";

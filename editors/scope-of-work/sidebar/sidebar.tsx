@@ -17,13 +17,13 @@ import Deliverables from "./deliverables.js";
 import Roadmaps from "./roadmaps.js";
 import Contributors from "./contributors.js";
 import BreadCrumbs from "../components/breadCrumbs.js";
-import { useSelectedScopeOfWorkDocument } from "../../../document-models/scope-of-work/hooks.js";
+import { useSelectedScopeOfWorkDocument } from "document-models/scope-of-work";
 import {
   type Milestone as MilestoneType,
   type Roadmap as RoadmapType,
   type Project as ProjectType,
   type Deliverable as DeliverableType,
-} from "../../../document-models/scope-of-work/gen/types.js";
+} from "document-models/scope-of-work";
 
 type SidebarNode = {
   id: string;

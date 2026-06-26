@@ -1,6 +1,8 @@
-import type { DocumentModelModule } from "document-model";
-import { ScopeOfWork } from "./scope-of-work/module.js";
+import { ScopeOfWork as ScopeOfWorkV1 } from "document-models/scope-of-work/v1";
 
-export const documentModels: DocumentModelModule<any>[] = [
-  ScopeOfWork,
-];
+/**
+ * WARNING: DO NOT EDIT
+ * This file is auto-generated and updated by codegen
+ */
+
+export const documentModels = [ScopeOfWorkV1] as const;

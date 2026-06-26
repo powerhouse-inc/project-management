@@ -1,4 +1,4 @@
-import { generateMock } from "@powerhousedao/codegen";
+import { generateMock } from "document-model";
 import { describe, expect, it } from "vitest";
 import {
   reducer,
@@ -10,7 +10,7 @@ import {
   AddAgentInputSchema,
   RemoveAgentInputSchema,
   EditAgentInputSchema,
-} from "@powerhousedao/project-management/document-models/scope-of-work";
+} from "document-models/scope-of-work";
 
 describe("ContributorsOperations", () => {
   it("should handle addAgent operation", () => {

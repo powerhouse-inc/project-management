@@ -1,1 +1,4 @@
-export { ScopeOfWorkEditor } from "./scope-of-work/module.js";
+/**
+ * WARNING: DO NOT EDIT
+ * This file is auto-generated and updated by codegen
+ */
