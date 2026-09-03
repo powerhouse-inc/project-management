@@ -1,4 +1,8 @@
 import type { ScopeOfWorkRoadmapsOperations } from "document-models/scope-of-work/v1";
+import { RoadmapAlreadyExistsError } from "../../gen/roadmaps/error.js";
+import { deleteDeliverables } from "./lookup.js";
+import { applyInvariants } from "./projects.js";
+import { isSet } from "./util.js";
 
 export const scopeOfWorkRoadmapsOperations: ScopeOfWorkRoadmapsOperations = {
   editRoadmapOperation(state, action) {
@@ -11,9 +15,11 @@ export const scopeOfWorkRoadmapsOperations: ScopeOfWorkRoadmapsOperations = {
 
     const updatedRoadmap = {
       ...roadmap,
-      title: action.input.title || roadmap.title,
-      slug: action.input.slug || roadmap.slug,
-      description: action.input.description || roadmap.description,
+      title: isSet(action.input.title) ? action.input.title : roadmap.title,
+      slug: isSet(action.input.slug) ? action.input.slug : roadmap.slug,
+      description: isSet(action.input.description)
+        ? action.input.description
+        : roadmap.description,
     };
 
     state.roadmaps = state.roadmaps.map((roadmap) =>
@@ -21,6 +27,12 @@ export const scopeOfWorkRoadmapsOperations: ScopeOfWorkRoadmapsOperations = {
     );
   },
   addRoadmapOperation(state, action) {
+    if (state.roadmaps.some((r) => String(r.id) === String(action.input.id))) {
+      throw new RoadmapAlreadyExistsError(
+        `Roadmap with ID ${action.input.id} already exists`,
+      );
+    }
+
     const roadmap = {
       id: action.input.id,
       title: action.input.title,
@@ -39,18 +51,17 @@ export const scopeOfWorkRoadmapsOperations: ScopeOfWorkRoadmapsOperations = {
       throw new Error("Roadmap not found");
     }
 
-    roadmap.milestones.forEach((milestone) => {
-      if (milestone.scope?.deliverables) {
-        milestone.scope.deliverables.forEach((deliverableId) => {
-          state.deliverables = state.deliverables.filter(
-            (deliverable) => String(deliverable.id) !== String(deliverableId),
-          );
-        });
-      }
-    });
+    // the milestones' deliverables go with the roadmap, wherever else they were listed
+    deleteDeliverables(
+      state,
+      roadmap.milestones.flatMap(
+        (milestone) => milestone.scope?.deliverables ?? [],
+      ),
+    );
 
     state.roadmaps = state.roadmaps.filter(
       (roadmap) => String(roadmap.id) !== String(action.input.id),
     );
+    applyInvariants(state);
   },
 };

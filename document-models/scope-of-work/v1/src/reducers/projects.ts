@@ -1,13 +1,28 @@
 import type { ScopeOfWorkProjectsOperations } from "document-models/scope-of-work/v1";
+import {
+  InvalidProjectBudgetError,
+  InvalidProjectMarginError,
+  ProjectAlreadyExistsError,
+  ProjectDeliverableAlreadyExistsError,
+  ProjectNotFoundError,
+} from "../../gen/projects/error.js";
 import type {
   Deliverable,
   DeliverablesSet,
   ScopeOfWorkState,
 } from "../../gen/schema/types.js";
+import { deleteDeliverables } from "./lookup.js";
 import { percentageProgress, storyPointsProgress } from "./progress.js";
+import { isSet } from "./util.js";
 
 export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
   addProjectOperation(state, action) {
+    if (state.projects.some((p) => p.id === action.input.id)) {
+      throw new ProjectAlreadyExistsError(
+        `Project with ID ${action.input.id} already exists`,
+      );
+    }
+
     const project = {
       id: action.input.id,
       code: action.input.code,
@@ -41,7 +56,17 @@ export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
     if (!project) {
       throw new Error("Project not found");
     }
-    Object.assign(project, action.input);
+
+    const { input } = action;
+    // required fields ignore an explicit null; nullable fields accept it as "clear"
+    if (isSet(input.title)) project.title = input.title;
+    if (isSet(input.code)) project.code = input.code;
+    if (isSet(input.slug)) project.slug = input.slug;
+    if (input.abstract !== undefined) project.abstract = input.abstract;
+    if (input.imageUrl !== undefined) project.imageUrl = input.imageUrl;
+    if (input.budgetType !== undefined) project.budgetType = input.budgetType;
+    if (input.currency !== undefined) project.currency = input.currency;
+    if (input.budget !== undefined) project.budget = input.budget;
   },
   updateProjectOwnerOperation(state, action) {
     const project = state.projects.find((p) => p.id === action.input.id);
@@ -51,22 +76,24 @@ export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
     project.projectOwner = action.input.projectOwner;
   },
   removeProjectOperation(state, action) {
-    // remove deliverables linked to project from project scope
     const project = state.projects.find((p) => p.id === action.input.projectId);
-    if (project?.scope?.deliverables) {
-      project.scope.deliverables.forEach((deliverableId) => {
-        state.deliverables = state.deliverables.filter(
-          (d) => d.id !== deliverableId,
-        );
-      });
+    if (!project) {
+      throw new ProjectNotFoundError("Project not found");
     }
+
+    // the project's deliverables go with it, wherever else they were listed
+    deleteDeliverables(state, [...(project.scope?.deliverables ?? [])]);
 
     state.projects = state.projects.filter(
       (p) => p.id !== action.input.projectId,
     );
-    applyInvariants(state, ["budget", "margin"]);
+    applyInvariants(state);
   },
   setProjectMarginOperation(state, action) {
+    if (action.input.margin < 0) {
+      throw new InvalidProjectMarginError("Margin must be zero or positive");
+    }
+
     const project = state.projects.find((p) => p.id === action.input.projectId);
     if (!project) {
       throw new Error("Project not found");
@@ -93,15 +120,44 @@ export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
       }
     });
 
-    applyInvariants(state, ["budget"]);
+    applyInvariants(state);
   },
   setProjectTotalBudgetOperation(state, action) {
+    const { totalBudget } = action.input;
+    if (totalBudget < 0) {
+      throw new InvalidProjectBudgetError(
+        "Total budget must be zero or positive",
+      );
+    }
+
     const project = state.projects.find((p) => p.id === action.input.projectId);
     if (!project) {
       throw new Error("Project not found");
     }
-    project.budget = action.input.totalBudget;
-    applyInvariants(state, ["margin"]);
+
+    const cost = project.scope ? calculateTotalCost(state, project.scope) : 0;
+    if (cost === 0 && totalBudget > 0) {
+      throw new InvalidProjectBudgetError(
+        "Cannot set a total budget on a project without costed deliverables",
+      );
+    }
+    if (totalBudget < cost) {
+      throw new InvalidProjectBudgetError(
+        `Total budget cannot be lower than the total cost (${cost})`,
+      );
+    }
+
+    // budget = cost × (1 + margin/100)  ⇒  margin = (budget / cost − 1) × 100
+    const margin = cost > 0 ? (totalBudget / cost - 1) * 100 : 0;
+    for (const id of project.scope?.deliverables ?? []) {
+      const deliverable = state.deliverables.find((d) => d.id === id);
+      if (deliverable?.budgetAnchor) {
+        deliverable.budgetAnchor = { ...deliverable.budgetAnchor, margin };
+      }
+    }
+
+    project.budget = totalBudget;
+    applyInvariants(state);
   },
   addProjectDeliverableOperation(state, action) {
     // resolve the target first: a throw after mutating would leave an orphan deliverable behind
@@ -112,8 +168,16 @@ export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
     if (!project.scope) {
       throw new Error("Project deliverable set not found");
     }
+    if (
+      state.deliverables.some(
+        (d) => String(d.id) === String(action.input.deliverableId),
+      )
+    ) {
+      throw new ProjectDeliverableAlreadyExistsError(
+        `Deliverable with ID ${action.input.deliverableId} already exists`,
+      );
+    }
 
-    // add deliverable to deliverables
     const newDeliverable: Deliverable = {
       id: action.input.deliverableId,
       owner: "",
@@ -135,6 +199,7 @@ export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
 
     state.deliverables.push(newDeliverable);
     project.scope.deliverables.push(newDeliverable.id);
+    applyInvariants(state);
   },
   removeProjectDeliverableOperation(state, action) {
     const project = state.projects.find((p) => p.id === action.input.projectId);
@@ -162,64 +227,30 @@ export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
           }
         : deliverable;
     });
-    applyInvariants(state, ["budget", "margin", "progress"]);
+    applyInvariants(state);
   },
 };
 
-export const applyInvariants = (state: ScopeOfWorkState, updates: string[]) => {
-  /*
-  invariant: budget = totalCost * margin
-   
-  */
-
-  if (updates.includes("budget")) {
-    state.projects.forEach((project) => {
-      if (project.scope) {
-        project.budget = calculateTotalBudget(state, project.scope);
+/**
+ * Re-derive everything that depends on the deliverables, in dependency order:
+ * budgets (from the anchors) for every project and milestone, then progress.
+ * Every operation that touches a deliverable or a scope calls this.
+ */
+export const applyInvariants = (state: ScopeOfWorkState) => {
+  state.projects.forEach((project) => {
+    if (project.scope) {
+      project.budget = calculateTotalBudget(state, project.scope);
+    }
+  });
+  state.roadmaps.forEach((roadmap) => {
+    roadmap.milestones.forEach((milestone) => {
+      if (milestone.scope) {
+        milestone.budget = calculateTotalBudget(state, milestone.scope);
       }
     });
-    state.roadmaps.forEach((roadmap) => {
-      roadmap.milestones.forEach((milestone) => {
-        if (milestone.scope) {
-          milestone.budget = calculateTotalBudget(state, milestone.scope);
-        }
-      });
-    });
-  }
+  });
 
-  if (updates.includes("margin")) {
-    state.projects.forEach((project) => {
-      if (project.scope) {
-        const margin = project.budget
-          ? project.budget / calculateTotalCost(state, project.scope)
-          : 0;
-        const deliverables = project.scope.deliverables.map((id) =>
-          state.deliverables.find((d) => d.id === id),
-        );
-        deliverables.forEach((deliverable: any) => {
-          if (deliverable?.budgetAnchor) {
-            deliverable.budgetAnchor = {
-              ...deliverable.budgetAnchor,
-              margin,
-            };
-          }
-        });
-      }
-    });
-  }
-
-  // another invariant: deliverableSet.progress = function of deliverableSet.deliverables.progress
-  if (updates.includes("progress")) {
-    calculateDeliverableSetsProgress(state);
-  }
-
-  // recalculate when
-  /*
-    - deliverableSet.deliverables.progress changes
-    - deliverableSet.deliverables.status changes
-    - deliverable is added / created / removed / deleted to deliverableSet
-    - deliverable is added / created / removed / deleted from deliverableSet
-  */
+  calculateDeliverableSetsProgress(state);
 };
 
 export const calculateTotalCost = (
@@ -247,8 +278,7 @@ const calculateTotalBudget = (
     .map((id) => state.deliverables.find((d) => d.id === id))
     .filter((deliverable) => deliverable !== undefined);
   const totalBudget = deliverables.reduce((acc, deliverable) => {
-    // Assume margin is a percentage (e.g., 5 means 5%)
-    // Convert margin to a multiplier: (1 + margin/100)
+    // margin is a percentage (e.g. 5 means 5%): multiplier (1 + margin/100)
     return (
       acc +
       (deliverable.budgetAnchor?.unitCost || 0) *

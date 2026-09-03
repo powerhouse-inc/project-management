@@ -1,15 +1,36 @@
 import type { ScopeOfWorkDeliverablesOperations } from "document-models/scope-of-work/v1";
-import type { Deliverable, KeyResult } from "../../gen/schema/types.js";
-import { applyInvariants } from "./projects.js";
+import {
+  DeliverableAlreadyExistsError,
+  DeliverableClosedError,
+  InvalidBudgetAnchorError,
+  InvalidProgressError,
+  KeyResultAlreadyExistsError,
+} from "../../gen/deliverables/error.js";
+import type {
+  Deliverable,
+  DeliverableStatus,
+  Progress,
+} from "../../gen/schema/types.js";
+import { deleteDeliverables } from "./lookup.js";
 import {
   binaryProgress,
   percentageProgress,
   storyPointsProgress,
 } from "./progress.js";
+import { applyInvariants } from "./projects.js";
+import { isSet } from "./util.js";
 
 export const scopeOfWorkDeliverablesOperations: ScopeOfWorkDeliverablesOperations =
   {
     addDeliverableOperation(state, action) {
+      if (
+        state.deliverables.some((d) => String(d.id) === String(action.input.id))
+      ) {
+        throw new DeliverableAlreadyExistsError(
+          `Deliverable with ID ${action.input.id} already exists`,
+        );
+      }
+
       const deliverable: Deliverable = {
         id: action.input.id,
         owner: action.input.owner || null,
@@ -39,34 +60,9 @@ export const scopeOfWorkDeliverablesOperations: ScopeOfWorkDeliverablesOperation
         throw new Error("Deliverable not found");
       }
 
-      // remove deliverable from deliverable sets in milestone and project
-      const roadmap = state.roadmaps.find((roadmap) =>
-        roadmap.milestones.find((milestone) =>
-          milestone?.scope?.deliverables?.includes(action.input.id),
-        ),
-      );
-      const milestone = roadmap?.milestones.find((milestone) =>
-        milestone?.scope?.deliverables?.includes(action.input.id),
-      );
-      if (milestone && milestone.scope) {
-        milestone.scope.deliverables = milestone.scope.deliverables?.filter(
-          (deliverable) => String(deliverable) !== String(action.input.id),
-        );
-      }
-
-      const project = state.projects.find((project) =>
-        project.scope?.deliverables.includes(action.input.id),
-      );
-      if (project && project.scope) {
-        project.scope.deliverables = project.scope.deliverables?.filter(
-          (deliverable) => String(deliverable) !== String(action.input.id),
-        );
-      }
-
-      state.deliverables = state.deliverables.filter(
-        (deliverable) => String(deliverable.id) !== String(action.input.id),
-      );
-      applyInvariants(state, ["budget", "margin", "progress"]);
+      // unlinks it from every project and milestone scope, then deletes it
+      deleteDeliverables(state, [action.input.id]);
+      applyInvariants(state);
     },
     editDeliverableOperation(state, action) {
       const deliverable = state.deliverables.find(
@@ -109,7 +105,7 @@ export const scopeOfWorkDeliverablesOperations: ScopeOfWorkDeliverablesOperation
           ? updatedDeliverable
           : deliverable,
       );
-      applyInvariants(state, ["progress"]);
+      applyInvariants(state);
     },
     setDeliverableProgressOperation(state, action) {
       const deliverable = state.deliverables.find(
@@ -118,41 +114,53 @@ export const scopeOfWorkDeliverablesOperations: ScopeOfWorkDeliverablesOperation
       if (!deliverable) {
         throw new Error("Deliverable not found");
       }
-
-      const updatedDeliverable = {
-        ...deliverable,
-        workProgress: action.input.workProgress
-          ? action.input.workProgress.percentage !== undefined &&
-            action.input.workProgress.percentage !== null
-            ? percentageProgress(action.input.workProgress.percentage)
-            : action.input.workProgress.storyPoints
-              ? storyPointsProgress(
-                  action.input.workProgress.storyPoints.total,
-                  action.input.workProgress.storyPoints.completed,
-                )
-              : action.input.workProgress.done !== undefined &&
-                  action.input.workProgress.done !== null
-                ? binaryProgress(action.input.workProgress.done)
-                : deliverable.workProgress
-          : deliverable.workProgress,
-      };
-
-      updatedDeliverable.status = "IN_PROGRESS";
       if (
-        deliverableIsCompleted(updatedDeliverable) &&
-        !["WONT_DO", "DELIVERED", "CANCELED"].includes(
-          updatedDeliverable.status,
-        )
+        deliverable.status === "CANCELED" ||
+        deliverable.status === "WONT_DO"
       ) {
-        updatedDeliverable.status = "DELIVERED";
+        throw new DeliverableClosedError(
+          `Deliverable ${action.input.id} is closed`,
+        );
       }
+
+      const input = action.input.workProgress;
+      let workProgress = deliverable.workProgress;
+      if (input) {
+        if (isSet(input.percentage)) {
+          if (input.percentage < 0 || input.percentage > 100) {
+            throw new InvalidProgressError(
+              "Percentage must be between 0 and 100",
+            );
+          }
+          workProgress = percentageProgress(input.percentage);
+        } else if (input.storyPoints) {
+          const { total, completed } = input.storyPoints;
+          if (total < 0 || completed < 0 || completed > total) {
+            throw new InvalidProgressError(
+              "Story points must be non-negative and completed cannot exceed total",
+            );
+          }
+          workProgress = storyPointsProgress(total, completed);
+        } else if (isSet(input.done)) {
+          workProgress = binaryProgress(input.done);
+        }
+      }
+
+      const status: DeliverableStatus = isCompleted(workProgress)
+        ? "DELIVERED"
+        : "IN_PROGRESS";
+      const updatedDeliverable: Deliverable = {
+        ...deliverable,
+        workProgress,
+        status,
+      };
 
       state.deliverables = state.deliverables.map((deliverable) =>
         String(deliverable.id) === String(action.input.id)
           ? updatedDeliverable
           : deliverable,
       );
-      applyInvariants(state, ["progress"]);
+      applyInvariants(state);
     },
     addKeyResultOperation(state, action) {
       const updatedDeliverable = state.deliverables.find(
@@ -162,19 +170,21 @@ export const scopeOfWorkDeliverablesOperations: ScopeOfWorkDeliverablesOperation
       if (!updatedDeliverable) {
         throw new Error("Deliverable not found");
       }
+      if (
+        updatedDeliverable.keyResults.some(
+          (keyResult) => String(keyResult.id) === String(action.input.id),
+        )
+      ) {
+        throw new KeyResultAlreadyExistsError(
+          `Key result with ID ${action.input.id} already exists`,
+        );
+      }
 
-      const keyResult = {
+      updatedDeliverable.keyResults.push({
         id: action.input.id,
         title: action.input.title || "",
         link: action.input.link || "",
-      };
-
-      updatedDeliverable.keyResults.push(keyResult);
-      state.deliverables = state.deliverables.map((deliverable) =>
-        String(deliverable.id) === String(action.input.deliverableId)
-          ? updatedDeliverable
-          : deliverable,
-      );
+      });
     },
     removeKeyResultOperation(state, action) {
       const updatedDeliverable = state.deliverables.find(
@@ -188,11 +198,6 @@ export const scopeOfWorkDeliverablesOperations: ScopeOfWorkDeliverablesOperation
       updatedDeliverable.keyResults = updatedDeliverable.keyResults.filter(
         (keyResult) => String(keyResult.id) !== String(action.input.id),
       );
-      state.deliverables = state.deliverables.map((deliverable) =>
-        String(deliverable.id) === String(action.input.deliverableId)
-          ? updatedDeliverable
-          : deliverable,
-      );
     },
     editKeyResultOperation(state, action) {
       const updatedDeliverable = state.deliverables.find(
@@ -203,26 +208,19 @@ export const scopeOfWorkDeliverablesOperations: ScopeOfWorkDeliverablesOperation
         throw new Error("Deliverable not found");
       }
 
-      const keyResult = updatedDeliverable.keyResults.find(
-        (keyResult) => String(keyResult.id) === String(action.input.id),
-      );
-
-      const updatedKeyResult = {
-        ...keyResult,
-        title: action.input.title || keyResult?.title,
-        link: action.input.link || keyResult?.link,
-      };
-
-      updatedDeliverable.keyResults = updatedDeliverable.keyResults?.map(
+      updatedDeliverable.keyResults = updatedDeliverable.keyResults.map(
         (keyResult) =>
           String(keyResult.id) === String(action.input.id)
-            ? updatedKeyResult
+            ? {
+                ...keyResult,
+                title: isSet(action.input.title)
+                  ? action.input.title
+                  : keyResult.title,
+                link: isSet(action.input.link)
+                  ? action.input.link
+                  : keyResult.link,
+              }
             : keyResult,
-      ) as KeyResult[];
-      state.deliverables = state.deliverables.map((deliverable) =>
-        String(deliverable.id) === String(action.input.deliverableId)
-          ? updatedDeliverable
-          : deliverable,
       );
     },
     setDeliverableBudgetAnchorProjectOperation(state, action) {
@@ -234,37 +232,38 @@ export const scopeOfWorkDeliverablesOperations: ScopeOfWorkDeliverablesOperation
         throw new Error("Deliverable not found");
       }
 
-      Object.assign(foundDeliverable, {
-        budgetAnchor: { ...foundDeliverable.budgetAnchor, ...action.input },
-      });
+      const { project, unit, unitCost, quantity, margin } = action.input;
+      if ((unitCost ?? 0) < 0 || (quantity ?? 0) < 0 || (margin ?? 0) < 0) {
+        throw new InvalidBudgetAnchorError(
+          "Budget anchor values must be zero or positive",
+        );
+      }
 
-      state.deliverables = state.deliverables.map((deliverable) =>
-        String(deliverable.id) === String(action.input.deliverableId)
-          ? foundDeliverable
-          : deliverable,
-      );
+      // only the anchor's own fields are written; the input's deliverableId never leaks in
+      const current = foundDeliverable.budgetAnchor ?? {
+        project: "",
+        unit: "Hours" as const,
+        unitCost: 0,
+        quantity: 0,
+        margin: 0,
+      };
+      foundDeliverable.budgetAnchor = {
+        project: project !== undefined ? project : current.project,
+        unit: isSet(unit) ? unit : current.unit,
+        unitCost: isSet(unitCost) ? unitCost : current.unitCost,
+        quantity: isSet(quantity) ? quantity : current.quantity,
+        margin: isSet(margin) ? margin : current.margin,
+      };
 
-      // Only apply budget and progress invariants, not margin invariant when setting margin
-      // This prevents the margin from being recalculated and overriding user input
-      applyInvariants(state, ["budget", "progress"]);
+      applyInvariants(state);
     },
   };
 
-const deliverableIsCompleted = (deliverable: any) => {
-  if (deliverable.workProgress?.done === true) {
-    return true;
-  }
-
-  if (deliverable.workProgress?.value === 100) {
-    return true;
-  }
-
-  if (
-    deliverable.workProgress?.completed === deliverable.workProgress?.total &&
-    deliverable.workProgress?.total > 0
-  ) {
-    return true;
-  }
-
-  return false;
-};
+/** Delivered when the binary flag is set, the percentage hits 100, or every story point is done. */
+const isCompleted = (progress: Progress | null | undefined): boolean =>
+  isSet(progress) &&
+  (progress.done === true ||
+    progress.value === 100 ||
+    (isSet(progress.total) &&
+      progress.total > 0 &&
+      progress.completed === progress.total));

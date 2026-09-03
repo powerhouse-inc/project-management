@@ -1,9 +1,10 @@
 import type { ScopeOfWorkDeliverablesSetOperations } from "document-models/scope-of-work/v1";
 import type { EditDeliverablesSetAction } from "../../gen/deliverables-set/actions.js";
 import type { ScopeOfWorkState } from "../../gen/schema/types.js";
+import { SetDeliverableNotFoundError } from "../../gen/deliverables-set/error.js";
 import { findMilestone } from "./lookup.js";
-import { applyInvariants } from "./projects.js";
 import { percentageProgress, storyPointsProgress } from "./progress.js";
+import { applyInvariants } from "./projects.js";
 
 export const scopeOfWorkDeliverablesSetOperations: ScopeOfWorkDeliverablesSetOperations =
   {
@@ -35,7 +36,7 @@ export const scopeOfWorkDeliverablesSetOperations: ScopeOfWorkDeliverablesSetOpe
             ? foundRoadmap
             : roadmap;
         });
-        applyInvariants(state, ["progress"]);
+        applyInvariants(state);
       } else if (action.input.projectId && !action.input.milestoneId) {
         // update project set
         const project = state.projects.find(
@@ -68,13 +69,22 @@ export const scopeOfWorkDeliverablesSetOperations: ScopeOfWorkDeliverablesSetOpe
             ? updatedProject
             : project;
         });
-        applyInvariants(state, ["progress"]);
+        applyInvariants(state);
       }
     },
     addDeliverableInSetOperation(state, action) {
       // check if action.input either milestoneId or projectId is provided
       if (!action.input.milestoneId && !action.input.projectId) {
         throw new Error("Either milestoneId or projectId must be provided");
+      }
+      if (
+        !state.deliverables.some(
+          (d) => String(d.id) === String(action.input.deliverableId),
+        )
+      ) {
+        throw new SetDeliverableNotFoundError(
+          `Deliverable ${action.input.deliverableId} not found`,
+        );
       }
 
       // if milestoneId is provided, check if roadmap exists
@@ -112,7 +122,7 @@ export const scopeOfWorkDeliverablesSetOperations: ScopeOfWorkDeliverablesSetOpe
             ? foundRoadmap
             : roadmap;
         });
-        applyInvariants(state, ["progress"]);
+        applyInvariants(state);
       } else if (action.input.projectId && !action.input.milestoneId) {
         // check if project exists
         const foundProject = state.projects.find(
@@ -163,7 +173,7 @@ export const scopeOfWorkDeliverablesSetOperations: ScopeOfWorkDeliverablesSetOpe
             : deliverable;
         });
 
-        applyInvariants(state, ["progress"]);
+        applyInvariants(state);
       }
     },
     removeDeliverableInSetOperation(state, action) {
@@ -189,7 +199,7 @@ export const scopeOfWorkDeliverablesSetOperations: ScopeOfWorkDeliverablesSetOpe
             ? foundRoadmap
             : roadmap;
         });
-        applyInvariants(state, ["progress"]);
+        applyInvariants(state);
       } else if (action.input.projectId) {
         const foundProject = state.projects.find(
           (project) => String(project.id) === String(action.input.projectId),
@@ -232,7 +242,7 @@ export const scopeOfWorkDeliverablesSetOperations: ScopeOfWorkDeliverablesSetOpe
               }
             : deliverable;
         });
-        applyInvariants(state, ["progress"]);
+        applyInvariants(state);
       }
     },
   };

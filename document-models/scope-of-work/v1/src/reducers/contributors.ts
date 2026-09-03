@@ -1,20 +1,23 @@
 import type { ScopeOfWorkContributorsOperations } from "document-models/scope-of-work/v1";
 import { type AddAgentAction } from "../../gen/contributors/actions.js";
-import { AgentNotFoundError } from "../../gen/contributors/error.js";
+import {
+  AgentAlreadyExistsError,
+  AgentNotFoundError,
+} from "../../gen/contributors/error.js";
 import type { Agent, ScopeOfWorkState } from "../../gen/schema/types.js";
 
 export const scopeOfWorkContributorsOperations: ScopeOfWorkContributorsOperations =
   {
     addAgentOperation(state: ScopeOfWorkState, action: AddAgentAction) {
-      // Check if agent with same ID already exists
       const existingAgent = state.contributors.find(
         (agent) => agent.id === action.input.id,
       );
       if (existingAgent) {
-        throw new Error(`Agent with ID ${action.input.id} already exists`);
+        throw new AgentAlreadyExistsError(
+          `Agent with ID ${action.input.id} already exists`,
+        );
       }
 
-      // Create new agent with correct structure matching GraphQL schema
       const agent = {
         id: action.input.id,
         name: action.input.name,
@@ -25,7 +28,6 @@ export const scopeOfWorkContributorsOperations: ScopeOfWorkContributorsOperation
       state.contributors.push(agent);
     },
     removeAgentOperation(state, action) {
-      // Find agent by ID
       const agentIndex = state.contributors.findIndex(
         (agent) => agent.id === action.input.id,
       );
@@ -35,11 +37,28 @@ export const scopeOfWorkContributorsOperations: ScopeOfWorkContributorsOperation
         );
       }
 
-      // Remove agent from contributors array
       state.contributors.splice(agentIndex, 1);
+
+      // an agent that no longer exists cannot own or coordinate anything
+      for (const deliverable of state.deliverables) {
+        if (deliverable.owner === action.input.id) {
+          deliverable.owner = null;
+        }
+      }
+      for (const project of state.projects) {
+        if (project.projectOwner === action.input.id) {
+          project.projectOwner = null;
+        }
+      }
+      for (const roadmap of state.roadmaps) {
+        for (const milestone of roadmap.milestones) {
+          milestone.coordinators = milestone.coordinators.filter(
+            (coordinatorId) => coordinatorId !== action.input.id,
+          );
+        }
+      }
     },
     editAgentOperation(state, action) {
-      // Find agent by ID
       const agentIndex = state.contributors.findIndex(
         (agent) => agent.id === action.input.id,
       );
@@ -49,7 +68,6 @@ export const scopeOfWorkContributorsOperations: ScopeOfWorkContributorsOperation
         );
       }
 
-      // Update agent with provided fields, preserving existing values for optional fields
       const existingAgent = state.contributors[agentIndex];
       const updatedAgent = {
         ...existingAgent,

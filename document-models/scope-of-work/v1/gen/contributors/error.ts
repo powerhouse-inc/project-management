@@ -1,7 +1,14 @@
-export type ErrorCode = "AgentNotFoundError";
+export type ErrorCode = "AgentAlreadyExistsError" | "AgentNotFoundError";
 
 export interface ReducerError {
   errorCode: ErrorCode;
+}
+
+export class AgentAlreadyExistsError extends Error implements ReducerError {
+  errorCode = "AgentAlreadyExistsError" as ErrorCode;
+  constructor(message = "AgentAlreadyExistsError") {
+    super(message);
+  }
 }
 
 export class AgentNotFoundError extends Error implements ReducerError {
@@ -12,5 +19,7 @@ export class AgentNotFoundError extends Error implements ReducerError {
 }
 
 export const errors = {
+  AddAgent: { AgentAlreadyExistsError },
+
   RemoveAgent: { AgentNotFoundError },
 };

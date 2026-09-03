@@ -3,8 +3,8 @@
  * asserting the derived aggregates (budgets, margins, progress, completion)
  * after every step — plus an executable list of known gaps.
  *
- * Gap tests use `it.fails`: each states the DESIRED behaviour. It passes while
- * the gap exists and turns red once the reducer is fixed — flip it to `it`.
+ * The "former gaps" block holds the regression tests for the logic holes the
+ * first version of this suite uncovered; each states the desired behaviour.
  */
 import {
   addAgent,
@@ -417,9 +417,9 @@ describe("scenario: restructuring", () => {
 /* ────────────────────────────────────────────────────────────────────────────
  * KNOWN GAPS — each `it.fails` states the desired behaviour. See the report.
  * ────────────────────────────────────────────────────────────────────────── */
-describe("known gaps (expected failures — flip to `it` once fixed)", () => {
+describe("former gaps (fixed — kept as regression tests)", () => {
   describe("GAP 1: budget ↔ margin round-trip uses inconsistent units", () => {
-    it.fails("a total budget set on the project survives the next re-derivation", () => {
+    it("a total budget set on the project survives the next re-derivation", () => {
       // cost 1500; asking for a 3000 budget should mean a 100% margin
       let doc = apply(
         costedScope(),
@@ -439,17 +439,20 @@ describe("known gaps (expected failures — flip to `it` once fixed)", () => {
       expect(project(doc)?.budget).toBe(3000);
     });
 
-    it.fails("setting a budget on an uncosted project does not produce an infinite margin", () => {
+    it("setting a budget on an uncosted project does not produce an infinite margin", () => {
       const doc = apply(
         plannedScope(),
         setProjectTotalBudget({ projectId: "p1", totalBudget: 100 }),
+      );
+      expect(lastError(doc)).toBe(
+        "Cannot set a total budget on a project without costed deliverables",
       );
       expect(Number.isFinite(anchor(doc, "api")?.margin)).toBe(true);
     });
   });
 
   describe("GAP 2: container-level changes leave other containers stale", () => {
-    it.fails("linking a costed deliverable into a project re-derives that project's budget", () => {
+    it("linking a costed deliverable into a project re-derives that project's budget", () => {
       const doc = apply(
         costedScope(),
         removeProjectDeliverable({ projectId: "p1", deliverableId: "ui" }),
@@ -460,7 +463,7 @@ describe("known gaps (expected failures — flip to `it` once fixed)", () => {
       expect(project(doc, "p2")?.budget).toBe(600); // today: 0 — only the progress invariant runs
     });
 
-    it.fails("removing a milestone does not leave its deleted deliverables dangling in the project", () => {
+    it("removing a milestone does not leave its deleted deliverables dangling in the project", () => {
       const doc = apply(
         costedScope(),
         setDeliverableProgress({
@@ -476,14 +479,14 @@ describe("known gaps (expected failures — flip to `it` once fixed)", () => {
       ); // and its progress is stale
     });
 
-    it.fails("removing a roadmap re-derives the budgets of projects that shared its deliverables", () => {
+    it("removing a roadmap re-derives the budgets of projects that shared its deliverables", () => {
       const doc = apply(costedScope(), removeRoadmap({ id: "r1" }));
       expect(state(doc).deliverables).toStrictEqual([]); // deleted with the milestones
       expect(project(doc)?.scope?.deliverables).toStrictEqual([]); // today: still ["api","ui"]
       expect(project(doc)?.budget).toBe(0); // today: still 1800 — no invariant runs at all
     });
 
-    it.fails("removing a project re-derives the progress of milestones that shared its deliverables", () => {
+    it("removing a project re-derives the progress of milestones that shared its deliverables", () => {
       const doc = apply(
         costedScope(),
         setDeliverableProgress({
@@ -498,19 +501,19 @@ describe("known gaps (expected failures — flip to `it` once fixed)", () => {
       ); // today: 100
     });
 
-    it.fails("deleting a deliverable scheduled in two milestones unlinks it from both", () => {
+    it("deleting a deliverable scheduled in two milestones unlinks it from both", () => {
       const doc = apply(
         plannedScope(),
         addDeliverableInSet({ deliverableId: "api", milestoneId: "m2" }),
         removeDeliverable({ id: "api" }),
       );
       expect(milestone(doc, "m1")?.scope?.deliverables).toStrictEqual([]);
-      expect(milestone(doc, "m2")?.scope?.deliverables).toStrictEqual([]); // today: still ["api"]
+      expect(milestone(doc, "m2")?.scope?.deliverables).toStrictEqual(["ui"]); // api is gone from both; ui was always m2's own
     });
   });
 
   describe("GAP 3: missing validation", () => {
-    it.fails("duplicate ids are rejected (only agents check today)", () => {
+    it("duplicate ids are rejected (only agents check today)", () => {
       const doc = apply(
         plannedScope(),
         addProject({ id: "p1", code: "DUP", title: "Duplicate" }),
@@ -526,7 +529,7 @@ describe("known gaps (expected failures — flip to `it` once fixed)", () => {
       expect(state(doc).projects).toHaveLength(1);
     });
 
-    it.fails("linking an unknown deliverable id into a set is rejected", () => {
+    it("linking an unknown deliverable id into a set is rejected", () => {
       const doc = apply(
         plannedScope(),
         addDeliverableInSet({ deliverableId: "ghost", milestoneId: "m1" }),
@@ -535,7 +538,7 @@ describe("known gaps (expected failures — flip to `it` once fixed)", () => {
       expect(milestone(doc, "m1")?.scope?.deliverables).not.toContain("ghost");
     });
 
-    it.fails("story points cannot be over-completed", () => {
+    it("story points cannot be over-completed", () => {
       const doc = apply(
         plannedScope(),
         setDeliverableProgress({
@@ -546,7 +549,7 @@ describe("known gaps (expected failures — flip to `it` once fixed)", () => {
       expect(lastError(doc)).toBeDefined(); // today: accepted, milestone reads 160%
     });
 
-    it.fails("negative costs and quantities are rejected", () => {
+    it("negative costs and quantities are rejected", () => {
       const doc = apply(
         plannedScope(),
         setDeliverableBudgetAnchorProject({
@@ -558,14 +561,14 @@ describe("known gaps (expected failures — flip to `it` once fixed)", () => {
       expect(lastError(doc)).toBeDefined();
     });
 
-    it.fails("removing an unknown project is an error like every other remove", () => {
+    it("removing an unknown project is an error like every other remove", () => {
       const doc = apply(plannedScope(), removeProject({ projectId: "nope" }));
       expect(lastError(doc)).toBe("Project not found");
     });
   });
 
   describe("GAP 4: referential integrity of contributors", () => {
-    it.fails("removing an agent clears (or refuses while) it is an owner or coordinator", () => {
+    it("removing an agent clears (or refuses while) it is an owner or coordinator", () => {
       const doc = apply(plannedScope(), removeAgent({ id: "alice" }));
       const stillReferenced =
         deliverable(doc, "api")?.owner === "alice" ||
@@ -575,7 +578,7 @@ describe("known gaps (expected failures — flip to `it` once fixed)", () => {
   });
 
   describe("GAP 5: status and edit semantics", () => {
-    it.fails("recording progress on a canceled deliverable does not silently reopen it", () => {
+    it("recording progress on a canceled deliverable does not silently reopen it", () => {
       const doc = apply(
         plannedScope(),
         editDeliverable({ id: "api", status: "CANCELED" }),
@@ -584,7 +587,7 @@ describe("known gaps (expected failures — flip to `it` once fixed)", () => {
       expect(deliverable(doc, "api")?.status).toBe("CANCELED"); // today: IN_PROGRESS
     });
 
-    it.fails("an explicit empty string clears roadmap/milestone text fields", () => {
+    it("an explicit empty string clears roadmap/milestone text fields", () => {
       const doc = apply(
         plannedScope(),
         editRoadmap({ id: "r1", description: "to be cleared" }),
@@ -595,7 +598,7 @@ describe("known gaps (expected failures — flip to `it` once fixed)", () => {
       expect(milestone(doc, "m1")?.sequenceCode).toBe(""); // today: "M1"
     });
 
-    it.fails("updating a project with explicit nulls keeps non-null fields valid", () => {
+    it("updating a project with explicit nulls keeps non-null fields valid", () => {
       const doc = apply(
         plannedScope(),
         updateProject({ id: "p1", slug: null, code: null }),
@@ -604,7 +607,7 @@ describe("known gaps (expected failures — flip to `it` once fixed)", () => {
       expect(typeof project(doc)?.code).toBe("string");
     });
 
-    it.fails("the budget anchor only carries its schema fields", () => {
+    it("the budget anchor only carries its schema fields", () => {
       const doc = costedScope();
       expect(Object.keys(anchor(doc, "api") ?? {}).sort()).toStrictEqual(
         ["margin", "project", "quantity", "unit", "unitCost"], // today also: deliverableId (leaked from the input)

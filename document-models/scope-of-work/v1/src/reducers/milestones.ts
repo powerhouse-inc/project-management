@@ -1,10 +1,15 @@
 import type { ScopeOfWorkMilestonesOperations } from "document-models/scope-of-work/v1";
 import type { EditMilestoneAction } from "../../gen/milestones/actions.js";
+import {
+  MilestoneAlreadyExistsError,
+  MilestoneDeliverableAlreadyExistsError,
+} from "../../gen/milestones/error.js";
 import type { ScopeOfWorkState } from "../../gen/schema/types.js";
 import type { Deliverable } from "../../gen/types.js";
-import { findMilestone } from "./lookup.js";
-import { applyInvariants } from "./projects.js";
+import { deleteDeliverables, findMilestone } from "./lookup.js";
 import { percentageProgress } from "./progress.js";
+import { applyInvariants } from "./projects.js";
+import { isSet } from "./util.js";
 
 export const scopeOfWorkMilestonesOperations: ScopeOfWorkMilestonesOperations =
   {
@@ -26,13 +31,19 @@ export const scopeOfWorkMilestonesOperations: ScopeOfWorkMilestonesOperations =
         throw new Error("Milestone not found");
       }
 
+      const { input } = action;
       const updatedMilestone = {
         ...foundMilestone,
-        sequenceCode: action.input.sequenceCode || foundMilestone.sequenceCode,
-        title: action.input.title || foundMilestone.title,
-        description: action.input.description || foundMilestone.description,
-        deliveryTarget:
-          action.input.deliveryTarget || foundMilestone.deliveryTarget,
+        sequenceCode: isSet(input.sequenceCode)
+          ? input.sequenceCode
+          : foundMilestone.sequenceCode,
+        title: isSet(input.title) ? input.title : foundMilestone.title,
+        description: isSet(input.description)
+          ? input.description
+          : foundMilestone.description,
+        deliveryTarget: isSet(input.deliveryTarget)
+          ? input.deliveryTarget
+          : foundMilestone.deliveryTarget,
       };
 
       foundRoadmap.milestones = foundRoadmap.milestones.map((milestone) =>
@@ -91,6 +102,11 @@ export const scopeOfWorkMilestonesOperations: ScopeOfWorkMilestonesOperations =
       if (!foundRoadmap) {
         throw new Error("Roadmap not found");
       }
+      if (findMilestone(state, action.input.id)) {
+        throw new MilestoneAlreadyExistsError(
+          `Milestone with ID ${action.input.id} already exists`,
+        );
+      }
 
       const milestone = {
         id: action.input.id,
@@ -133,14 +149,10 @@ export const scopeOfWorkMilestonesOperations: ScopeOfWorkMilestonesOperations =
         throw new Error("Milestone not found");
       }
 
-      // remove deliverables linked to milestone from milestone.scope.deliverables
-      if (foundMilestone.scope?.deliverables) {
-        foundMilestone.scope.deliverables.forEach((deliverableId) => {
-          state.deliverables = state.deliverables.filter(
-            (deliverable) => String(deliverable.id) !== String(deliverableId),
-          );
-        });
-      }
+      // the milestone's deliverables go with it, wherever else they were listed
+      deleteDeliverables(state, [
+        ...(foundMilestone.scope?.deliverables ?? []),
+      ]);
 
       foundRoadmap.milestones = foundRoadmap.milestones.filter(
         (milestone) => String(milestone.id) !== String(action.input.id),
@@ -150,7 +162,7 @@ export const scopeOfWorkMilestonesOperations: ScopeOfWorkMilestonesOperations =
           ? foundRoadmap
           : roadmap;
       });
-      applyInvariants(state, ["budget", "margin"]);
+      applyInvariants(state);
     },
     addMilestoneDeliverableOperation(state, action) {
       // resolve the target first: a throw after mutating would leave an orphan deliverable behind
@@ -162,8 +174,16 @@ export const scopeOfWorkMilestonesOperations: ScopeOfWorkMilestonesOperations =
       if (!foundMilestone.scope) {
         throw new Error("Milestone deliverable set not found");
       }
+      if (
+        state.deliverables.some(
+          (d) => String(d.id) === String(action.input.deliverableId),
+        )
+      ) {
+        throw new MilestoneDeliverableAlreadyExistsError(
+          `Deliverable with ID ${action.input.deliverableId} already exists`,
+        );
+      }
 
-      // add deliverable to deliverables
       const newDeliverable: Deliverable = {
         id: action.input.deliverableId,
         owner: "",
@@ -185,6 +205,7 @@ export const scopeOfWorkMilestonesOperations: ScopeOfWorkMilestonesOperations =
 
       state.deliverables.push(newDeliverable);
       foundMilestone.scope.deliverables.push(newDeliverable.id);
+      applyInvariants(state);
     },
     removeMilestoneDeliverableOperation(state, action) {
       const found = findMilestone(state, action.input.milestoneId);
@@ -214,6 +235,6 @@ export const scopeOfWorkMilestonesOperations: ScopeOfWorkMilestonesOperations =
             }
           : deliverable;
       });
-      applyInvariants(state, ["budget", "margin", "progress"]);
+      applyInvariants(state);
     },
   };

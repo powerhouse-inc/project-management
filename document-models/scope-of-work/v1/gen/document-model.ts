@@ -62,7 +62,15 @@ export const documentModel: DocumentModelGlobalState = {
                 "input AddDeliverableInput {\n  id: OID!\n  owner: ID\n  title: String\n  code: String\n  description: String\n  status: PMDeliverableStatusInput\n}\n\nenum PMDeliverableStatusInput {\n  WONT_DO\n  DRAFT\n  TODO\n  BLOCKED\n  IN_PROGRESS\n  DELIVERED\n  CANCELED\n}",
               template: "This operation is used to create a new deliverable. ",
               reducer: "",
-              errors: [],
+              errors: [
+                {
+                  id: "deliverable-already-exists",
+                  name: "DeliverableAlreadyExistsError",
+                  code: "DELIVERABLE_ALREADY_EXISTS",
+                  description: "A deliverable with this id already exists",
+                  template: "Deliverable with ID ${id} already exists",
+                },
+              ],
               examples: [],
               scope: "global",
             },
@@ -99,7 +107,24 @@ export const documentModel: DocumentModelGlobalState = {
                 "input SetDeliverableProgressInput {\n  id: OID! #deliverable id\n  workProgress: ProgressInput\n}\n\ninput ProgressInput {\n  # Only one of these fields should be provided\n  percentage: Float\n  storyPoints: StoryPointInput\n  done: Boolean\n}\n\ninput StoryPointInput {\n  total: Int!\n  completed: Int!\n}\n",
               template: "",
               reducer: "",
-              errors: [],
+              errors: [
+                {
+                  id: "invalid-progress",
+                  name: "InvalidProgressError",
+                  code: "INVALID_PROGRESS",
+                  description:
+                    "Percentage must be between 0 and 100; story points must be non-negative with completed not exceeding total",
+                  template: "Invalid progress value",
+                },
+                {
+                  id: "deliverable-closed",
+                  name: "DeliverableClosedError",
+                  code: "DELIVERABLE_CLOSED",
+                  description:
+                    "Progress cannot be recorded on a CANCELED or WONT_DO deliverable",
+                  template: "Deliverable ${id} is closed",
+                },
+              ],
               examples: [],
               scope: "global",
             },
@@ -113,7 +138,16 @@ export const documentModel: DocumentModelGlobalState = {
               template:
                 "This operation allows a user to add a key result to a specific deliverable. Key results are measurable outcomes or indicators that help track progress on a deliverable. ",
               reducer: "",
-              errors: [],
+              errors: [
+                {
+                  id: "key-result-already-exists",
+                  name: "KeyResultAlreadyExistsError",
+                  code: "KEY_RESULT_ALREADY_EXISTS",
+                  description:
+                    "A key result with this id already exists on the deliverable",
+                  template: "Key result with ID ${id} already exists",
+                },
+              ],
               examples: [],
               scope: "global",
             },
@@ -149,7 +183,16 @@ export const documentModel: DocumentModelGlobalState = {
                 "input SetDeliverableBudgetAnchorProjectInput {\n  deliverableId: ID!\n  project: OID\n  unit: Unit\n  unitCost: Float\n  quantity: Float\n  margin: Float\n}",
               template: "",
               reducer: "",
-              errors: [],
+              errors: [
+                {
+                  id: "invalid-budget-anchor",
+                  name: "InvalidBudgetAnchorError",
+                  code: "INVALID_BUDGET_ANCHOR",
+                  description:
+                    "unitCost, quantity and margin must be zero or positive",
+                  template: "Budget anchor values must be zero or positive",
+                },
+              ],
               examples: [],
               scope: "global",
             },
@@ -168,7 +211,15 @@ export const documentModel: DocumentModelGlobalState = {
                 "input AddRoadmapInput {\n  id: OID!\n  title: String!\n  slug: String\n  description: String\n}",
               template: "",
               reducer: "",
-              errors: [],
+              errors: [
+                {
+                  id: "roadmap-already-exists",
+                  name: "RoadmapAlreadyExistsError",
+                  code: "ROADMAP_ALREADY_EXISTS",
+                  description: "A roadmap with this id already exists",
+                  template: "Roadmap with ID ${id} already exists",
+                },
+              ],
               examples: [],
               scope: "global",
             },
@@ -212,7 +263,15 @@ export const documentModel: DocumentModelGlobalState = {
                 "input AddMilestoneInput {\n  id: OID!\n  roadmapId:OID!\n  sequenceCode: String\n  title: String\n  description: String\n  deliveryTarget: String\n}",
               template: "",
               reducer: "",
-              errors: [],
+              errors: [
+                {
+                  id: "milestone-already-exists",
+                  name: "MilestoneAlreadyExistsError",
+                  code: "MILESTONE_ALREADY_EXISTS",
+                  description: "A milestone with this id already exists",
+                  template: "Milestone with ID ${id} already exists",
+                },
+              ],
               examples: [],
               scope: "global",
             },
@@ -274,7 +333,16 @@ export const documentModel: DocumentModelGlobalState = {
                 "input AddMilestoneDeliverableInput {\n  milestoneId: OID!\n  deliverableId: OID!\n  title: String!\n}",
               template: "",
               reducer: "",
-              errors: [],
+              errors: [
+                {
+                  id: "milestone-deliverable-already-exists",
+                  name: "MilestoneDeliverableAlreadyExistsError",
+                  code: "MILESTONE_DELIVERABLE_ALREADY_EXISTS",
+                  description: "A deliverable with this id already exists",
+                  template:
+                    "Deliverable with ID ${deliverableId} already exists",
+                },
+              ],
               examples: [],
               scope: "global",
             },
@@ -317,7 +385,16 @@ export const documentModel: DocumentModelGlobalState = {
                 "input AddDeliverableInSetInput {\n  milestoneId: ID\n  projectId: ID\n  deliverableId: OID!\n}",
               template: "",
               reducer: "",
-              errors: [],
+              errors: [
+                {
+                  id: "set-deliverable-not-found",
+                  name: "SetDeliverableNotFoundError",
+                  code: "SET_DELIVERABLE_NOT_FOUND",
+                  description:
+                    "The deliverable to link into the set was not found",
+                  template: "Deliverable ${deliverableId} not found",
+                },
+              ],
               examples: [],
               scope: "global",
             },
@@ -349,7 +426,15 @@ export const documentModel: DocumentModelGlobalState = {
               template: "",
               reducer:
                 "// Check if agent with same ID already exists\nconst existingAgent = state.contributors.find(agent => agent.id === action.input.id);\nif (existingAgent) {\n  throw new AgentDuplicateIdError(`Agent with ID ${action.input.id} already exists`);\n}\n\n// Create new agent with correct structure matching GraphQL schema\nconst agent = {\n  id: action.input.id,\n  name: action.input.name,\n  icon: action.input.icon || null,\n  description: action.input.description || null,\n};\n\nstate.contributors.push(agent);",
-              errors: [],
+              errors: [
+                {
+                  id: "agent-already-exists",
+                  name: "AgentAlreadyExistsError",
+                  code: "AGENT_ALREADY_EXISTS",
+                  description: "An agent with this id already exists",
+                  template: "Agent with ID ${id} already exists",
+                },
+              ],
               examples: [],
               scope: "global",
             },
@@ -403,7 +488,15 @@ export const documentModel: DocumentModelGlobalState = {
               template:
                 "Creates a new project in a DRAFT status, initializing its core fields. The status of the new project defaults to DRAFT. The Deliverables list (scope) is initialized as empty.",
               reducer: "",
-              errors: [],
+              errors: [
+                {
+                  id: "project-already-exists",
+                  name: "ProjectAlreadyExistsError",
+                  code: "PROJECT_ALREADY_EXISTS",
+                  description: "A project with this id already exists",
+                  template: "Project with ID ${id} already exists",
+                },
+              ],
               examples: [],
               scope: "global",
             },
@@ -442,7 +535,15 @@ export const documentModel: DocumentModelGlobalState = {
               schema: "input RemoveProjectInput {\n  projectId: ID!\n}",
               template: "",
               reducer: "",
-              errors: [],
+              errors: [
+                {
+                  id: "project-not-found",
+                  name: "ProjectNotFoundError",
+                  code: "PROJECT_NOT_FOUND",
+                  description: "The specified project was not found",
+                  template: "Project not found",
+                },
+              ],
               examples: [],
               scope: "global",
             },
@@ -454,7 +555,15 @@ export const documentModel: DocumentModelGlobalState = {
                 "input SetProjectMarginInput {\n  projectId: OID!\n  margin: Float!\n}",
               template: "",
               reducer: "",
-              errors: [],
+              errors: [
+                {
+                  id: "invalid-project-margin",
+                  name: "InvalidProjectMarginError",
+                  code: "INVALID_PROJECT_MARGIN",
+                  description: "The margin must be zero or positive",
+                  template: "Margin must be zero or positive",
+                },
+              ],
               examples: [],
               scope: "global",
             },
@@ -466,7 +575,15 @@ export const documentModel: DocumentModelGlobalState = {
                 "input SetProjectTotalBudgetInput {\n  projectId: OID!\n  totalBudget: Float!\n}",
               template: "",
               reducer: "",
-              errors: [],
+              errors: [
+                {
+                  id: "invalid-project-budget",
+                  name: "InvalidProjectBudgetError",
+                  code: "INVALID_PROJECT_BUDGET",
+                  description: "The total budget must be zero or positive",
+                  template: "Total budget must be zero or positive",
+                },
+              ],
               examples: [],
               scope: "global",
             },
@@ -478,7 +595,16 @@ export const documentModel: DocumentModelGlobalState = {
                 "input AddProjectDeliverableInput {\n  projectId: OID!\n  deliverableId: ID!\n  title: String!\n}",
               template: "",
               reducer: "",
-              errors: [],
+              errors: [
+                {
+                  id: "project-deliverable-already-exists",
+                  name: "ProjectDeliverableAlreadyExistsError",
+                  code: "PROJECT_DELIVERABLE_ALREADY_EXISTS",
+                  description: "A deliverable with this id already exists",
+                  template:
+                    "Deliverable with ID ${deliverableId} already exists",
+                },
+              ],
               examples: [],
               scope: "global",
             },

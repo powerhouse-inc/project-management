@@ -200,7 +200,7 @@ describe("projects reducer", () => {
       ]);
     });
 
-    it("is a no-op for an unknown project and tolerates a project without scope", () => {
+    it("rejects an unknown project and tolerates a project without scope", () => {
       const doc = craft({
         projects: [rawProject({ id: "p-noscope", scope: null })],
       });
@@ -211,7 +211,7 @@ describe("projects reducer", () => {
         removeProject({ projectId: "p-noscope" }),
       );
 
-      expect(errors(next)).toStrictEqual([]);
+      expect(errors(next)).toStrictEqual(["Project not found"]);
       expect(state(next).projects).toStrictEqual([]);
     });
   });
@@ -225,17 +225,19 @@ describe("projects reducer", () => {
 
       expect(errors(doc)).toStrictEqual([]);
       expect(project(doc)?.budget).toBe(450);
-      expect(anchorOf(doc, "d1")?.margin).toBe(1.5);
-      expect(anchorOf(doc, "d2")?.margin).toBe(1.5);
+      expect(anchorOf(doc, "d1")?.margin).toBe(50);
+      expect(anchorOf(doc, "d2")?.margin).toBe(50);
 
-      const zeroed = apply(
+      // a budget equal to cost means no margin at all
+      const atCost = apply(
         doc,
-        setProjectTotalBudget({ projectId: "p1", totalBudget: 0 }),
+        setProjectTotalBudget({ projectId: "p1", totalBudget: 300 }),
       );
-      expect(anchorOf(zeroed, "d1")?.margin).toBe(0);
+      expect(anchorOf(atCost, "d1")?.margin).toBe(0);
+      expect(project(atCost)?.budget).toBe(300);
     });
 
-    it("setProjectTotalBudget on a project whose deliverables have no cost yields an unbounded margin", () => {
+    it("setProjectTotalBudget is rejected on a project with no costed deliverables", () => {
       const doc = apply(
         utils.createDocument(),
         addProject({ id: "p1", code: "P1", title: "Free" }),
@@ -247,10 +249,11 @@ describe("projects reducer", () => {
         setProjectTotalBudget({ projectId: "p1", totalBudget: 100 }),
       );
 
-      expect(errors(doc)).toStrictEqual([]);
-      expect(project(doc)?.budget).toBe(100);
-      // total cost is 0, so budget / cost has no finite value
-      expect(anchorOf(doc, "d1")?.margin).toBe(Infinity);
+      expect(lastError(doc)).toBe(
+        "Cannot set a total budget on a project without costed deliverables",
+      );
+      expect(project(doc)?.budget).toBe(0);
+      expect(anchorOf(doc, "d1")?.margin).toBe(0);
     });
 
     it("setProjectMargin applies the margin to every deliverable and recomputes the budget", () => {
@@ -305,7 +308,7 @@ describe("projects reducer", () => {
       expect(errors(next)).toStrictEqual([]);
       expect(anchorOf(next, "d-noanchor")).toBeNull();
       // margin path: 20 / 10 = 2
-      expect(anchorOf(next, "d-anchor")?.margin).toBe(2);
+      expect(anchorOf(next, "d-anchor")?.margin).toBe(100);
     });
 
     it("also recomputes milestone budgets, skipping milestones without scope", () => {
