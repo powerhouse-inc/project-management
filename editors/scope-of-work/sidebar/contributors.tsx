@@ -15,7 +15,7 @@ import {
   useDrives,
   useGetDocuments,
 } from "@powerhousedao/reactor-browser";
-import type { FileNode } from "document-drive";
+import type { FileNode } from "@powerhousedao/shared/document-drive";
 import type { PHDocument } from "document-model";
 import { useRemoteBuilderProfiles } from "../hooks/useRemoteBuilderProfiles.js";
 
