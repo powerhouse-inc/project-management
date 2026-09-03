@@ -82,19 +82,15 @@ enum DeliverableStatus {
   CANCELED
 }
 
-union Progress = StoryPoint | Percentage | Binary
-
-type Percentage {
-  value: Float!
-}
-
-type Binary {
+# Work progress. Exactly one representation is populated:
+#   percentage   -> value
+#   story points -> total + completed
+#   binary       -> done
+type Progress {
+  value: Float
+  total: Int
+  completed: Int
   done: Boolean
-}
-
-type StoryPoint {
-  total: Int!
-  completed: Int!
 }
 
 type KeyResult {

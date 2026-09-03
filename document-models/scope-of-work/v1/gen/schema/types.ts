@@ -144,10 +144,6 @@ export type Agent = {
   name: Scalars["String"]["output"];
 };
 
-export type Binary = {
-  done: Maybe<Scalars["Boolean"]["output"]>;
-};
-
 export type BudgetAnchorProject = {
   margin: Scalars["Float"]["output"];
   project: Maybe<Scalars["OID"]["output"]>;
@@ -302,11 +298,12 @@ export type PmDeliverableStatusInput =
   | "TODO"
   | "WONT_DO";
 
-export type Percentage = {
-  value: Scalars["Float"]["output"];
+export type Progress = {
+  completed: Maybe<Scalars["Int"]["output"]>;
+  done: Maybe<Scalars["Boolean"]["output"]>;
+  total: Maybe<Scalars["Int"]["output"]>;
+  value: Maybe<Scalars["Float"]["output"]>;
 };
-
-export type Progress = Binary | Percentage | StoryPoint;
 
 export type ProgressInput = {
   done?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -434,11 +431,6 @@ export type SetProjectMarginInput = {
 export type SetProjectTotalBudgetInput = {
   projectId: Scalars["OID"]["input"];
   totalBudget: Scalars["Float"]["input"];
-};
-
-export type StoryPoint = {
-  completed: Scalars["Int"]["output"];
-  total: Scalars["Int"]["output"];
 };
 
 export type StoryPointInput = {

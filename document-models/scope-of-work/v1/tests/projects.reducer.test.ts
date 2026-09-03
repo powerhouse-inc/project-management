@@ -28,6 +28,11 @@ import {
   rawRoadmap,
   state,
 } from "./reducer-test-helpers.js";
+import {
+  binaryProgress,
+  percentageProgress,
+  storyPointsProgress,
+} from "../src/reducers/progress.js";
 
 type Doc = ReturnType<typeof utils.createDocument>;
 
@@ -76,7 +81,7 @@ const withScopedDeliverables = (
         scope: {
           deliverables: [...deliverables.map((d) => d.id), ...extraIds],
           status: "DRAFT",
-          progress: { value: 0 },
+          progress: percentageProgress(0),
           deliverablesCompleted: { total: 0, completed: 0 },
         },
       }),
@@ -120,7 +125,7 @@ describe("projects reducer", () => {
         scope: {
           deliverables: [],
           status: "DRAFT",
-          progress: { value: 0 },
+          progress: percentageProgress(0),
           deliverablesCompleted: { total: 0, completed: 0 },
         },
       });
@@ -457,10 +462,10 @@ describe("projects reducer", () => {
   describe("progress invariant", () => {
     it("sums story points when every deliverable uses them", () => {
       const doc = withScopedDeliverables([
-        rawDeliverable({ id: "a", workProgress: { total: 10, completed: 4 } }),
+        rawDeliverable({ id: "a", workProgress: storyPointsProgress(10, 4) }),
         rawDeliverable({
           id: "b",
-          workProgress: { total: 6, completed: 6 },
+          workProgress: storyPointsProgress(6, 6),
           status: "DELIVERED",
         }),
       ]);
@@ -469,7 +474,7 @@ describe("projects reducer", () => {
 
       expect(errors(next)).toStrictEqual([]);
       expect(project(next)?.scope).toMatchObject({
-        progress: { total: 16, completed: 10 },
+        progress: storyPointsProgress(16, 10),
         deliverablesCompleted: { total: 2, completed: 1 },
       });
     });
@@ -477,45 +482,53 @@ describe("projects reducer", () => {
     it("averages percentage equivalents across mixed progress types and ignores canceled work", () => {
       const doc = withScopedDeliverables(
         [
-          rawDeliverable({ id: "pct", workProgress: { value: 50 } }),
+          rawDeliverable({ id: "pct", workProgress: percentageProgress(50) }),
           rawDeliverable({
             id: "sp",
-            workProgress: { total: 4, completed: 2 },
+            workProgress: storyPointsProgress(4, 2),
           }),
           rawDeliverable({
             id: "sp-empty",
-            workProgress: { total: 0, completed: 0 },
+            workProgress: storyPointsProgress(0, 0),
           }),
           rawDeliverable({
             id: "bin-done",
-            workProgress: { done: true },
+            workProgress: binaryProgress(true),
             status: "TODO",
           }),
           rawDeliverable({
             id: "bin-wip",
-            workProgress: { done: false },
+            workProgress: binaryProgress(false),
             status: "IN_PROGRESS",
           }),
           rawDeliverable({
             id: "bin-todo",
-            workProgress: { done: false },
+            workProgress: binaryProgress(false),
             status: "TODO",
           }),
-          rawDeliverable({ id: "bin-null", workProgress: { done: null } }),
+          rawDeliverable({
+            id: "bin-null",
+            workProgress: {
+              value: null,
+              total: null,
+              completed: null,
+              done: null,
+            },
+          }),
           rawDeliverable({ id: "none", workProgress: null }),
           rawDeliverable({
             id: "delivered",
-            workProgress: { value: 100 },
+            workProgress: percentageProgress(100),
             status: "DELIVERED",
           }),
           rawDeliverable({
             id: "canceled",
-            workProgress: { value: 100 },
+            workProgress: percentageProgress(100),
             status: "CANCELED",
           }),
           rawDeliverable({
             id: "wontdo",
-            workProgress: { value: 100 },
+            workProgress: percentageProgress(100),
             status: "WONT_DO",
           }),
         ],
@@ -527,7 +540,7 @@ describe("projects reducer", () => {
       expect(errors(next)).toStrictEqual([]);
       // (50 + 50 + 0 + 100 + 50 + 0 + 0 + 0 + 100) / 9
       expect(project(next)?.scope).toMatchObject({
-        progress: { value: 38.89 },
+        progress: percentageProgress(38.89),
         deliverablesCompleted: { total: 9, completed: 2 },
       });
     });
@@ -537,7 +550,7 @@ describe("projects reducer", () => {
         [
           rawDeliverable({
             id: "canceled",
-            workProgress: { value: 100 },
+            workProgress: percentageProgress(100),
             status: "CANCELED",
           }),
         ],
@@ -552,7 +565,7 @@ describe("projects reducer", () => {
       expect(errors(next)).toStrictEqual([]);
       expect(project(next)?.scope).toMatchObject({
         status: "CANCELED",
-        progress: { value: 0 },
+        progress: percentageProgress(0),
         deliverablesCompleted: { total: 0, completed: 0 },
       });
     });
@@ -560,7 +573,7 @@ describe("projects reducer", () => {
     it("recomputes milestone scopes too, skipping milestones and projects without scope", () => {
       const doc = craft({
         deliverables: [
-          rawDeliverable({ id: "d1", workProgress: { value: 30 } }),
+          rawDeliverable({ id: "d1", workProgress: percentageProgress(30) }),
         ],
         roadmaps: [
           rawRoadmap({
@@ -571,7 +584,7 @@ describe("projects reducer", () => {
                 scope: {
                   deliverables: ["d1"],
                   status: "DRAFT",
-                  progress: { value: 0 },
+                  progress: percentageProgress(0),
                   deliverablesCompleted: { total: 0, completed: 0 },
                 },
               }),
@@ -586,7 +599,7 @@ describe("projects reducer", () => {
 
       expect(errors(next)).toStrictEqual([]);
       expect(state(next).roadmaps[0].milestones[0].scope).toMatchObject({
-        progress: { value: 30 },
+        progress: percentageProgress(30),
         deliverablesCompleted: { total: 1, completed: 0 },
       });
     });

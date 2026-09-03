@@ -23,6 +23,7 @@ import {
   rawRoadmap,
   state,
 } from "./reducer-test-helpers.js";
+import { percentageProgress } from "../src/reducers/progress.js";
 
 const withMilestone = () =>
   apply(
@@ -61,7 +62,7 @@ describe("milestones reducer", () => {
         scope: {
           deliverables: [],
           status: "DRAFT",
-          progress: { value: 0 },
+          progress: percentageProgress(0),
           deliverablesCompleted: { total: 0, completed: 0 },
         },
         budget: 0,
@@ -234,7 +235,7 @@ describe("milestones reducer", () => {
         id: "d1",
         title: "Ship it",
         status: "DRAFT",
-        workProgress: { value: 0 },
+        workProgress: percentageProgress(0),
       });
     });
 
@@ -331,7 +332,7 @@ describe("milestones reducer", () => {
                 scope: {
                   deliverables: ["d1"],
                   status: "DRAFT",
-                  progress: { value: 0 },
+                  progress: percentageProgress(0),
                   deliverablesCompleted: { total: 0, completed: 0 },
                 },
               }),

@@ -25,6 +25,11 @@ import {
   rawRoadmap,
   state,
 } from "./reducer-test-helpers.js";
+import {
+  binaryProgress,
+  percentageProgress,
+  storyPointsProgress,
+} from "../src/reducers/progress.js";
 
 const deliverable = (
   doc: ReturnType<typeof utils.createDocument>,
@@ -227,10 +232,10 @@ describe("deliverables reducer", () => {
       expect(errors(doc)).toStrictEqual([]);
       expect(deliverable(doc, "d-proj")).toMatchObject({
         status: "IN_PROGRESS",
-        workProgress: { value: 40 },
+        workProgress: percentageProgress(40),
       });
       expect(state(doc).projects[0].scope).toMatchObject({
-        progress: { value: 40 },
+        progress: percentageProgress(40),
         deliverablesCompleted: { total: 1, completed: 0 },
       });
     });
@@ -266,7 +271,7 @@ describe("deliverables reducer", () => {
       );
       expect(deliverable(doc, "d-free")).toMatchObject({
         status: "IN_PROGRESS",
-        workProgress: { total: 5, completed: 2 },
+        workProgress: storyPointsProgress(5, 2),
       });
 
       const done = apply(
@@ -291,20 +296,26 @@ describe("deliverables reducer", () => {
     it("stores binary progress and completes when done", () => {
       const doc = apply(
         populated(),
-        setDeliverableProgress({ id: "d-free", workProgress: { done: false } }),
+        setDeliverableProgress({
+          id: "d-free",
+          workProgress: binaryProgress(false),
+        }),
       );
       expect(deliverable(doc, "d-free")).toMatchObject({
         status: "IN_PROGRESS",
-        workProgress: { done: false },
+        workProgress: binaryProgress(false),
       });
 
       const done = apply(
         doc,
-        setDeliverableProgress({ id: "d-free", workProgress: { done: true } }),
+        setDeliverableProgress({
+          id: "d-free",
+          workProgress: binaryProgress(true),
+        }),
       );
       expect(deliverable(done, "d-free")).toMatchObject({
         status: "DELIVERED",
-        workProgress: { done: true },
+        workProgress: binaryProgress(true),
       });
     });
 
@@ -329,7 +340,10 @@ describe("deliverables reducer", () => {
     it("records an error for an unknown deliverable", () => {
       const doc = apply(
         populated(),
-        setDeliverableProgress({ id: "nope", workProgress: { done: true } }),
+        setDeliverableProgress({
+          id: "nope",
+          workProgress: binaryProgress(true),
+        }),
       );
       expect(lastError(doc)).toBe("Deliverable not found");
     });

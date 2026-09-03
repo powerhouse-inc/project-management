@@ -10,8 +10,8 @@ export const ProgressBar = ({ progress }: { progress: any }) => {
     );
   }
 
-  // Case 1: Binary progress {done: boolean}
-  if ("done" in progress && typeof progress.done === "boolean") {
+  // Case 1: binary progress (done populated)
+  if (typeof progress.done === "boolean") {
     if (progress.done === false) {
       return (
         <div className="w-full bg-gray-200 rounded-full h-2">
@@ -33,8 +33,8 @@ export const ProgressBar = ({ progress }: { progress: any }) => {
     }
   }
 
-  // Case 2: Percentage progress {value: number}
-  if ("value" in progress && typeof progress.value === "number") {
+  // Case 2: percentage progress (value populated)
+  if (typeof progress.value === "number") {
     const percentage = Math.min(Math.max(progress.value, 0), 100);
     const bgColor =
       percentage >= 100
@@ -55,10 +55,8 @@ export const ProgressBar = ({ progress }: { progress: any }) => {
     );
   }
 
-  // Case 3: Story points progress {completed: number, total: number}
+  // Case 3: story points progress (completed + total populated)
   if (
-    "completed" in progress &&
-    "total" in progress &&
     typeof progress.completed === "number" &&
     typeof progress.total === "number"
   ) {

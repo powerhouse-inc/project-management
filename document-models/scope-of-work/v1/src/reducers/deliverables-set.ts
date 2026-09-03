@@ -3,6 +3,7 @@ import type { EditDeliverablesSetAction } from "../../gen/deliverables-set/actio
 import type { ScopeOfWorkState } from "../../gen/schema/types.js";
 import { findMilestone } from "./lookup.js";
 import { applyInvariants } from "./projects.js";
+import { percentageProgress, storyPointsProgress } from "./progress.js";
 
 export const scopeOfWorkDeliverablesSetOperations: ScopeOfWorkDeliverablesSetOperations =
   {
@@ -53,7 +54,7 @@ export const scopeOfWorkDeliverablesSetOperations: ScopeOfWorkDeliverablesSetOpe
               action.input.status ||
               project.scope?.status ||
               ("DRAFT" as const),
-            progress: project.scope?.progress || { value: 0 },
+            progress: project.scope?.progress || percentageProgress(0),
             deliverablesCompleted: action.input.deliverablesCompleted ||
               project.scope?.deliverablesCompleted || {
                 total: 0,
@@ -90,7 +91,7 @@ export const scopeOfWorkDeliverablesSetOperations: ScopeOfWorkDeliverablesSetOpe
           foundMilestone.scope = {
             deliverables: [],
             status: "DRAFT" as const,
-            progress: { total: 0, completed: 0 },
+            progress: storyPointsProgress(0, 0),
             deliverablesCompleted: {
               total: 0,
               completed: 0,
@@ -127,7 +128,7 @@ export const scopeOfWorkDeliverablesSetOperations: ScopeOfWorkDeliverablesSetOpe
           foundProject.scope = {
             deliverables: [],
             status: "DRAFT" as const,
-            progress: { total: 0, completed: 0 },
+            progress: storyPointsProgress(0, 0),
             deliverablesCompleted: {
               total: 0,
               completed: 0,

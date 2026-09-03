@@ -22,6 +22,7 @@ import {
   rawRoadmap,
   state,
 } from "./reducer-test-helpers.js";
+import { percentageProgress } from "../src/reducers/progress.js";
 
 /** A roadmap with one milestone, one project and two free deliverables. */
 const base = () =>
@@ -109,7 +110,7 @@ describe("deliverables-set reducer", () => {
       expect(projectScope(doc)).toStrictEqual({
         deliverables: [],
         status: "DRAFT",
-        progress: { value: 0 },
+        progress: percentageProgress(0),
         deliverablesCompleted: { total: 0, completed: 0 },
       });
     });
@@ -299,7 +300,7 @@ describe("deliverables-set reducer", () => {
             scope: {
               deliverables: ["d1"],
               status: "DRAFT",
-              progress: { value: 0 },
+              progress: percentageProgress(0),
               deliverablesCompleted: { total: 0, completed: 0 },
             },
           }),

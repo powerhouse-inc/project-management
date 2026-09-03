@@ -13,7 +13,6 @@ import type {
   AddProjectInput,
   AddRoadmapInput,
   Agent,
-  Binary,
   BudgetAnchorProject,
   BudgetExpenditure,
   BudgetType,
@@ -37,7 +36,7 @@ import type {
   PmCurrency,
   PmCurrencyInput,
   PmDeliverableStatusInput,
-  Percentage,
+  Progress,
   ProgressInput,
   Project,
   RemoveAgentInput,
@@ -58,7 +57,6 @@ import type {
   SetDeliverableProgressInput,
   SetProjectMarginInput,
   SetProjectTotalBudgetInput,
-  StoryPoint,
   StoryPointInput,
   Unit,
   UpdateProjectInput,
@@ -277,13 +275,6 @@ export function AgentSchema(): z.ZodObject<Properties<Agent>> {
   });
 }
 
-export function BinarySchema(): z.ZodObject<Properties<Binary>> {
-  return z.object({
-    __typename: z.literal("Binary").optional(),
-    done: z.boolean().nullish(),
-  });
-}
-
 export function BudgetAnchorProjectSchema(): z.ZodObject<
   Properties<BudgetAnchorProject>
 > {
@@ -461,15 +452,14 @@ export function MilestoneSchema(): z.ZodObject<Properties<Milestone>> {
   });
 }
 
-export function PercentageSchema(): z.ZodObject<Properties<Percentage>> {
+export function ProgressSchema(): z.ZodObject<Properties<Progress>> {
   return z.object({
-    __typename: z.literal("Percentage").optional(),
-    value: z.number(),
+    __typename: z.literal("Progress").optional(),
+    completed: z.number().nullish(),
+    done: z.boolean().nullish(),
+    total: z.number().nullish(),
+    value: z.number().nullish(),
   });
-}
-
-export function ProgressSchema() {
-  return z.union([BinarySchema(), PercentageSchema(), StoryPointSchema()]);
 }
 
 export function ProgressInputSchema(): z.ZodObject<Properties<ProgressInput>> {
@@ -648,14 +638,6 @@ export function SetProjectTotalBudgetInputSchema(): z.ZodObject<
   return z.object({
     projectId: z.string(),
     totalBudget: z.number(),
-  });
-}
-
-export function StoryPointSchema(): z.ZodObject<Properties<StoryPoint>> {
-  return z.object({
-    __typename: z.literal("StoryPoint").optional(),
-    completed: z.number(),
-    total: z.number(),
   });
 }
 

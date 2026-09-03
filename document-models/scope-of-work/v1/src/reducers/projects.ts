@@ -4,6 +4,7 @@ import type {
   DeliverablesSet,
   ScopeOfWorkState,
 } from "../../gen/schema/types.js";
+import { percentageProgress, storyPointsProgress } from "./progress.js";
 
 export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
   addProjectOperation(state, action) {
@@ -26,9 +27,7 @@ export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
       scope: {
         deliverables: [],
         status: "DRAFT" as const,
-        progress: {
-          value: 0,
-        },
+        progress: percentageProgress(0),
         deliverablesCompleted: {
           total: 0,
           completed: 0,
@@ -123,9 +122,7 @@ export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
       code: "",
       description: "",
       status: "DRAFT",
-      workProgress: {
-        value: 0,
-      },
+      workProgress: percentageProgress(0),
       keyResults: [],
       budgetAnchor: {
         project: action.input.projectId,
@@ -329,7 +326,7 @@ const calculateDeliverableSetProgress = (
 
   if (deliverables.length === 0) {
     // No valid deliverables, set default progress
-    deliverableSet.progress = { value: 0 };
+    deliverableSet.progress = percentageProgress(0);
     deliverableSet.deliverablesCompleted = { total: 0, completed: 0 };
     return;
   }
@@ -351,10 +348,10 @@ const calculateDeliverableSetProgress = (
       }
     });
 
-    deliverableSet.progress = {
-      total: totalStoryPoints,
-      completed: completedStoryPoints,
-    };
+    deliverableSet.progress = storyPointsProgress(
+      totalStoryPoints,
+      completedStoryPoints,
+    );
   } else {
     // 3.b) If !storyPointsOnly => AVERAGE (percentageCompletedEquivalent[i])
     const percentages = deliverables.map((d: any) =>
@@ -365,9 +362,9 @@ const calculateDeliverableSetProgress = (
       percentages.reduce((sum: number, p: number) => sum + p, 0) /
       percentages.length;
 
-    deliverableSet.progress = {
-      value: Math.round(averagePercentage * 100) / 100, // Round to 2 decimal places
-    };
+    deliverableSet.progress = percentageProgress(
+      Math.round(averagePercentage * 100) / 100, // 2 decimal places
+    );
   }
 
   // Update deliverablesCompleted count

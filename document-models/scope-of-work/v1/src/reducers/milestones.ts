@@ -4,6 +4,7 @@ import type { ScopeOfWorkState } from "../../gen/schema/types.js";
 import type { Deliverable } from "../../gen/types.js";
 import { findMilestone } from "./lookup.js";
 import { applyInvariants } from "./projects.js";
+import { percentageProgress } from "./progress.js";
 
 export const scopeOfWorkMilestonesOperations: ScopeOfWorkMilestonesOperations =
   {
@@ -101,9 +102,7 @@ export const scopeOfWorkMilestonesOperations: ScopeOfWorkMilestonesOperations =
         scope: {
           deliverables: [],
           status: "DRAFT" as const,
-          progress: {
-            value: 0,
-          },
+          progress: percentageProgress(0),
           deliverablesCompleted: {
             total: 0,
             completed: 0,
@@ -173,9 +172,7 @@ export const scopeOfWorkMilestonesOperations: ScopeOfWorkMilestonesOperations =
         code: "",
         description: "",
         status: "DRAFT",
-        workProgress: {
-          value: 0,
-        },
+        workProgress: percentageProgress(0),
         keyResults: [],
         budgetAnchor: {
           project: "",

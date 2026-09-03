@@ -10,6 +10,7 @@ import type {
   Project,
   Roadmap,
 } from "../gen/schema/types.js";
+import { percentageProgress } from "../src/reducers/progress.js";
 
 export type Doc = ReturnType<typeof utils.createDocument>;
 export type Action = Parameters<typeof reducer>[1];
@@ -55,7 +56,7 @@ export function emptySet(): DeliverablesSet {
   return {
     deliverables: [],
     status: "DRAFT",
-    progress: { value: 0 },
+    progress: percentageProgress(0),
     deliverablesCompleted: { total: 0, completed: 0 },
   };
 }

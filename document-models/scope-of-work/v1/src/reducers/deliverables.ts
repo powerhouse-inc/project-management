@@ -1,6 +1,11 @@
 import type { ScopeOfWorkDeliverablesOperations } from "document-models/scope-of-work/v1";
 import type { Deliverable, KeyResult } from "../../gen/schema/types.js";
 import { applyInvariants } from "./projects.js";
+import {
+  binaryProgress,
+  percentageProgress,
+  storyPointsProgress,
+} from "./progress.js";
 
 export const scopeOfWorkDeliverablesOperations: ScopeOfWorkDeliverablesOperations =
   {
@@ -119,15 +124,15 @@ export const scopeOfWorkDeliverablesOperations: ScopeOfWorkDeliverablesOperation
         workProgress: action.input.workProgress
           ? action.input.workProgress.percentage !== undefined &&
             action.input.workProgress.percentage !== null
-            ? { value: action.input.workProgress.percentage }
+            ? percentageProgress(action.input.workProgress.percentage)
             : action.input.workProgress.storyPoints
-              ? {
-                  total: action.input.workProgress.storyPoints.total,
-                  completed: action.input.workProgress.storyPoints.completed,
-                }
+              ? storyPointsProgress(
+                  action.input.workProgress.storyPoints.total,
+                  action.input.workProgress.storyPoints.completed,
+                )
               : action.input.workProgress.done !== undefined &&
                   action.input.workProgress.done !== null
-                ? { done: action.input.workProgress.done }
+                ? binaryProgress(action.input.workProgress.done)
                 : deliverable.workProgress
           : deliverable.workProgress,
       };

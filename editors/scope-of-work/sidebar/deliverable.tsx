@@ -165,18 +165,13 @@ const Deliverable: React.FC<DeliverablesProps> = ({
     setIsSP(false);
 
     if (currentDeliverable.workProgress) {
-      if (
-        "done" in currentDeliverable.workProgress &&
-        !("total" in currentDeliverable.workProgress)
-      ) {
-        setIsBoolean(true);
-      } else if ("value" in currentDeliverable.workProgress) {
-        setIsPercentage(true);
-      } else if (
-        "total" in currentDeliverable.workProgress &&
-        "completed" in currentDeliverable.workProgress
-      ) {
+      const progress = currentDeliverable.workProgress;
+      if (progress.total != null && progress.completed != null) {
         setIsSP(true);
+      } else if (progress.value != null) {
+        setIsPercentage(true);
+      } else if (progress.done != null) {
+        setIsBoolean(true);
       }
     }
     setStateDeliverable(currentDeliverable);
@@ -509,14 +504,9 @@ const Deliverable: React.FC<DeliverablesProps> = ({
             <div className="col-span-3 flex justify-end items-end mr-4">
               {isBoolean && (
                 <Checkbox
-                  key={`checkbox-${currentDeliverable.id}-${workProgress && "completed" in workProgress ? Boolean(workProgress.completed) : false}`}
+                  key={`checkbox-${currentDeliverable.id}-${Boolean(workProgress?.done)}`}
                   label="Delivered"
-                  // defaultChecked={workProgress && "isBinary" in workProgress ? (workProgress.isBinary ?? false) : false}
-                  defaultChecked={
-                    workProgress && "done" in workProgress
-                      ? Boolean(workProgress.done)
-                      : false
-                  }
+                  defaultChecked={Boolean(workProgress?.done)}
                   onChange={(e: boolean | "indeterminate") => {
                     if (e === "indeterminate") {
                       return;
@@ -538,11 +528,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                   <input
                     type="number"
                     className="w-16 h-8 border border-gray-300 rounded px-2 bg-white"
-                    defaultValue={
-                      workProgress && "value" in workProgress
-                        ? (workProgress.value ?? 0)
-                        : 0
-                    }
+                    defaultValue={workProgress?.value ?? 0}
                     onBlur={(e) => {
                       dispatch(
                         actions.setDeliverableProgress({
@@ -563,44 +549,24 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                     <input
                       type="number"
                       min={0}
-                      max={
-                        workProgress && "total" in workProgress
-                          ? workProgress.total
-                          : 0
-                      }
+                      max={workProgress?.total ?? 0}
                       className="w-16 h-8 border border-gray-300 rounded px-2 flex items-end bg-white"
-                      value={
-                        workProgress && "completed" in workProgress
-                          ? Number(workProgress.completed) || 0
-                          : 0
-                      }
+                      value={workProgress?.completed ?? 0}
                       onChange={(e) => {
                         const newCompleted = parseInt(e.target.value) || 0;
-                        const total =
-                          workProgress && "total" in workProgress
-                            ? workProgress.total
-                            : 0;
+                        const total = workProgress?.total ?? 0;
                         // Ensure completed doesn't exceed total
                         const clampedCompleted = Math.min(
                           Math.max(0, newCompleted),
                           total,
                         );
-                        setWorkProgress((prev) => {
-                          if (prev && "completed" in prev) {
-                            return {
-                              ...prev,
-                              completed: clampedCompleted,
-                            };
-                          }
-                          return prev;
-                        });
+                        setWorkProgress((prev) =>
+                          prev ? { ...prev, completed: clampedCompleted } : prev,
+                        );
                       }}
                       onBlur={(e) => {
-                        if (workProgress && "completed" in workProgress) {
-                          const total =
-                            workProgress && "total" in workProgress
-                              ? workProgress.total
-                              : 0;
+                        if (workProgress?.completed != null) {
+                          const total = workProgress?.total ?? 0;
                           const newCompleted = parseInt(e.target.value) || 0;
                           // Ensure completed doesn't exceed total
                           const clampedCompleted = Math.min(
@@ -628,42 +594,27 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                       type="number"
                       min={0}
                       className="w-16 h-8 border border-gray-300 rounded px-2 flex items-end bg-white"
-                      value={
-                        workProgress && "total" in workProgress
-                          ? workProgress.total
-                          : 0
-                      }
+                      value={workProgress?.total ?? 0}
                       onChange={(e) => {
                         const newTotal = parseInt(e.target.value) || 0;
                         setWorkProgress((prev) => {
-                          if (prev && "total" in prev && "completed" in prev) {
-                            // If completed exceeds new total, clamp it
-                            const clampedCompleted = Math.min(
-                              prev.completed,
-                              newTotal,
-                            );
-                            return {
-                              ...prev,
-                              total: newTotal,
-                              completed: clampedCompleted,
-                            };
-                          }
-                          if (prev && "total" in prev) {
-                            return {
-                              ...prev,
-                              total: newTotal,
-                            };
-                          }
-                          return prev;
+                          if (!prev) return prev;
+                          // If completed exceeds new total, clamp it
+                          const clampedCompleted = Math.min(
+                            prev.completed ?? 0,
+                            newTotal,
+                          );
+                          return {
+                            ...prev,
+                            total: newTotal,
+                            completed: clampedCompleted,
+                          };
                         });
                       }}
                       onBlur={(e) => {
-                        if (workProgress && "total" in workProgress) {
+                        if (workProgress?.total != null) {
                           const newTotal = parseInt(e.target.value) || 0;
-                          const currentCompleted =
-                            workProgress && "completed" in workProgress
-                              ? workProgress.completed
-                              : 0;
+                          const currentCompleted = workProgress.completed ?? 0;
                           // Ensure completed doesn't exceed new total
                           const clampedCompleted = Math.min(
                             currentCompleted,
