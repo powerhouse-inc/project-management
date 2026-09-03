@@ -1,4 +1,4 @@
-import { generateMock } from "document-model";
+import { generateMock } from "document-model/mock";
 import {
   addAgent,
   AddAgentInputSchema,
@@ -15,7 +15,9 @@ import { describe, expect, it } from "vitest";
 describe("ContributorsOperations", () => {
   it("should handle addAgent operation", () => {
     const document = utils.createDocument();
-    const input = generateMock(AddAgentInputSchema());
+    const input = generateMock(AddAgentInputSchema(), {
+      icon: "https://example.com",
+    });
 
     const updatedDocument = reducer(document, addAgent(input));
 
@@ -47,7 +49,9 @@ describe("ContributorsOperations", () => {
 
   it("should handle editAgent operation", () => {
     const document = utils.createDocument();
-    const input = generateMock(EditAgentInputSchema());
+    const input = generateMock(EditAgentInputSchema(), {
+      icon: "https://example.com",
+    });
 
     const updatedDocument = reducer(document, editAgent(input));
 

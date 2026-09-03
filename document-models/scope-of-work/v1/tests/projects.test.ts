@@ -1,4 +1,4 @@
-import { generateMock } from "document-model";
+import { generateMock } from "document-model/mock";
 import {
   addProject,
   addProjectDeliverable,
@@ -25,7 +25,9 @@ import { describe, expect, it } from "vitest";
 describe("ProjectsOperations", () => {
   it("should handle addProject operation", () => {
     const document = utils.createDocument();
-    const input = generateMock(AddProjectInputSchema());
+    const input = generateMock(AddProjectInputSchema(), {
+      imageUrl: "https://example.com",
+    });
 
     const updatedDocument = reducer(document, addProject(input));
 
@@ -42,7 +44,9 @@ describe("ProjectsOperations", () => {
 
   it("should handle updateProject operation", () => {
     const document = utils.createDocument();
-    const input = generateMock(UpdateProjectInputSchema());
+    const input = generateMock(UpdateProjectInputSchema(), {
+      imageUrl: "https://example.com",
+    });
 
     const updatedDocument = reducer(document, updateProject(input));
 

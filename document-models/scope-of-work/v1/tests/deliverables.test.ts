@@ -1,4 +1,4 @@
-import { generateMock } from "document-model";
+import { generateMock } from "document-model/mock";
 import {
   addDeliverable,
   AddDeliverableInputSchema,
@@ -59,7 +59,9 @@ describe("DeliverablesOperations", () => {
 
   it("should handle editDeliverable operation", () => {
     const document = utils.createDocument();
-    const input = generateMock(EditDeliverableInputSchema());
+    const input = generateMock(EditDeliverableInputSchema(), {
+      icon: "https://example.com",
+    });
 
     const updatedDocument = reducer(document, editDeliverable(input));
 
