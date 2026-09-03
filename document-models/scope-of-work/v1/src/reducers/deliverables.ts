@@ -27,10 +27,6 @@ export const scopeOfWorkDeliverablesOperations: ScopeOfWorkDeliverablesOperation
       state.deliverables.push(deliverable);
     },
     removeDeliverableOperation(state, action) {
-      if (action.input.id === undefined) {
-        throw new Error("Invalid deliverable id input");
-      }
-
       const deliverable = state.deliverables.find(
         (deliverable) => String(deliverable.id) === String(action.input.id),
       );
@@ -194,13 +190,6 @@ export const scopeOfWorkDeliverablesOperations: ScopeOfWorkDeliverablesOperation
       );
     },
     editKeyResultOperation(state, action) {
-      if (
-        action.input.id === undefined ||
-        action.input.deliverableId === undefined
-      ) {
-        throw new Error("Invalid key result id or deliverable id input");
-      }
-
       const updatedDeliverable = state.deliverables.find(
         (deliverable) =>
           String(deliverable.id) === String(action.input.deliverableId),

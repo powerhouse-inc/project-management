@@ -49,10 +49,7 @@ export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
     if (!project) {
       throw new Error("Project not found");
     }
-    project.projectOwner =
-      action.input.projectOwner !== undefined
-        ? action.input.projectOwner
-        : project.projectOwner;
+    project.projectOwner = action.input.projectOwner;
   },
   removeProjectOperation(state, action) {
     // remove deliverables linked to project from project scope
@@ -108,6 +105,15 @@ export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
     applyInvariants(state, ["margin"]);
   },
   addProjectDeliverableOperation(state, action) {
+    // resolve the target first: a throw after mutating would leave an orphan deliverable behind
+    const project = state.projects.find((p) => p.id === action.input.projectId);
+    if (!project) {
+      throw new Error("Project not found");
+    }
+    if (!project.scope) {
+      throw new Error("Project deliverable set not found");
+    }
+
     // add deliverable to deliverables
     const newDeliverable: Deliverable = {
       id: action.input.deliverableId,
@@ -131,14 +137,6 @@ export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
     };
 
     state.deliverables.push(newDeliverable);
-
-    const project = state.projects.find((p) => p.id === action.input.projectId);
-    if (!project) {
-      throw new Error("Project not found");
-    }
-    if (!project.scope) {
-      throw new Error("Project deliverable set not found");
-    }
     project.scope.deliverables.push(newDeliverable.id);
   },
   removeProjectDeliverableOperation(state, action) {
@@ -362,11 +360,10 @@ const calculateDeliverableSetProgress = (
     const percentages = deliverables.map((d: any) =>
       getPercentageEquivalent(d),
     );
+    // the empty-set case returned early above, so percentages is never empty
     const averagePercentage =
-      percentages.length > 0
-        ? percentages.reduce((sum: number, p: number) => sum + p, 0) /
-          percentages.length
-        : 0;
+      percentages.reduce((sum: number, p: number) => sum + p, 0) /
+      percentages.length;
 
     deliverableSet.progress = {
       value: Math.round(averagePercentage * 100) / 100, // Round to 2 decimal places

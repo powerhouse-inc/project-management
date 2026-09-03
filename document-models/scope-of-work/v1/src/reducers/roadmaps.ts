@@ -21,10 +21,6 @@ export const scopeOfWorkRoadmapsOperations: ScopeOfWorkRoadmapsOperations = {
     );
   },
   addRoadmapOperation(state, action) {
-    if (action.input.id === undefined || action.input.title === undefined) {
-      throw new Error("Invalid input");
-    }
-
     const roadmap = {
       id: action.input.id,
       title: action.input.title,
@@ -36,10 +32,6 @@ export const scopeOfWorkRoadmapsOperations: ScopeOfWorkRoadmapsOperations = {
     state.roadmaps.push(roadmap);
   },
   removeRoadmapOperation(state, action) {
-    if (action.input.id === undefined) {
-      throw new Error("Invalid roadmap id input");
-    }
-
     const roadmap = state.roadmaps.find(
       (roadmap) => String(roadmap.id) === String(action.input.id),
     );
@@ -47,17 +39,15 @@ export const scopeOfWorkRoadmapsOperations: ScopeOfWorkRoadmapsOperations = {
       throw new Error("Roadmap not found");
     }
 
-    if (roadmap.milestones) {
-      roadmap.milestones.forEach((milestone) => {
-        if (milestone.scope?.deliverables) {
-          milestone.scope.deliverables.forEach((deliverableId) => {
-            state.deliverables = state.deliverables.filter(
-              (deliverable) => String(deliverable.id) !== String(deliverableId),
-            );
-          });
-        }
-      });
-    }
+    roadmap.milestones.forEach((milestone) => {
+      if (milestone.scope?.deliverables) {
+        milestone.scope.deliverables.forEach((deliverableId) => {
+          state.deliverables = state.deliverables.filter(
+            (deliverable) => String(deliverable.id) !== String(deliverableId),
+          );
+        });
+      }
+    });
 
     state.roadmaps = state.roadmaps.filter(
       (roadmap) => String(roadmap.id) !== String(action.input.id),

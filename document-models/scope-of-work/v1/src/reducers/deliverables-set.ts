@@ -1,6 +1,7 @@
 import type { ScopeOfWorkDeliverablesSetOperations } from "document-models/scope-of-work/v1";
 import type { EditDeliverablesSetAction } from "../../gen/deliverables-set/actions.js";
 import type { ScopeOfWorkState } from "../../gen/schema/types.js";
+import { findMilestone } from "./lookup.js";
 import { applyInvariants } from "./projects.js";
 
 export const scopeOfWorkDeliverablesSetOperations: ScopeOfWorkDeliverablesSetOperations =
@@ -10,21 +11,12 @@ export const scopeOfWorkDeliverablesSetOperations: ScopeOfWorkDeliverablesSetOpe
       action: EditDeliverablesSetAction,
     ) {
       if (action.input.milestoneId && !action.input.projectId) {
-        const foundRoadmap = state.roadmaps.find((roadmap) => {
-          return roadmap.milestones.some(
-            (milestone) =>
-              String(milestone.id) === String(action.input.milestoneId),
-          );
-        });
-        if (!foundRoadmap) {
+        const found = findMilestone(state, action.input.milestoneId);
+        if (!found) {
           throw new Error("Roadmap with milestone not found");
         }
-
-        const foundMilestone = foundRoadmap.milestones.find(
-          (milestone) =>
-            String(milestone.id) === String(action.input.milestoneId),
-        );
-        if (!foundMilestone || !foundMilestone.scope) {
+        const { roadmap: foundRoadmap, milestone: foundMilestone } = found;
+        if (!foundMilestone.scope) {
           throw new Error("Milestone or scope not found");
         }
 
@@ -86,25 +78,13 @@ export const scopeOfWorkDeliverablesSetOperations: ScopeOfWorkDeliverablesSetOpe
 
       // if milestoneId is provided, check if roadmap exists
       if (action.input.milestoneId && !action.input.projectId) {
-        const foundRoadmap = state.roadmaps.find((roadmap) => {
-          return roadmap.milestones.some(
-            (milestone) =>
-              String(milestone.id) === String(action.input.milestoneId),
-          );
-        });
-        if (!foundRoadmap) {
+        const found = findMilestone(state, action.input.milestoneId);
+        if (!found) {
           throw new Error(
             `Roadmap with milestone ${action.input.milestoneId} not found`,
           );
         }
-
-        const foundMilestone = foundRoadmap.milestones.find(
-          (milestone) =>
-            String(milestone.id) === String(action.input.milestoneId),
-        );
-        if (!foundMilestone) {
-          throw new Error("Milestone not found");
-        }
+        const { roadmap: foundRoadmap, milestone: foundMilestone } = found;
 
         if (!foundMilestone.scope) {
           foundMilestone.scope = {
@@ -172,7 +152,7 @@ export const scopeOfWorkDeliverablesSetOperations: ScopeOfWorkDeliverablesSetOpe
             ? {
                 ...deliverable,
                 budgetAnchor: {
-                  project: action.input.projectId || "",
+                  project: foundProject.id,
                   unit: deliverable.budgetAnchor?.unit || "Hours",
                   unitCost: deliverable.budgetAnchor?.unitCost || 0,
                   quantity: deliverable.budgetAnchor?.quantity || 0,
@@ -187,23 +167,11 @@ export const scopeOfWorkDeliverablesSetOperations: ScopeOfWorkDeliverablesSetOpe
     },
     removeDeliverableInSetOperation(state, action) {
       if (action.input.milestoneId) {
-        const foundRoadmap = state.roadmaps.find((roadmap) => {
-          return roadmap.milestones.some(
-            (milestone) =>
-              String(milestone.id) === String(action.input.milestoneId),
-          );
-        });
-        if (!foundRoadmap) {
+        const found = findMilestone(state, action.input.milestoneId);
+        if (!found) {
           throw new Error("Roadmap with milestone not found");
         }
-
-        const foundMilestone = foundRoadmap.milestones.find(
-          (milestone) =>
-            String(milestone.id) === String(action.input.milestoneId),
-        );
-        if (!foundMilestone) {
-          throw new Error("Milestone not found");
-        }
+        const { roadmap: foundRoadmap, milestone: foundMilestone } = found;
 
         if (!foundMilestone.scope) {
           throw new Error("Milestone scope not found");

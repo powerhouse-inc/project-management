@@ -2,6 +2,7 @@ import type { ScopeOfWorkMilestonesOperations } from "document-models/scope-of-w
 import type { EditMilestoneAction } from "../../gen/milestones/actions.js";
 import type { ScopeOfWorkState } from "../../gen/schema/types.js";
 import type { Deliverable } from "../../gen/types.js";
+import { findMilestone } from "./lookup.js";
 import { applyInvariants } from "./projects.js";
 
 export const scopeOfWorkMilestonesOperations: ScopeOfWorkMilestonesOperations =
@@ -45,25 +46,13 @@ export const scopeOfWorkMilestonesOperations: ScopeOfWorkMilestonesOperations =
       });
     },
     addCoordinatorOperation(state, action) {
-      const foundRoadmap = state.roadmaps.find((roadmap) => {
-        return roadmap.milestones.some(
-          (milestone) =>
-            String(milestone.id) === String(action.input.milestoneId),
-        );
-      });
-      if (!foundRoadmap) {
+      const found = findMilestone(state, action.input.milestoneId);
+      if (!found) {
         throw new Error(
           `Roadmap with milestone ${action.input.milestoneId} not found`,
         );
       }
-
-      const foundMilestone = foundRoadmap.milestones.find(
-        (milestone) =>
-          String(milestone.id) === String(action.input.milestoneId),
-      );
-      if (!foundMilestone) {
-        throw new Error("Milestone not found");
-      }
+      const { roadmap: foundRoadmap, milestone: foundMilestone } = found;
 
       if (!foundMilestone.coordinators.includes(action.input.id)) {
         foundMilestone.coordinators.push(action.input.id);
@@ -76,25 +65,13 @@ export const scopeOfWorkMilestonesOperations: ScopeOfWorkMilestonesOperations =
       });
     },
     removeCoordinatorOperation(state, action) {
-      const foundRoadmap = state.roadmaps.find((roadmap) => {
-        return roadmap.milestones.some(
-          (milestone) =>
-            String(milestone.id) === String(action.input.milestoneId),
-        );
-      });
-      if (!foundRoadmap) {
+      const found = findMilestone(state, action.input.milestoneId);
+      if (!found) {
         throw new Error(
           `Roadmap with milestone ${action.input.milestoneId} not found`,
         );
       }
-
-      const foundMilestone = foundRoadmap.milestones.find(
-        (milestone) =>
-          String(milestone.id) === String(action.input.milestoneId),
-      );
-      if (!foundMilestone) {
-        throw new Error("Milestone not found");
-      }
+      const { roadmap: foundRoadmap, milestone: foundMilestone } = found;
 
       foundMilestone.coordinators = foundMilestone.coordinators.filter(
         (coordinatorId) => coordinatorId !== action.input.id,
@@ -107,13 +84,6 @@ export const scopeOfWorkMilestonesOperations: ScopeOfWorkMilestonesOperations =
       });
     },
     addMilestoneOperation(state, action) {
-      if (
-        action.input.id === undefined ||
-        action.input.roadmapId === undefined
-      ) {
-        throw new Error("Invalid input");
-      }
-
       const foundRoadmap = state.roadmaps.find(
         (roadmap) => String(roadmap.id) === String(action.input.roadmapId),
       );
@@ -150,13 +120,6 @@ export const scopeOfWorkMilestonesOperations: ScopeOfWorkMilestonesOperations =
       });
     },
     removeMilestoneOperation(state, action) {
-      if (
-        action.input.id === undefined ||
-        action.input.roadmapId === undefined
-      ) {
-        throw new Error("Invalid input");
-      }
-
       const foundRoadmap = state.roadmaps.find(
         (roadmap) => String(roadmap.id) === String(action.input.roadmapId),
       );
@@ -191,6 +154,16 @@ export const scopeOfWorkMilestonesOperations: ScopeOfWorkMilestonesOperations =
       applyInvariants(state, ["budget", "margin"]);
     },
     addMilestoneDeliverableOperation(state, action) {
+      // resolve the target first: a throw after mutating would leave an orphan deliverable behind
+      const found = findMilestone(state, action.input.milestoneId);
+      if (!found) {
+        throw new Error("Milestone not found");
+      }
+      const { milestone: foundMilestone } = found;
+      if (!foundMilestone.scope) {
+        throw new Error("Milestone deliverable set not found");
+      }
+
       // add deliverable to deliverables
       const newDeliverable: Deliverable = {
         id: action.input.deliverableId,
@@ -214,43 +187,14 @@ export const scopeOfWorkMilestonesOperations: ScopeOfWorkMilestonesOperations =
       };
 
       state.deliverables.push(newDeliverable);
-
-      // add deliverable to milestone.scope.deliverables
-      const roadmap = state.roadmaps.find((roadmap) => {
-        return roadmap.milestones.find(
-          (milestone) =>
-            String(milestone.id) === String(action.input.milestoneId),
-        );
-      });
-      const foundMilestone = roadmap?.milestones.find(
-        (milestone) =>
-          String(milestone.id) === String(action.input.milestoneId),
-      );
-      if (!foundMilestone) {
-        throw new Error("Milestone not found");
-      }
-      if (!foundMilestone.scope) {
-        throw new Error("Milestone deliverable set not found");
-      }
       foundMilestone.scope.deliverables.push(newDeliverable.id);
     },
     removeMilestoneDeliverableOperation(state, action) {
-      const roadmap = state.roadmaps.find((roadmap) => {
-        return roadmap.milestones.find(
-          (milestone) =>
-            String(milestone.id) === String(action.input.milestoneId),
-        );
-      });
-      if (!roadmap) {
+      const found = findMilestone(state, action.input.milestoneId);
+      if (!found) {
         throw new Error("Roadmap not found");
       }
-      const foundMilestone = roadmap.milestones.find(
-        (milestone) =>
-          String(milestone.id) === String(action.input.milestoneId),
-      );
-      if (!foundMilestone) {
-        throw new Error("Milestone not found");
-      }
+      const { milestone: foundMilestone } = found;
       if (!foundMilestone.scope) {
         throw new Error("Milestone deliverable set not found");
       }
