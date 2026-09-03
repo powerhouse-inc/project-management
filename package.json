@@ -89,7 +89,6 @@
     "@electric-sql/pglite-tools": "0.2.20",
     "@openfeature/core": "^1.9.1",
     "@powerhousedao/analytics-engine-core": "6.2.2-dev.71",
-    "@powerhousedao/builder-profile": "1.0.7",
     "@powerhousedao/builder-tools": "6.2.2-dev.71",
     "@powerhousedao/codegen": "6.2.2-dev.71",
     "@powerhousedao/common": "6.2.2-dev.71",

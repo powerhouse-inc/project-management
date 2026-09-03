@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useState, useEffect } from "react";
+import { useMemo } from "react";
 import {
   ObjectSetTable,
   type ColumnDef,
@@ -10,30 +10,7 @@ import {
   type ScopeOfWorkAction,
 } from "document-models/scope-of-work";
 import { actions } from "document-models/scope-of-work";
-import {
-  type DocumentDispatch,
-  useDrives,
-  useGetDocuments,
-} from "@powerhousedao/reactor-browser";
-import type { FileNode } from "@powerhousedao/shared/document-drive";
-import type { PHDocument } from "document-model";
-import { useRemoteBuilderProfiles } from "../hooks/useRemoteBuilderProfiles.js";
-
-// Type for builder profile state (local documents)
-interface BuilderProfileState {
-  global: {
-    name?: string;
-    description?: string | null;
-    icon?: string | null;
-  };
-}
-
-type ProfileOption = {
-  id: string;
-  label: string;
-  value: string;
-  title: string;
-};
+import { type DocumentDispatch } from "@powerhousedao/reactor-browser";
 
 interface ContributorsProps {
   dispatch: DocumentDispatch<ScopeOfWorkAction>;
@@ -52,139 +29,6 @@ const Contributors: React.FC<ContributorsProps> = ({
       title: contributor.name,
     }));
   }, [contributors]);
-
-  const drives = useDrives();
-
-  // Map all builder profile FileNodes from all drives with their driveId
-  const builderProfileNodesWithDriveId = useMemo(() => {
-    if (!drives) return [];
-
-    return drives.flatMap((drive) => {
-      const builderProfileNodes = drive.state.global.nodes.filter(
-        (node): node is FileNode =>
-          node.kind === "file" &&
-          "documentType" in node &&
-          node.documentType === "powerhouse/builder-profile",
-      );
-
-      return builderProfileNodes.map((node) => ({
-        node,
-        driveId: drive.header.id,
-      }));
-    });
-  }, [drives]);
-
-  // Get all unique builder PHIDs from the nodes
-  const builderPhids = useMemo(() => {
-    return builderProfileNodesWithDriveId.map(({ node }) => node.id);
-  }, [builderProfileNodesWithDriveId]);
-
-  // Get the async function to fetch documents
-  const getDocuments = useGetDocuments();
-
-  // State to store fetched builder profile documents
-  const [builderProfileDocuments, setBuilderProfileDocuments] = useState<
-    PHDocument[]
-  >([]);
-
-  // Fetch builder profile documents when PHIDs change
-  useEffect(() => {
-    if (builderPhids.length === 0) {
-      setBuilderProfileDocuments([]);
-      return;
-    }
-
-    getDocuments(builderPhids)
-      .then((docs) => {
-        setBuilderProfileDocuments(docs);
-      })
-      .catch((error) => {
-        console.error("Failed to fetch builder profiles:", error);
-        setBuilderProfileDocuments([]);
-      });
-  }, [builderPhids, getDocuments]);
-
-  // Create a map of PHID to document for quick lookup (local drives)
-  const localBuilderProfileMap = useMemo(() => {
-    if (!builderProfileDocuments || builderProfileDocuments.length === 0)
-      return new Map<string, PHDocument>();
-
-    const map = new Map<string, PHDocument>();
-    builderProfileDocuments.forEach((doc) => {
-      if (doc.header.documentType === "powerhouse/builder-profile") {
-        map.set(doc.header.id, doc);
-      }
-    });
-    return map;
-  }, [builderProfileDocuments]);
-
-  // Fetch remote profiles as fallback for contributors not found locally
-  const { profileMap: remoteProfileMap, allProfiles: remoteProfiles } =
-    useRemoteBuilderProfiles(localBuilderProfileMap);
-
-  // Helper function to get builder profile documents from all drives (local + remote)
-  const getBuilderProfiles = useCallback((): ProfileOption[] => {
-    // Start with local profiles
-    const profileOptions: ProfileOption[] = builderProfileNodesWithDriveId.map(
-      ({ node }) => {
-        const doc = localBuilderProfileMap.get(node.id);
-        const state = doc?.state as BuilderProfileState | undefined;
-        const name = state?.global?.name || node.name || node.id;
-
-        return {
-          id: node.id,
-          label: name,
-          value: node.id,
-          title: name,
-        };
-      },
-    );
-
-    // Add remote profiles that aren't already in local
-    const localIds = new Set(profileOptions.map((p) => p.id));
-    for (const remoteProfile of remoteProfiles) {
-      if (!localIds.has(remoteProfile.id)) {
-        const name = remoteProfile.state?.name || remoteProfile.id;
-        profileOptions.push({
-          id: remoteProfile.id,
-          label: name,
-          value: remoteProfile.id,
-          title: name,
-        });
-      }
-    }
-
-    return profileOptions;
-  }, [builderProfileNodesWithDriveId, localBuilderProfileMap, remoteProfiles]);
-
-  // Helper function to get builder profile data by PHID (local first, then remote fallback)
-  const getBuilderProfileByPhid = useCallback(
-    (phid: string) => {
-      // Try local first
-      const localDoc = localBuilderProfileMap.get(phid);
-      if (localDoc) {
-        const state = localDoc.state as unknown as BuilderProfileState;
-        return {
-          name: state.global?.name || localDoc.header.id,
-          description: state.global?.description || null,
-          icon: state.global?.icon || null,
-        };
-      }
-
-      // Fall back to remote
-      const remoteProfile = remoteProfileMap.get(phid);
-      if (remoteProfile) {
-        return {
-          name: remoteProfile.state?.name || remoteProfile.id,
-          description: remoteProfile.state?.description || null,
-          icon: remoteProfile.state?.icon || null,
-        };
-      }
-
-      return null;
-    },
-    [localBuilderProfileMap, remoteProfileMap],
-  );
 
   const columns = useMemo<Array<ColumnDef<RichContributors>>>(
     () => [
@@ -224,7 +68,6 @@ const Contributors: React.FC<ContributorsProps> = ({
 
               // If a PHID is entered and it's different from current value
               if (newValue && newValue !== currentValue) {
-                const builderProfile = getBuilderProfileByPhid(newValue);
                 const existingAgent = contributors.find(
                   (agent) => agent.id === newValue,
                 );
@@ -235,52 +78,21 @@ const Contributors: React.FC<ContributorsProps> = ({
                     dispatch(actions.removeAgent({ id: context.row.id }));
                   }
 
-                  if (builderProfile) {
-                    // Create new agent with data from builder profile
-                    dispatch(
-                      actions.addAgent({
-                        id: newValue,
-                        name: builderProfile.name,
-                        icon: builderProfile.icon,
-                        description: builderProfile.description,
-                      }),
-                    );
-                  } else {
-                    // Manual PHID entry - create agent with empty data that user can fill
-                    dispatch(
-                      actions.addAgent({
-                        id: newValue,
-                        name: "", // User will need to fill this
-                        icon: null,
-                        description: null,
-                      }),
-                    );
-                  }
+                  // Create the agent with empty details for the user to fill in
+                  dispatch(
+                    actions.addAgent({
+                      id: newValue,
+                      name: "",
+                      icon: null,
+                      description: null,
+                    }),
+                  );
                 }
               }
             }}
             placeholder="Enter PHID"
             className="w-full"
-            variant="withValueAndTitle"
-            initialOptions={getBuilderProfiles()}
-            fetchOptionsCallback={async (userInput: string) => {
-              const builderProfiles = getBuilderProfiles();
-
-              // Filter profiles based on user input
-              if (!userInput.trim()) {
-                return builderProfiles;
-              }
-
-              const filteredProfiles = builderProfiles.filter(
-                (profile) =>
-                  profile.label
-                    .toLowerCase()
-                    .includes(userInput.toLowerCase()) ||
-                  profile.id.toLowerCase().includes(userInput.toLowerCase()),
-              );
-
-              return filteredProfiles;
-            }}
+            autoComplete={false}
           />
         ),
         renderCell: (value) => {
@@ -386,7 +198,7 @@ const Contributors: React.FC<ContributorsProps> = ({
         },
       },
     ],
-    [contributors, getBuilderProfiles, getBuilderProfileByPhid, dispatch],
+    [contributors, dispatch],
   );
 
   return (

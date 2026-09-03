@@ -15,11 +15,6 @@
       "packageName": "@powerhousedao/vetra",
       "version": "staging",
       "provider": "npm"
-    },
-    {
-      "packageName": "@powerhousedao/builder-profile",
-      "version": "0.0.18",
-      "provider": "npm"
     }
   ],
   "packageRegistryUrl": "https://registry.dev.vetra.io",

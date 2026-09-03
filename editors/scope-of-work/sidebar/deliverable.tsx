@@ -21,8 +21,6 @@ import { useEffect, useMemo, useState } from "react";
 import { generateId } from "document-model/core";
 import BudgetCalculator from "./budgetCalculator.js";
 import { type DocumentDispatch } from "@powerhousedao/reactor-browser";
-import { useRemoteBuilderProfiles } from "../hooks/useRemoteBuilderProfiles.js";
-import type { RemoteBuilderProfile } from "../utils/graphql-client.js";
 interface DeliverablesProps {
   deliverables: DeliverableType[];
   dispatch: DocumentDispatch<ScopeOfWorkAction>;
@@ -69,19 +67,6 @@ const convertContributorToOption = (contributor: Agent): PHIDOption => ({
   icon: "Person",
 });
 
-const convertRemoteProfileToOption = (profile: RemoteBuilderProfile): PHIDOption => ({
-  value: profile.id,
-  title: profile.state.name || profile.id,
-  path: "powerhouse/builder-profile",
-  description: profile.state.description || undefined,
-  icon: profile.state.icon ? (
-    <img
-      src={profile.state.icon}
-      alt=""
-      className="w-6 h-6 rounded-full object-cover"
-    />
-  ) : "Person",
-});
 
 const Deliverable: React.FC<DeliverablesProps> = ({
   deliverables,
@@ -101,77 +86,55 @@ const Deliverable: React.FC<DeliverablesProps> = ({
   const [icon, setIcon] = useState(currentDeliverable.icon || "");
   const [ownerPreview, setOwnerPreview] = useState<PHIDOption | null>(null);
 
-  // Create a map of local contributor IDs for the remote profiles hook
+  // Owners are chosen from this document's own contributors
   const localProfileMap = useMemo(() => {
     const map = new Map<string, Agent>();
     contributors.forEach((c) => map.set(c.id, c));
     return map;
   }, [contributors]);
 
-  // Fetch remote builder profiles
-  const { allProfiles: remoteProfiles, isLoading: isLoadingRemote, profileMap: remoteProfileMap } =
-    useRemoteBuilderProfiles(localProfileMap);
-
-  // Combine local contributors and remote profiles into initial options
-  const initialOptions = useMemo<PHIDOption[]>(() => {
-    const localOptions = contributors.map(convertContributorToOption);
-    const remoteOptions = remoteProfiles.map(convertRemoteProfileToOption);
-    return [...localOptions, ...remoteOptions];
-  }, [contributors, remoteProfiles]);
+  const initialOptions = useMemo<PHIDOption[]>(
+    () => contributors.map(convertContributorToOption),
+    [contributors],
+  );
 
   // Fetch options callback for searching
   const fetchOptionsCallback = useMemo(() => {
     return async (userInput: string): Promise<PHIDOption[]> => {
       const searchTerm = userInput.toLowerCase();
 
-      // Search local contributors
-      const localMatches = contributors
-        .filter((c) => c.name.toLowerCase().includes(searchTerm))
+      const matches = contributors
+        .filter(
+          (c) =>
+            c.name.toLowerCase().includes(searchTerm) ||
+            c.id.toLowerCase().includes(searchTerm),
+        )
         .map(convertContributorToOption);
 
-      // Search remote profiles
-      const remoteMatches = remoteProfiles
-        .filter((p) =>
-          p.state.name?.toLowerCase().includes(searchTerm) ||
-          p.id.toLowerCase().includes(searchTerm)
-        )
-        .map(convertRemoteProfileToOption);
-
-      const allMatches = [...localMatches, ...remoteMatches];
-
-      if (allMatches.length === 0) {
-        return Promise.reject(new Error("No profiles found"));
+      if (matches.length === 0) {
+        return Promise.reject(new Error("No contributors found"));
       }
 
-      return allMatches;
+      return matches;
     };
-  }, [contributors, remoteProfiles]);
+  }, [contributors]);
 
   // Fetch selected option callback for displaying selected value
   const fetchSelectedOptionCallback = useMemo(() => {
     return async (phid: string): Promise<PHIDOption> => {
-      // Check local contributors first
       const localContributor = contributors.find((c) => c.id === phid);
       if (localContributor) {
         return convertContributorToOption(localContributor);
       }
 
-      // Check remote profiles
-      const remoteProfile = remoteProfileMap.get(phid);
-      if (remoteProfile) {
-        return convertRemoteProfileToOption(remoteProfile);
-      }
-
-      return Promise.reject(new Error("Profile not found"));
+      return Promise.reject(new Error("Contributor not found"));
     };
-  }, [contributors, remoteProfileMap]);
+  }, [contributors]);
 
-  // Helper to check if a PHID is known (local or remote)
+  // Helper to check if a PHID belongs to a known contributor
   const isKnownPhid = useMemo(() => {
-    return (phid: string): boolean => {
-      return localProfileMap.has(phid) || remoteProfileMap.has(phid);
-    };
-  }, [localProfileMap, remoteProfileMap]);
+    return (phid: string): boolean => localProfileMap.has(phid);
+  }, [localProfileMap]);
 
   useEffect(() => {
     const fetchOwnerPreview = async () => {
@@ -342,11 +305,7 @@ const Deliverable: React.FC<DeliverablesProps> = ({
                 className="w-full"
                 name="owner"
                 label="Deliverable Owner"
-                placeholder={
-                  isLoadingRemote
-                    ? "Loading profiles..."
-                    : "Search builder name or enter PHID"
-                }
+                placeholder="Search contributor name or enter PHID"
                 variant="withValueTitleAndDescription"
                 value={stateDeliverable.owner || ""}
                 autoComplete={true}
