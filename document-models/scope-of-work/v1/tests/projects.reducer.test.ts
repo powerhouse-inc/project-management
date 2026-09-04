@@ -121,6 +121,7 @@ describe("projects reducer", () => {
         budgetType: "OPEX",
         currency: "EUR",
         budget: 1000,
+        targetBudget: 1000, // a budget given at creation fixes the envelope
         expenditure: { percentage: 0, actuals: 0, cap: 0 },
         scope: {
           deliverables: [],
@@ -237,7 +238,7 @@ describe("projects reducer", () => {
       expect(project(atCost)?.budget).toBe(300);
     });
 
-    it("setProjectTotalBudget is rejected on a project with no costed deliverables", () => {
+    it("setProjectTotalBudget fixes the envelope even before anything is quoted", () => {
       const doc = apply(
         utils.createDocument(),
         addProject({ id: "p1", code: "P1", title: "Free" }),
@@ -249,10 +250,9 @@ describe("projects reducer", () => {
         setProjectTotalBudget({ projectId: "p1", totalBudget: 100 }),
       );
 
-      expect(lastError(doc)).toBe(
-        "Cannot set a total budget on a project without costed deliverables",
-      );
-      expect(project(doc)?.budget).toBe(0);
+      expect(errors(doc)).toStrictEqual([]);
+      expect(project(doc)).toMatchObject({ budget: 100, targetBudget: 100 });
+      // nothing to solve yet: the quote has no cost, so its margin is untouched
       expect(anchorOf(doc, "d1")?.margin).toBe(0);
     });
 
@@ -292,6 +292,7 @@ describe("projects reducer", () => {
               unitCost: 10,
               quantity: 1,
               margin: 0,
+              marginPinned: false,
             },
           }),
           rawDeliverable({ id: "d-noanchor", budgetAnchor: null }),
@@ -308,7 +309,9 @@ describe("projects reducer", () => {
       expect(errors(next)).toStrictEqual([]);
       expect(anchorOf(next, "d-noanchor")).toBeNull();
       // margin path: 20 / 10 = 2
-      expect(anchorOf(next, "d-anchor")?.margin).toBe(100);
+      // a margin set by a person is pinned: the fixed budget of 20 leaves it alone
+      expect(anchorOf(next, "d-anchor")?.margin).toBe(50);
+      expect(project(next)).toMatchObject({ budget: 20, targetBudget: 20 });
     });
 
     it("also recomputes milestone budgets, skipping milestones without scope", () => {
@@ -387,6 +390,7 @@ describe("projects reducer", () => {
           unitCost: 3,
           quantity: 3,
           margin: 5,
+          marginPinned: false,
         }),
       );
       expect(errors(doc)).toStrictEqual([]);
@@ -406,6 +410,7 @@ describe("projects reducer", () => {
         unitCost: 3,
         quantity: 3,
         margin: 5,
+        marginPinned: false,
       });
       expect(project(next)?.budget).toBe(0);
     });
@@ -427,6 +432,7 @@ describe("projects reducer", () => {
         unitCost: 0,
         quantity: 0,
         margin: 0,
+        marginPinned: false,
       });
     });
 

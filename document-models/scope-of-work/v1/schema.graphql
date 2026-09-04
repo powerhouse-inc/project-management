@@ -65,6 +65,8 @@ type BudgetAnchorProject {
   unitCost: Float!
   quantity: Float!
   margin: Float!
+  # true when the margin was set by a person; false/null when it is derived from a fixed project budget
+  marginPinned: Boolean
 }
 
 enum Unit {
@@ -111,6 +113,8 @@ type Project {
   budgetType: BudgetType
   currency: PMCurrency
   budget: Float
+  # when set, the project budget is fixed at this envelope and unpinned margins are derived from it
+  targetBudget: Float
   expenditure: BudgetExpenditure
 }
 
@@ -272,6 +276,8 @@ input SetDeliverableBudgetAnchorProjectInput {
   unitCost: Float
   quantity: Float
   margin: Float
+  # omit: a provided margin pins itself; false: unpin so a fixed project budget derives it
+  marginPinned: Boolean
 }
 
 # roadmaps

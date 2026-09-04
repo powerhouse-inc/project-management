@@ -18,7 +18,7 @@ import {
   storyPointsProgress,
 } from "./progress.js";
 import { applyInvariants } from "./projects.js";
-import { isSet } from "./util.js";
+import { isSet, round2 } from "./util.js";
 
 export const scopeOfWorkDeliverablesOperations: ScopeOfWorkDeliverablesOperations =
   {
@@ -47,6 +47,7 @@ export const scopeOfWorkDeliverablesOperations: ScopeOfWorkDeliverablesOperation
           unitCost: 0,
           quantity: 0,
           margin: 0,
+          marginPinned: false,
         },
       };
 
@@ -132,7 +133,7 @@ export const scopeOfWorkDeliverablesOperations: ScopeOfWorkDeliverablesOperation
               "Percentage must be between 0 and 100",
             );
           }
-          workProgress = percentageProgress(input.percentage);
+          workProgress = percentageProgress(round2(input.percentage));
         } else if (input.storyPoints) {
           const { total, completed } = input.storyPoints;
           if (total < 0 || completed < 0 || completed > total) {
@@ -232,27 +233,36 @@ export const scopeOfWorkDeliverablesOperations: ScopeOfWorkDeliverablesOperation
         throw new Error("Deliverable not found");
       }
 
-      const { project, unit, unitCost, quantity, margin } = action.input;
+      const { project, unit, unitCost, quantity, margin, marginPinned } =
+        action.input;
       if ((unitCost ?? 0) < 0 || (quantity ?? 0) < 0 || (margin ?? 0) < 0) {
         throw new InvalidBudgetAnchorError(
           "Budget anchor values must be zero or positive",
         );
       }
 
-      // only the anchor's own fields are written; the input's deliverableId never leaks in
+      // only the anchor's own fields are written; the input's deliverableId never leaks in.
+      // A margin typed by a person is pinned unless told otherwise; `marginPinned: false` releases it
+      // so a fixed project budget can derive it again.
       const current = foundDeliverable.budgetAnchor ?? {
         project: "",
         unit: "Hours" as const,
         unitCost: 0,
         quantity: 0,
         margin: 0,
+        marginPinned: false,
       };
       foundDeliverable.budgetAnchor = {
         project: project !== undefined ? project : current.project,
         unit: isSet(unit) ? unit : current.unit,
-        unitCost: isSet(unitCost) ? unitCost : current.unitCost,
-        quantity: isSet(quantity) ? quantity : current.quantity,
-        margin: isSet(margin) ? margin : current.margin,
+        unitCost: isSet(unitCost) ? round2(unitCost) : current.unitCost,
+        quantity: isSet(quantity) ? round2(quantity) : current.quantity,
+        margin: isSet(margin) ? round2(margin) : current.margin,
+        marginPinned: isSet(marginPinned)
+          ? marginPinned
+          : isSet(margin)
+            ? true
+            : (current.marginPinned ?? false),
       };
 
       applyInvariants(state);

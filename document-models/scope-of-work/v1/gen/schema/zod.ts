@@ -281,6 +281,7 @@ export function BudgetAnchorProjectSchema(): z.ZodObject<
   return z.object({
     __typename: z.literal("BudgetAnchorProject").optional(),
     margin: z.number(),
+    marginPinned: z.boolean().nullish(),
     project: z.string().nullish(),
     quantity: z.number(),
     unit: UnitSchema.nullish(),
@@ -484,6 +485,7 @@ export function ProjectSchema(): z.ZodObject<Properties<Project>> {
     projectOwner: z.string().nullish(),
     scope: z.lazy(() => DeliverablesSetSchema().nullish()),
     slug: z.string(),
+    targetBudget: z.number().nullish(),
     title: z.string(),
   });
 }
@@ -607,6 +609,7 @@ export function SetDeliverableBudgetAnchorProjectInputSchema(): z.ZodObject<
   return z.object({
     deliverableId: z.string(),
     margin: z.number().nullish(),
+    marginPinned: z.boolean().nullish(),
     project: z.string().nullish(),
     quantity: z.number().nullish(),
     unit: UnitSchema.nullish(),

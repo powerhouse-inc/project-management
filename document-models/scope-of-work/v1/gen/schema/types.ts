@@ -146,6 +146,7 @@ export type Agent = {
 
 export type BudgetAnchorProject = {
   margin: Scalars["Float"]["output"];
+  marginPinned: Maybe<Scalars["Boolean"]["output"]>;
   project: Maybe<Scalars["OID"]["output"]>;
   quantity: Scalars["Float"]["output"];
   unit: Maybe<Unit>;
@@ -323,6 +324,7 @@ export type Project = {
   projectOwner: Maybe<Scalars["ID"]["output"]>;
   scope: Maybe<DeliverablesSet>;
   slug: Scalars["String"]["output"];
+  targetBudget: Maybe<Scalars["Float"]["output"]>;
   title: Scalars["String"]["output"];
 };
 
@@ -412,6 +414,7 @@ export type ScopeOfWorkStatusInput =
 export type SetDeliverableBudgetAnchorProjectInput = {
   deliverableId: Scalars["ID"]["input"];
   margin?: InputMaybe<Scalars["Float"]["input"]>;
+  marginPinned?: InputMaybe<Scalars["Boolean"]["input"]>;
   project?: InputMaybe<Scalars["OID"]["input"]>;
   quantity?: InputMaybe<Scalars["Float"]["input"]>;
   unit?: InputMaybe<Unit>;

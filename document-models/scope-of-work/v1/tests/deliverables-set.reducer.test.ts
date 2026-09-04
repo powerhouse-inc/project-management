@@ -179,6 +179,7 @@ describe("deliverables-set reducer", () => {
           unitCost: 5,
           quantity: 4,
           margin: 25,
+          marginPinned: false,
         }),
         addDeliverableInSet({ deliverableId: "d1", projectId: "p1" }),
         addDeliverableInSet({ deliverableId: "d1", projectId: "p1" }),
@@ -193,6 +194,7 @@ describe("deliverables-set reducer", () => {
         unitCost: 5,
         quantity: 4,
         margin: 25,
+        marginPinned: false,
       });
       expect(anchorOf(doc, "d2")).toStrictEqual({
         project: "p1",
@@ -200,6 +202,7 @@ describe("deliverables-set reducer", () => {
         unitCost: 0,
         quantity: 0,
         margin: 0,
+        marginPinned: false,
       });
     });
 
@@ -221,6 +224,7 @@ describe("deliverables-set reducer", () => {
         unitCost: 0,
         quantity: 0,
         margin: 0,
+        marginPinned: false,
       });
     });
 
@@ -289,6 +293,7 @@ describe("deliverables-set reducer", () => {
         unitCost: 7,
         quantity: 2,
         margin: 10,
+        marginPinned: true, // the margin was typed, so it travels pinned
       });
     });
 
@@ -320,6 +325,7 @@ describe("deliverables-set reducer", () => {
         unitCost: 0,
         quantity: 0,
         margin: 0,
+        marginPinned: false,
       });
     });
 

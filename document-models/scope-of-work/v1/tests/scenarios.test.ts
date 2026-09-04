@@ -444,9 +444,8 @@ describe("former gaps (fixed — kept as regression tests)", () => {
         plannedScope(),
         setProjectTotalBudget({ projectId: "p1", totalBudget: 100 }),
       );
-      expect(lastError(doc)).toBe(
-        "Cannot set a total budget on a project without costed deliverables",
-      );
+      expect(errors(doc)).toStrictEqual([]);
+      expect(project(doc)).toMatchObject({ budget: 100, targetBudget: 100 });
       expect(Number.isFinite(anchor(doc, "api")?.margin)).toBe(true);
     });
   });
@@ -610,7 +609,7 @@ describe("former gaps (fixed — kept as regression tests)", () => {
     it("the budget anchor only carries its schema fields", () => {
       const doc = costedScope();
       expect(Object.keys(anchor(doc, "api") ?? {}).sort()).toStrictEqual(
-        ["margin", "project", "quantity", "unit", "unitCost"], // today also: deliverableId (leaked from the input)
+        ["margin", "marginPinned", "project", "quantity", "unit", "unitCost"], // today also: deliverableId (leaked from the input)
       );
     });
   });

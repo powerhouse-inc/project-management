@@ -1,5 +1,7 @@
 export type ErrorCode =
   | "ProjectAlreadyExistsError"
+  | "InvalidInitialBudgetError"
+  | "InvalidBudgetUpdateError"
   | "ProjectNotFoundError"
   | "InvalidProjectMarginError"
   | "InvalidProjectBudgetError"
@@ -12,6 +14,20 @@ export interface ReducerError {
 export class ProjectAlreadyExistsError extends Error implements ReducerError {
   errorCode = "ProjectAlreadyExistsError" as ErrorCode;
   constructor(message = "ProjectAlreadyExistsError") {
+    super(message);
+  }
+}
+
+export class InvalidInitialBudgetError extends Error implements ReducerError {
+  errorCode = "InvalidInitialBudgetError" as ErrorCode;
+  constructor(message = "InvalidInitialBudgetError") {
+    super(message);
+  }
+}
+
+export class InvalidBudgetUpdateError extends Error implements ReducerError {
+  errorCode = "InvalidBudgetUpdateError" as ErrorCode;
+  constructor(message = "InvalidBudgetUpdateError") {
     super(message);
   }
 }
@@ -48,7 +64,9 @@ export class ProjectDeliverableAlreadyExistsError
 }
 
 export const errors = {
-  AddProject: { ProjectAlreadyExistsError },
+  AddProject: { ProjectAlreadyExistsError, InvalidInitialBudgetError },
+
+  UpdateProject: { InvalidBudgetUpdateError },
 
   RemoveProject: { ProjectNotFoundError },
 

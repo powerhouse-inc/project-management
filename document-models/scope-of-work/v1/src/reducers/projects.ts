@@ -1,5 +1,7 @@
 import type { ScopeOfWorkProjectsOperations } from "document-models/scope-of-work/v1";
 import {
+  InvalidBudgetUpdateError,
+  InvalidInitialBudgetError,
   InvalidProjectBudgetError,
   InvalidProjectMarginError,
   ProjectAlreadyExistsError,
@@ -13,7 +15,7 @@ import type {
 } from "../../gen/schema/types.js";
 import { deleteDeliverables } from "./lookup.js";
 import { percentageProgress, storyPointsProgress } from "./progress.js";
-import { isSet } from "./util.js";
+import { isSet, round2 } from "./util.js";
 
 export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
   addProjectOperation(state, action) {
@@ -22,8 +24,15 @@ export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
         `Project with ID ${action.input.id} already exists`,
       );
     }
+    if (isSet(action.input.budget) && action.input.budget < 0) {
+      throw new InvalidInitialBudgetError("Budget must be zero or positive");
+    }
+    // a budget given at creation fixes the project's envelope from day one
+    const targetBudget = isSet(action.input.budget)
+      ? round2(action.input.budget)
+      : null;
 
-    const project = {
+    state.projects.push({
       id: action.input.id,
       code: action.input.code,
       title: action.input.title,
@@ -33,31 +42,26 @@ export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
       imageUrl: action.input.imageUrl || null,
       budgetType: action.input.budgetType || "CAPEX",
       currency: action.input.currency || "USD",
-      budget: action.input.budget || 0,
-      expenditure: {
-        percentage: 0,
-        actuals: 0,
-        cap: 0,
-      },
+      budget: targetBudget ?? 0,
+      targetBudget,
+      expenditure: { percentage: 0, actuals: 0, cap: 0 },
       scope: {
         deliverables: [],
         status: "DRAFT" as const,
         progress: percentageProgress(0),
-        deliverablesCompleted: {
-          total: 0,
-          completed: 0,
-        },
+        deliverablesCompleted: { total: 0, completed: 0 },
       },
-    };
-    state.projects.push(project);
+    });
   },
   updateProjectOperation(state, action) {
     const project = state.projects.find((p) => p.id === action.input.id);
     if (!project) {
       throw new Error("Project not found");
     }
-
     const { input } = action;
+    if (isSet(input.budget) && input.budget < 0) {
+      throw new InvalidBudgetUpdateError("Budget must be zero or positive");
+    }
     // required fields ignore an explicit null; nullable fields accept it as "clear"
     if (isSet(input.title)) project.title = input.title;
     if (isSet(input.code)) project.code = input.code;
@@ -66,7 +70,11 @@ export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
     if (input.imageUrl !== undefined) project.imageUrl = input.imageUrl;
     if (input.budgetType !== undefined) project.budgetType = input.budgetType;
     if (input.currency !== undefined) project.currency = input.currency;
-    if (input.budget !== undefined) project.budget = input.budget;
+    // `budget` sets (or, with null, releases) the fixed envelope; the derived budget follows
+    if (input.budget !== undefined)
+      project.targetBudget =
+        input.budget === null ? null : round2(input.budget);
+    applyInvariants(state);
   },
   updateProjectOwnerOperation(state, action) {
     const project = state.projects.find((p) => p.id === action.input.id);
@@ -80,10 +88,8 @@ export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
     if (!project) {
       throw new ProjectNotFoundError("Project not found");
     }
-
     // the project's deliverables go with it, wherever else they were listed
     deleteDeliverables(state, [...(project.scope?.deliverables ?? [])]);
-
     state.projects = state.projects.filter(
       (p) => p.id !== action.input.projectId,
     );
@@ -93,12 +99,10 @@ export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
     if (action.input.margin < 0) {
       throw new InvalidProjectMarginError("Margin must be zero or positive");
     }
-
     const project = state.projects.find((p) => p.id === action.input.projectId);
     if (!project) {
       throw new Error("Project not found");
     }
-
     const projectDeliverableSet = project.scope;
     if (!projectDeliverableSet) {
       throw new Error("Project deliverable set not found`");
@@ -106,20 +110,20 @@ export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
     if (projectDeliverableSet.deliverables.length < 1) {
       throw new Error("Project deliverable set has no deliverables");
     }
-
-    const projectDeliverables = projectDeliverableSet.deliverables
-      .map((id) => state.deliverables.find((d) => d.id === id))
-      .filter((d) => d !== undefined);
-
-    projectDeliverables.forEach((deliverable: Deliverable) => {
+    // a margin set by a person is pinned: a fixed budget solves around it, never over it
+    const margin = round2(action.input.margin);
+    for (const deliverable of fundedDeliverables(
+      state,
+      projectDeliverableSet,
+    )) {
       if (deliverable.budgetAnchor) {
         deliverable.budgetAnchor = {
           ...deliverable.budgetAnchor,
-          margin: action.input.margin,
+          margin,
+          marginPinned: true,
         };
       }
-    });
-
+    }
     applyInvariants(state);
   },
   setProjectTotalBudgetOperation(state, action) {
@@ -129,34 +133,12 @@ export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
         "Total budget must be zero or positive",
       );
     }
-
     const project = state.projects.find((p) => p.id === action.input.projectId);
     if (!project) {
       throw new Error("Project not found");
     }
-
-    const cost = project.scope ? calculateTotalCost(state, project.scope) : 0;
-    if (cost === 0 && totalBudget > 0) {
-      throw new InvalidProjectBudgetError(
-        "Cannot set a total budget on a project without costed deliverables",
-      );
-    }
-    if (totalBudget < cost) {
-      throw new InvalidProjectBudgetError(
-        `Total budget cannot be lower than the total cost (${cost})`,
-      );
-    }
-
-    // budget = cost × (1 + margin/100)  ⇒  margin = (budget / cost − 1) × 100
-    const margin = cost > 0 ? (totalBudget / cost - 1) * 100 : 0;
-    for (const id of project.scope?.deliverables ?? []) {
-      const deliverable = state.deliverables.find((d) => d.id === id);
-      if (deliverable?.budgetAnchor) {
-        deliverable.budgetAnchor = { ...deliverable.budgetAnchor, margin };
-      }
-    }
-
-    project.budget = totalBudget;
+    // fixes the envelope; unpinned margins are derived from it by the invariant
+    project.targetBudget = round2(totalBudget);
     applyInvariants(state);
   },
   addProjectDeliverableOperation(state, action) {
@@ -177,7 +159,6 @@ export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
         `Deliverable with ID ${action.input.deliverableId} already exists`,
       );
     }
-
     const newDeliverable: Deliverable = {
       id: action.input.deliverableId,
       owner: "",
@@ -194,9 +175,9 @@ export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
         unitCost: 0,
         quantity: 0,
         margin: 0,
+        marginPinned: false,
       },
     };
-
     state.deliverables.push(newDeliverable);
     project.scope.deliverables.push(newDeliverable.id);
     applyInvariants(state);
@@ -212,82 +193,91 @@ export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
     project.scope.deliverables = project.scope.deliverables.filter(
       (d) => d !== action.input.deliverableId,
     );
-
-    state.deliverables = state.deliverables.map((deliverable) => {
-      return String(deliverable.id) === String(action.input.deliverableId)
-        ? {
-            ...deliverable,
-            budgetAnchor: {
-              project: "",
-              unit: deliverable.budgetAnchor?.unit || "Hours",
-              unitCost: deliverable.budgetAnchor?.unitCost || 0,
-              quantity: deliverable.budgetAnchor?.quantity || 0,
-              margin: deliverable.budgetAnchor?.margin || 0,
-            },
-          }
-        : deliverable;
-    });
+    state.deliverables = state.deliverables.map((deliverable) =>
+      String(deliverable.id) === String(action.input.deliverableId)
+        ? { ...deliverable, budgetAnchor: detachedAnchor(deliverable) }
+        : deliverable,
+    );
     applyInvariants(state);
   },
 };
 
+/** The anchor a deliverable keeps when it leaves a project or milestone: same quote, no funder. */
+export const detachedAnchor = (deliverable: Deliverable) => ({
+  project: "",
+  unit: deliverable.budgetAnchor?.unit || "Hours",
+  unitCost: deliverable.budgetAnchor?.unitCost || 0,
+  quantity: deliverable.budgetAnchor?.quantity || 0,
+  margin: deliverable.budgetAnchor?.margin || 0,
+  marginPinned: deliverable.budgetAnchor?.marginPinned ?? false,
+});
+
 /**
  * Re-derive everything that depends on the deliverables, in dependency order:
- * budgets (from the anchors) for every project and milestone, then progress.
- * Every operation that touches a deliverable or a scope calls this.
+ * project budgets (or, for fixed budgets, the margins that fit them), milestone
+ * budgets from the resulting line budgets, then progress.
+ * Every operation that touches a deliverable, a quote or a scope calls this.
  */
 export const applyInvariants = (state: ScopeOfWorkState) => {
-  state.projects.forEach((project) => {
-    if (project.scope) {
-      project.budget = calculateTotalBudget(state, project.scope);
+  for (const project of state.projects) {
+    if (!project.scope) continue;
+    const deliverables = fundedDeliverables(state, project.scope);
+    if (isSet(project.targetBudget)) {
+      fitMarginsToBudget(deliverables, project.targetBudget);
+      project.budget = project.targetBudget;
+    } else {
+      project.budget = round2(
+        deliverables.reduce((acc, d) => acc + lineBudget(d), 0),
+      );
     }
-  });
-  state.roadmaps.forEach((roadmap) => {
-    roadmap.milestones.forEach((milestone) => {
+  }
+  for (const roadmap of state.roadmaps) {
+    for (const milestone of roadmap.milestones) {
       if (milestone.scope) {
-        milestone.budget = calculateTotalBudget(state, milestone.scope);
+        milestone.budget = round2(
+          fundedDeliverables(state, milestone.scope).reduce(
+            (acc, d) => acc + lineBudget(d),
+            0,
+          ),
+        );
       }
-    });
-  });
-
+    }
+  }
   calculateDeliverableSetsProgress(state);
 };
 
-export const calculateTotalCost = (
-  state: ScopeOfWorkState,
-  deliverableSet: DeliverablesSet,
-) => {
-  const deliverables = deliverableSet.deliverables
-    .map((id) => state.deliverables.find((d) => d.id === id))
-    .filter((deliverable) => deliverable !== undefined);
-  const totalCost = deliverables.reduce((acc, deliverable) => {
-    return (
-      acc +
-      (deliverable.budgetAnchor?.unitCost || 0) *
-        (deliverable.budgetAnchor?.quantity || 0)
-    );
-  }, 0);
-  return totalCost === 0 ? 0 : Number(totalCost.toFixed(2));
+/**
+ * Fixed budget: pinned margins hold; every unpinned quote gets the single margin that makes
+ * the lines add up to the envelope. Negative when the work costs more than the envelope —
+ * that is the "over budget" signal, not an error. Nothing to solve when everything is pinned.
+ */
+const fitMarginsToBudget = (deliverables: Deliverable[], target: number) => {
+  const free = deliverables.filter(
+    (d) => d.budgetAnchor && d.budgetAnchor.marginPinned !== true,
+  );
+  const pinnedBudget = deliverables
+    .filter((d) => d.budgetAnchor?.marginPinned === true)
+    .reduce((acc, d) => acc + lineBudget(d), 0);
+  const freeCost = free.reduce((acc, d) => acc + lineCost(d), 0);
+  if (freeCost <= 0) return;
+  const margin = round2(((target - pinnedBudget) / freeCost - 1) * 100);
+  for (const d of free) {
+    if (d.budgetAnchor) d.budgetAnchor = { ...d.budgetAnchor, margin };
+  }
 };
 
-const calculateTotalBudget = (
+const fundedDeliverables = (
   state: ScopeOfWorkState,
-  deliverableSet: DeliverablesSet,
-) => {
-  const deliverables = deliverableSet.deliverables
+  set: DeliverablesSet,
+): Deliverable[] =>
+  set.deliverables
     .map((id) => state.deliverables.find((d) => d.id === id))
-    .filter((deliverable) => deliverable !== undefined);
-  const totalBudget = deliverables.reduce((acc, deliverable) => {
-    // margin is a percentage (e.g. 5 means 5%): multiplier (1 + margin/100)
-    return (
-      acc +
-      (deliverable.budgetAnchor?.unitCost || 0) *
-        (deliverable.budgetAnchor?.quantity || 0) *
-        (1 + (deliverable.budgetAnchor?.margin || 0) / 100)
-    );
-  }, 0);
-  return totalBudget === 0 ? 0 : Number(totalBudget.toFixed(2));
-};
+    .filter((d): d is Deliverable => d !== undefined);
+
+export const lineCost = (d: Deliverable): number =>
+  d.budgetAnchor ? d.budgetAnchor.unitCost * d.budgetAnchor.quantity : 0;
+export const lineBudget = (d: Deliverable): number =>
+  d.budgetAnchor ? round2(lineCost(d) * (1 + d.budgetAnchor.margin / 100)) : 0;
 
 // Helper function to determine if a deliverable uses story points
 const isStoryPointsProgress = (
@@ -315,24 +305,19 @@ const getPercentageEquivalent = (deliverable: any): number => {
   if (!deliverable.workProgress) {
     return 0;
   }
-
   const progress = deliverable.workProgress;
-
   if (isPercentageProgress(progress)) {
     return progress.value;
   }
-
   if (isStoryPointsProgress(progress)) {
     return progress.total > 0 ? (progress.completed / progress.total) * 100 : 0;
   }
-
   if (isBinaryProgress(progress)) {
     if (deliverable.status === "IN_PROGRESS") {
       return 50;
     }
     return progress.done ? 100 : 0;
   }
-
   return 0;
 };
 
@@ -346,7 +331,6 @@ const calculateDeliverableSetProgress = (
   state: ScopeOfWorkState,
   deliverableSet: any,
 ) => {
-  // Get all deliverables in this set, filtering out ignored ones
   const deliverables = deliverableSet.deliverables
     .map((id: string) => state.deliverables.find((d) => d.id === id))
     .filter(
@@ -355,35 +339,29 @@ const calculateDeliverableSetProgress = (
     );
 
   if (deliverables.length === 0) {
-    // No valid deliverables, set default progress
     deliverableSet.progress = percentageProgress(0);
     deliverableSet.deliverablesCompleted = { total: 0, completed: 0 };
     return;
   }
 
-  // Determine if ALL deliverables use story points
   const allUseStoryPoints = deliverables.every(
     (d: any) => d.workProgress && isStoryPointsProgress(d.workProgress),
   );
 
   if (allUseStoryPoints) {
-    // 3.a) If StoryPoints only => deliverableSet.progress.completed = Sum (completed[i]), deliverableSet.progress.total = Sum (total[i])
     let totalStoryPoints = 0;
     let completedStoryPoints = 0;
-
     deliverables.forEach((deliverable: any) => {
       if (isStoryPointsProgress(deliverable.workProgress)) {
         totalStoryPoints += deliverable.workProgress.total;
         completedStoryPoints += deliverable.workProgress.completed;
       }
     });
-
     deliverableSet.progress = storyPointsProgress(
       totalStoryPoints,
       completedStoryPoints,
     );
   } else {
-    // 3.b) If !storyPointsOnly => AVERAGE (percentageCompletedEquivalent[i])
     const percentages = deliverables.map((d: any) =>
       getPercentageEquivalent(d),
     );
@@ -391,13 +369,9 @@ const calculateDeliverableSetProgress = (
     const averagePercentage =
       percentages.reduce((sum: number, p: number) => sum + p, 0) /
       percentages.length;
-
-    deliverableSet.progress = percentageProgress(
-      Math.round(averagePercentage * 100) / 100, // 2 decimal places
-    );
+    deliverableSet.progress = percentageProgress(round2(averagePercentage));
   }
 
-  // Update deliverablesCompleted count
   const completedDeliverables = deliverables.filter(
     (d: any) =>
       d.status === "DELIVERED" ||
@@ -405,7 +379,6 @@ const calculateDeliverableSetProgress = (
         isBinaryProgress(d.workProgress) &&
         d.workProgress.done),
   );
-
   deliverableSet.deliverablesCompleted = {
     total: deliverables.length,
     completed: completedDeliverables.length,
@@ -413,31 +386,13 @@ const calculateDeliverableSetProgress = (
 };
 
 const calculateDeliverableSetsProgress = (state: ScopeOfWorkState) => {
-  // run through all deliverable sets in milestones, projects and calculate the progress from each deliverable
-  // The progress has to be calculated for each deliverableSet inside a milestone or project
-  /* For every set
-    1) Remove / ignore CANCELLED or WONT_DO deliverables
-    2) Determine storyPointsOnly = true or false
-      if storyPointsOnly = true => set progress to StoryPoints on deliverableSet
-      if storyPointsOnly = false => set progress to Percentage on deliverableSet
-    (completed / total) * 100
-    3.a) If StoryPoints only => deliverableSet.progress.completed = Sum (completed[i]), deliverableSet.progress.total = Sum (total[i])
-    3.b) If !storyPointsOnly => AVERAGE (percentageCompletedEquivalent[i])
-    percentageCompletedEquivalent[i] = 
-    Progress.percentage ? percentageValue
-    Progress.storyPoints ? completed / total
-    Progress.binary ? (status = IN_PROGESS ) : 50% : ( completed ? 100 : 0 ))
-
-  */
-
-  // Process all deliverable sets in projects
+  // every deliverable set — in projects and in milestones — derives its progress from its deliverables:
+  // story points only → summed points; otherwise the average percentage equivalent
   state.projects.forEach((project) => {
     if (project.scope) {
       calculateDeliverableSetProgress(state, project.scope);
     }
   });
-
-  // Process all deliverable sets in milestones
   state.roadmaps.forEach((roadmap) => {
     roadmap.milestones.forEach((milestone) => {
       if (milestone.scope) {

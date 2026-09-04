@@ -294,6 +294,7 @@ describe("milestones reducer", () => {
           unitCost: 10,
           quantity: 2,
           margin: 50,
+          marginPinned: false,
         }),
       );
       // budget invariant: 10 * 2 * (1 + 50/100) = 30
@@ -317,6 +318,7 @@ describe("milestones reducer", () => {
         unitCost: 10,
         quantity: 2,
         margin: 50,
+        marginPinned: false,
       });
     });
 
@@ -353,6 +355,7 @@ describe("milestones reducer", () => {
         unitCost: 0,
         quantity: 0,
         margin: 0,
+        marginPinned: false,
       });
     });
 

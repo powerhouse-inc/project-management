@@ -1,7 +1,7 @@
 import type { ScopeOfWorkDeliverablesSetOperations } from "document-models/scope-of-work/v1";
 import type { EditDeliverablesSetAction } from "../../gen/deliverables-set/actions.js";
-import type { ScopeOfWorkState } from "../../gen/schema/types.js";
 import { SetDeliverableNotFoundError } from "../../gen/deliverables-set/error.js";
+import type { ScopeOfWorkState } from "../../gen/schema/types.js";
 import { findMilestone } from "./lookup.js";
 import { percentageProgress, storyPointsProgress } from "./progress.js";
 import { applyInvariants } from "./projects.js";
@@ -168,6 +168,7 @@ export const scopeOfWorkDeliverablesSetOperations: ScopeOfWorkDeliverablesSetOpe
                   unitCost: deliverable.budgetAnchor?.unitCost || 0,
                   quantity: deliverable.budgetAnchor?.quantity || 0,
                   margin: deliverable.budgetAnchor?.margin || 0,
+                  marginPinned: deliverable.budgetAnchor?.marginPinned ?? false,
                 },
               }
             : deliverable;
@@ -238,6 +239,7 @@ export const scopeOfWorkDeliverablesSetOperations: ScopeOfWorkDeliverablesSetOpe
                   unitCost: deliverable.budgetAnchor?.unitCost || 0,
                   quantity: deliverable.budgetAnchor?.quantity || 0,
                   margin: deliverable.budgetAnchor?.margin || 0,
+                  marginPinned: deliverable.budgetAnchor?.marginPinned ?? false,
                 },
               }
             : deliverable;

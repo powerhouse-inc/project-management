@@ -27,6 +27,7 @@ import {
   updateProject,
   updateProjectOwner,
   utils,
+  removeProjectDeliverable,
 } from "document-models/scope-of-work/v1";
 import { describe, expect, it } from "vitest";
 import {
@@ -45,6 +46,7 @@ import {
   state,
   type Doc,
 } from "./reducer-test-helpers.js";
+import { round2 } from "../src/reducers/util.js";
 
 const deliverable = (doc: Doc, id: string) =>
   state(doc).deliverables.find((d) => d.id === id);
@@ -262,6 +264,7 @@ describe("money bounds", () => {
       unitCost: 5,
       quantity: 2,
       margin: 10,
+      marginPinned: true,
     });
   });
 
@@ -279,7 +282,7 @@ describe("money bounds", () => {
     expect(lastError(doc)).toBe("Margin must be zero or positive");
   });
 
-  it("rejects a negative total budget or one below the total cost", () => {
+  it("rejects a negative total budget; a budget below cost is allowed and reads as a negative derived margin", () => {
     const doc = apply(
       base(),
       addProjectDeliverable({
@@ -298,9 +301,12 @@ describe("money bounds", () => {
 
     expect(errors(doc)).toStrictEqual([
       "Total budget must be zero or positive",
-      "Total budget cannot be lower than the total cost (300)",
     ]);
-    expect(project(doc)?.budget).toBe(300);
+    expect(project(doc)).toMatchObject({ budget: 299, targetBudget: 299 });
+    expect(deliverable(doc, "pd")?.budgetAnchor).toMatchObject({
+      margin: -0.33,
+      marginPinned: false,
+    });
   });
 
   it("allows a zero budget on a project with no cost, including one without a scope", () => {
@@ -410,7 +416,8 @@ describe("edit semantics: explicit null keeps, empty string clears", () => {
       imageUrl: null,
       budgetType: null,
       currency: null,
-      budget: null,
+      budget: 0,
+      targetBudget: null,
     });
   });
 
@@ -478,6 +485,239 @@ describe("edit semantics: explicit null keeps, empty string clears", () => {
     expect(deliverable(doc, "d1")).toMatchObject({
       status: "DELIVERED",
       workProgress: binaryProgress(true),
+    });
+  });
+});
+
+describe("fixed budgets and pinned margins", () => {
+  const quoted = (
+    id: string,
+    unitCost: number,
+    quantity: number,
+    margin?: number,
+  ) =>
+    setDeliverableBudgetAnchorProject(
+      margin === undefined
+        ? { deliverableId: id, unitCost, quantity }
+        : { deliverableId: id, unitCost, quantity, margin },
+    );
+  const funded = (...ids: string[]) =>
+    ids.map((id) =>
+      addProjectDeliverable({ projectId: "p1", deliverableId: id, title: id }),
+    );
+
+  it("a budget set on the project fixes the envelope; every new quote is fitted into it", () => {
+    let doc = apply(
+      base(),
+      updateProject({ id: "p1", budget: 1000 }),
+      ...funded("a"),
+      quoted("a", 100, 5),
+    );
+    expect(project(doc)).toMatchObject({ budget: 1000, targetBudget: 1000 });
+    expect(deliverable(doc, "a")?.budgetAnchor).toMatchObject({
+      margin: 100,
+      marginPinned: false,
+    }); // 500 of cost → 1000
+
+    doc = apply(doc, ...funded("b"), quoted("b", 100, 5));
+    expect(project(doc)?.budget).toBe(1000);
+    expect(
+      [deliverable(doc, "a"), deliverable(doc, "b")].map(
+        (d) => d?.budgetAnchor?.margin,
+      ),
+    ).toStrictEqual([0, 0]); // 1000 of cost
+
+    doc = apply(doc, ...funded("c"), quoted("c", 100, 5));
+    expect(project(doc)?.budget).toBe(1000); // the envelope never moves…
+    expect(deliverable(doc, "c")?.budgetAnchor?.margin).toBe(-33.33); // …the margin goes negative: over budget
+    expect(errors(doc)).toStrictEqual([]);
+  });
+
+  it("pinned margins hold, unpinned quotes absorb the envelope, and a line can be released or pinned again", () => {
+    let doc = apply(
+      base(),
+      ...funded("a", "b"),
+      quoted("a", 100, 5, 20),
+      quoted("b", 100, 2),
+      setProjectTotalBudget({ projectId: "p1", totalBudget: 1000 }),
+    );
+    expect(deliverable(doc, "a")?.budgetAnchor).toMatchObject({
+      margin: 20,
+      marginPinned: true,
+    }); // typed → pinned → 600
+    expect(deliverable(doc, "b")?.budgetAnchor).toMatchObject({
+      margin: 100,
+      marginPinned: false,
+    }); // (1000 − 600) / 200 − 1
+    doc = apply(
+      doc,
+      setDeliverableBudgetAnchorProject({
+        deliverableId: "a",
+        marginPinned: false,
+      }),
+    );
+    expect(
+      [deliverable(doc, "a"), deliverable(doc, "b")].map(
+        (d) => d?.budgetAnchor?.margin,
+      ),
+    ).toStrictEqual([42.86, 42.86]); // 1000 / 700 − 1
+    doc = apply(
+      doc,
+      setDeliverableBudgetAnchorProject({
+        deliverableId: "b",
+        marginPinned: true,
+      }),
+    );
+    expect(deliverable(doc, "b")?.budgetAnchor).toMatchObject({
+      margin: 42.86,
+      marginPinned: true,
+    });
+  });
+
+  it("with every margin pinned there is nothing to solve: the envelope stands and the lines keep their own totals", () => {
+    const doc = apply(
+      base(),
+      ...funded("a", "b"),
+      quoted("a", 100, 5, 20),
+      quoted("b", 100, 2, 10),
+      setProjectTotalBudget({ projectId: "p1", totalBudget: 1000 }),
+    );
+    expect(project(doc)).toMatchObject({ budget: 1000, targetBudget: 1000 });
+    expect(
+      [deliverable(doc, "a"), deliverable(doc, "b")].map(
+        (d) => d?.budgetAnchor?.margin,
+      ),
+    ).toStrictEqual([20, 10]);
+  });
+
+  it("setProjectMargin pins every line; releasing the budget returns to a derived total", () => {
+    let doc = apply(
+      base(),
+      ...funded("a", "b"),
+      quoted("a", 100, 5),
+      quoted("b", 100, 2),
+      setProjectMargin({ projectId: "p1", margin: 10 }),
+      setProjectTotalBudget({ projectId: "p1", totalBudget: 5000 }),
+    );
+    expect(
+      [deliverable(doc, "a"), deliverable(doc, "b")].map(
+        (d) => d?.budgetAnchor,
+      ),
+    ).toMatchObject([
+      { margin: 10, marginPinned: true },
+      { margin: 10, marginPinned: true },
+    ]);
+    expect(project(doc)?.budget).toBe(5000); // nothing free to absorb it
+    doc = apply(doc, updateProject({ id: "p1", budget: null }));
+    expect(project(doc)).toMatchObject({ budget: 770, targetBudget: null }); // 550 + 220
+  });
+
+  it("a detached anchor keeps its pin, and an anchor without the flag reads as unpinned", () => {
+    const doc = craft({
+      projects: [
+        rawProject({
+          id: "p1",
+          scope: {
+            deliverables: ["d1"],
+            status: "DRAFT",
+            progress: percentageProgress(0),
+            deliverablesCompleted: { total: 1, completed: 0 },
+          },
+        }),
+      ],
+      deliverables: [
+        rawDeliverable({
+          id: "d1",
+          budgetAnchor: {
+            project: "p1",
+            unit: "Hours",
+            unitCost: 10,
+            quantity: 1,
+            margin: 5,
+            marginPinned: null,
+          },
+        }),
+      ],
+    });
+    const next = apply(
+      doc,
+      removeProjectDeliverable({ projectId: "p1", deliverableId: "d1" }),
+    );
+    expect(deliverable(next, "d1")?.budgetAnchor).toMatchObject({
+      project: "",
+      margin: 5,
+      marginPinned: false,
+    });
+  });
+
+  it("rejects a negative budget on create and update", () => {
+    const doc = apply(
+      base(),
+      addProject({ id: "p2", code: "P2", title: "neg", budget: -1 }),
+      updateProject({ id: "p1", budget: -5 }),
+    );
+    expect(errors(doc)).toStrictEqual([
+      "Budget must be zero or positive",
+      "Budget must be zero or positive",
+    ]);
+    expect(state(doc).projects.map((p) => p.id)).toStrictEqual(["p1"]);
+  });
+
+  it("stores every number with at most two decimals", () => {
+    const doc = apply(
+      base(),
+      ...funded("a"),
+      quoted("a", 12.345, 1.005, 33.333),
+      setDeliverableProgress({ id: "a", workProgress: { percentage: 33.333 } }),
+      updateProject({ id: "p1", budget: 100.005 }),
+    );
+    expect(deliverable(doc, "a")?.budgetAnchor).toMatchObject({
+      unitCost: 12.35,
+      quantity: 1.01,
+      margin: 33.33,
+    });
+    expect(deliverable(doc, "a")?.workProgress?.value).toBe(33.33);
+    expect(project(doc)).toMatchObject({
+      targetBudget: 100.01,
+      budget: 100.01,
+    });
+  });
+});
+
+describe("round2", () => {
+  it("rounds half-cents up, tolerates exponent notation and passes non-finite values through", () => {
+    expect(round2(1.005)).toBe(1.01);
+    expect(round2(12.345)).toBe(12.35);
+    expect(round2(38.888888888888886)).toBe(38.89);
+    expect(round2(1e-7)).toBe(0);
+    expect(round2(1.5e-7)).toBe(0);
+    expect(round2(Infinity)).toBe(Infinity);
+    expect(Number.isNaN(round2(Number.NaN))).toBe(true);
+  });
+
+  it("a legacy anchor without the pin flag stays unpinned when re-quoted without a margin", () => {
+    const doc = craft({
+      deliverables: [
+        rawDeliverable({
+          id: "d1",
+          budgetAnchor: {
+            project: "",
+            unit: "Hours",
+            unitCost: 1,
+            quantity: 1,
+            margin: 0,
+            marginPinned: null,
+          },
+        }),
+      ],
+    });
+    const next = apply(
+      doc,
+      setDeliverableBudgetAnchorProject({ deliverableId: "d1", unitCost: 3 }),
+    );
+    expect(deliverable(next, "d1")?.budgetAnchor).toMatchObject({
+      unitCost: 3,
+      marginPinned: false,
     });
   });
 });

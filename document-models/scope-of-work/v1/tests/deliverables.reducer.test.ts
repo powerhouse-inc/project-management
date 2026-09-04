@@ -444,6 +444,7 @@ describe("deliverables reducer", () => {
           unitCost: 100,
           quantity: 3,
           margin: 10,
+          marginPinned: true,
         }),
       );
 
@@ -454,6 +455,7 @@ describe("deliverables reducer", () => {
         unitCost: 100,
         quantity: 3,
         margin: 10,
+        marginPinned: true,
       });
       // 100 * 3 * 1.10
       expect(state(doc).projects[0].budget).toBe(330);

@@ -200,6 +200,7 @@ export const scopeOfWorkMilestonesOperations: ScopeOfWorkMilestonesOperations =
           unitCost: 0,
           quantity: 0,
           margin: 0,
+          marginPinned: false,
         },
       };
 
@@ -231,6 +232,7 @@ export const scopeOfWorkMilestonesOperations: ScopeOfWorkMilestonesOperations =
                 unitCost: deliverable.budgetAnchor?.unitCost || 0,
                 quantity: deliverable.budgetAnchor?.quantity || 0,
                 margin: deliverable.budgetAnchor?.margin || 0,
+                marginPinned: deliverable.budgetAnchor?.marginPinned ?? false,
               },
             }
           : deliverable;

@@ -84,6 +84,7 @@ export function rawDeliverable(
       unitCost: 0,
       quantity: 0,
       margin: 0,
+      marginPinned: false,
     },
     ...overrides,
   };
@@ -102,6 +103,7 @@ export function rawProject(
     budgetType: null,
     currency: null,
     budget: 0,
+    targetBudget: null,
     expenditure: null,
     scope: emptySet(),
     ...overrides,
