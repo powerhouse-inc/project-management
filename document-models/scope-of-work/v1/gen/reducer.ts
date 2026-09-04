@@ -42,6 +42,7 @@ import {
   RemoveRoadmapInputSchema,
   SetDeliverableBudgetAnchorProjectInputSchema,
   SetDeliverableProgressInputSchema,
+  SetProjectExpenditureInputSchema,
   SetProjectMarginInputSchema,
   SetProjectTotalBudgetInputSchema,
   UpdateProjectInputSchema,
@@ -445,6 +446,18 @@ const stateReducer: StateReducer<ScopeOfWorkPHState> = (
       RemoveProjectDeliverableInputSchema().parse(action.input);
 
       scopeOfWorkProjectsOperations.removeProjectDeliverableOperation(
+        (state as any)[action.scope],
+        action as any,
+        dispatch,
+      );
+
+      break;
+    }
+
+    case "SET_PROJECT_EXPENDITURE": {
+      SetProjectExpenditureInputSchema().parse(action.input);
+
+      scopeOfWorkProjectsOperations.setProjectExpenditureOperation(
         (state as any)[action.scope],
         action as any,
         dispatch,

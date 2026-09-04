@@ -8,6 +8,7 @@ import {
   AddProjectInputSchema,
   RemoveProjectDeliverableInputSchema,
   RemoveProjectInputSchema,
+  SetProjectExpenditureInputSchema,
   SetProjectMarginInputSchema,
   SetProjectTotalBudgetInputSchema,
   UpdateProjectInputSchema,
@@ -18,6 +19,7 @@ import type {
   AddProjectInput,
   RemoveProjectDeliverableInput,
   RemoveProjectInput,
+  SetProjectExpenditureInput,
   SetProjectMarginInput,
   SetProjectTotalBudgetInput,
   UpdateProjectInput,
@@ -28,6 +30,7 @@ import type {
   AddProjectDeliverableAction,
   RemoveProjectAction,
   RemoveProjectDeliverableAction,
+  SetProjectExpenditureAction,
   SetProjectMarginAction,
   SetProjectTotalBudgetAction,
   UpdateProjectAction,
@@ -105,5 +108,14 @@ export const removeProjectDeliverable = (
     { ...input },
     undefined,
     RemoveProjectDeliverableInputSchema,
+    "global",
+  );
+
+export const setProjectExpenditure = (input: SetProjectExpenditureInput) =>
+  createAction<SetProjectExpenditureAction>(
+    "SET_PROJECT_EXPENDITURE",
+    { ...input },
+    undefined,
+    SetProjectExpenditureInputSchema,
     "global",
   );

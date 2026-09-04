@@ -13,7 +13,15 @@
     }
   ],
   "apps": [],
-  "editors": [],
+  "editors": [
+    {
+      "id": "scope-of-work",
+      "name": "Scope of Work",
+      "documentTypes": [
+        "powerhouse/scopeofwork"
+      ]
+    }
+  ],
   "processors": [],
   "subgraphs": [],
   "config": []

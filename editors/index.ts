@@ -1,4 +1,1 @@
-/**
- * WARNING: DO NOT EDIT
- * This file is auto-generated and updated by codegen
- */
+export { ScopeOfWork } from "./scope-of-work/module.js";

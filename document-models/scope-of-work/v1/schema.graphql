@@ -473,3 +473,9 @@ input RemoveProjectDeliverableInput {
   projectId: OID!
   deliverableId: OID!
 }
+
+input SetProjectExpenditureInput {
+  projectId: OID!
+  actuals: Float
+  cap: Float
+}

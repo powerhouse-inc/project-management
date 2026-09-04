@@ -133,12 +133,12 @@ Only **after** the codegen has produced the boilerplate files, proceed with the 
 - Always check for type and lint errors after creating or modifying the editor
 - **CRITICAL**: After creating a new editor, verify that `editors/editors.ts` includes the new editor module. The codegen should update this file automatically, but if it doesn't, manually add the import and include the editor in the `editors` array. Without this registration, Connect won't find an editor for the document type. Example:
 
-  ~~~typescript
+  ```typescript
   import type { EditorModule } from "document-model";
   import { TodoListEditor } from "./todo-list-editor/module.js";
 
   export const editors: EditorModule[] = [TodoListEditor];
-  ~~~
+  ```
 
 ### Document Editor Implementation Pattern
 
@@ -150,7 +150,7 @@ The following section is valid for editors that edit a single document type.
 
 Using a "Todo" document model as example:
 
-~~~typescript
+```typescript
 import { generateId } from "document-model";
 import { actions, useSelectedTodoDocument } from "document-models/todo";
 
@@ -171,7 +171,7 @@ export default function Editor() {
 // barrel `document-models/todo` (which always points at the latest version).
 // Action creators are exposed as `actions.<actionName>` from the same barrel
 // (e.g. `actions.addTodo(...)`) — never import from a deep `gen/creators.js` path.
-~~~
+```
 
 The `useSelectedTodoDocument` (and every other document hook) is auto-generated and re-exported from the `document-models/<name>` top-level barrel, so you don't need to implement it yourself. See the "Editor code conventions" section below for the full import-path rules.
 
@@ -183,7 +183,7 @@ These rules apply to **every** editor regardless of which UI library you use. Th
 
 Every document model exposes a single public surface via its top-level barrel. Use it for **all** document-model symbols (types, actions, hooks, utils):
 
-~~~typescript
+```typescript
 // ✅ GOOD — barrel always points at the latest version
 import { actions, useSelectedTodoDocument } from "document-models/todo";
 import type { TodoAction, TodoDocument } from "document-models/todo";
@@ -192,7 +192,7 @@ import type { TodoAction, TodoDocument } from "document-models/todo";
 import { useSelectedTodoDocument } from "../hooks/useTodoDocument.js";
 import { addTodo } from "../../document-models/todo/gen/creators.js";
 import type { Todo } from "document-models/todo/v1/gen/schema/types.js";
-~~~
+```
 
 The barrel re-exports types, `actions.<actionName>` action creators, the four generated hooks (`useSelected<Name>Document`, `use<Name>DocumentById`, `use<Name>DocumentsInSelectedDrive`, `use<Name>DocumentsInSelectedFolder`), and `utils`. There is **no** `editors/hooks/` folder — that path does not exist in generated projects.
 
@@ -211,7 +211,7 @@ Use these directly. **Do NOT** introduce a `@/*` alias — `baseUrl` is not conf
 
 The boilerplate uses `"module": "nodenext"`, which requires explicit `.js` extensions on every relative import (even when the source file is `.ts` / `.tsx`):
 
-~~~typescript
+```typescript
 // ✅ GOOD
 import { Button } from "./components/ui/button.js";
 import { cn } from "../lib/utils.js";
@@ -219,7 +219,7 @@ import { cn } from "../lib/utils.js";
 // ❌ BAD — fails at compile time
 import { Button } from "./components/ui/button";
 import { cn } from "../lib/utils";
-~~~
+```
 
 When a third-party CLI generates extensionless imports, do a bulk find-and-replace after install to add `.js` to every relative path.
 
@@ -227,14 +227,14 @@ When a third-party CLI generates extensionless imports, do a bulk find-and-repla
 
 The boilerplate oxlint config enables `typescript/no-base-to-string` (the `recommendedTypeChecked` equivalent). `String(value ?? "")` on a value typed as `unknown` will trip the rule because the default `Object.prototype.toString` produces `"[object Object]"`. Use a small helper:
 
-~~~typescript
+```typescript
 function str(v: unknown): string {
   if (v == null) return "";
   if (typeof v === "string") return v;
   if (typeof v === "number" || typeof v === "boolean") return String(v);
   return JSON.stringify(v);
 }
-~~~
+```
 
 ### Drag-and-drop file uploads (optional pattern)
 
@@ -242,7 +242,7 @@ Use this **only** when your editor needs to accept arbitrary file drops (images,
 
 Connect wraps every editor in an outer DropZone that only handles Powerhouse document files (`.phd`, `.phdm`, `.zip`). To accept other files in your editor, use the `useEditorFileDrop` hook — it spreads the right handlers and a marker attribute that tells the outer DropZone to leave your subtree alone.
 
-~~~tsx
+```tsx
 import { useEditorFileDrop } from "@powerhousedao/reactor-browser";
 
 export default function Editor() {
@@ -264,7 +264,7 @@ export default function Editor() {
     </div>
   );
 }
-~~~
+```
 
 The overlay `div` **MUST** use `pointer-events-none` — otherwise it captures the `drop` event and your handler never fires.
 
@@ -282,7 +282,7 @@ Use this **only** when your editor needs UI primitives not covered by `@powerhou
 
 2. **Create `components.json`** at the project root. The `@/*` alias here is consumed by the shadcn / AI Elements CLIs at install time only — do **NOT** add a matching `@/*` alias to `tsconfig.json`:
 
-   ~~~json
+   ```json
    {
      "$schema": "https://ui.shadcn.com/schema.json",
      "style": "new-york",
@@ -303,7 +303,7 @@ Use this **only** when your editor needs UI primitives not covered by `@powerhou
      },
      "iconLibrary": "lucide"
    }
-   ~~~
+   ```
 
 3. **Create `editors/<name>/lib/utils.ts`** exporting the standard `cn` helper (`twMerge(clsx(inputs))`).
 
@@ -311,9 +311,9 @@ Use this **only** when your editor needs UI primitives not covered by `@powerhou
 
 5. **Install AI Elements** using Vercel's CLI (not shadcn's). Verify each name exists at https://ai-sdk.dev/elements first — unknown names abort the install:
 
-   ~~~bash
+   ```bash
    npx ai-elements@latest add conversation message reasoning tool prompt-input code-block
-   ~~~
+   ```
 
    The CLI auto-installs `ai`, `use-stick-to-bottom`, `streamdown` (+ `@streamdown/{cjk,code,math,mermaid}`), and `@radix-ui/react-use-controllable-state`.
 
@@ -337,7 +337,7 @@ If TypeScript complains that your concrete interface is missing an index signatu
 
 #### Final file structure
 
-~~~
+```
 editors/<name>/
   editor.tsx              ← main editor (edit codegen output)
   module.ts               ← DO NOT EDIT (codegen)
@@ -346,7 +346,7 @@ editors/<name>/
     ai-elements/          ← moved from project root in step 6
     ui/                   ← shadcn primitives installed by ai-elements CLI
     <wrappers bridging document-model types to AI Elements primitives>
-~~~
+```
 
 ## ⚠️ CRITICAL: Generated Files & Modification Rules
 
@@ -391,11 +391,11 @@ Make sure to check if the operation reducer code needs to be updated after chang
 
 ### ❌ Forbidden Patterns
 
-~~~typescript
+```typescript
 // NEVER use fallback values with non-deterministic functions
 id: action.input.id || crypto.randomUUID(); // ❌ FORBIDDEN
 timestamp: action.input.timestamp || new Date(); // ❌ FORBIDDEN
-~~~
+```
 
 ### ✅ Required Pattern
 
@@ -407,7 +407,7 @@ All dynamic values must come from action input:
 
 ### Example
 
-~~~typescript
+```typescript
 // ❌ BAD - impure reducer
 const newItem = {
   id: crypto.randomUUID(), // Non-deterministic
@@ -419,7 +419,7 @@ const newItem = {
   id: action.input.id, // From action input
   createdAt: action.input.createdAt, // From action input
 };
-~~~
+```
 
 ### Handling Nullable Input Types
 
@@ -429,7 +429,7 @@ const newItem = {
 - Optional state types use `Maybe<T>` = `T | null`.
 - If there is no applicable default value then use `|| null`.
 
-~~~typescript
+```typescript
 // ❌ BAD - Type error with Maybe<string>
 amount: action.input.amount,
 notes: action.input.notes,
@@ -437,11 +437,11 @@ notes: action.input.notes,
 // ✅ GOOD - Matches Maybe<T> = T | null
 amount: action.input.amount || null,
 notes: action.input.notes || [],
-~~~
+```
 
 Use truthy checks when conditionally assigning optional values from input to state:
 
-~~~typescript
+```typescript
 // ❌ BAD - Type 'string | null' is not assignable to type 'string'.
 if (action.input.field !== undefined) entry.field = action.input.field;
 
@@ -451,7 +451,7 @@ if (action.input.field) state.field = action.input.field;
 // ✅ GOOD - For booleans use explicit null/undefined checks
 if (action.input.field !== undefined && action.input.field !== null)
   state.field = action.input.field;
-~~~
+```
 
 ### Error Handling in Operations
 
@@ -474,7 +474,7 @@ Errors referenced in the reducer code will be imported automatically.
 
 #### Error Usage in Reducers
 
-~~~typescript
+```typescript
 // ✅ GOOD - Throw specific errors by name
 if (!action.input.id) {
   throw new MissingIdError("ID is required for operation");
@@ -495,7 +495,7 @@ import { MissingIdError } from "../../gen/module-name/error.js";
 
 // ✅ GOOD - Simply reference the error and it will be imported automatically
 throw new MissingIdError("message");
-~~~
+```
 
 #### Common Error Patterns
 
@@ -526,7 +526,7 @@ throw new MissingIdError("message");
 
 ##### Example
 
-~~~typescript
+```typescript
 it("should return error and not mutate state", () => {
   const document = utils.createDocument();
   const initialState = document.state.global.name;
@@ -543,7 +543,7 @@ it("should return error and not mutate state", () => {
 
 // ❌ WRONG - Never use toThrow()
 expect(() => reducer(document, setName({ name: "invalid" }))).toThrow();
-~~~
+```
 
 ## Document Model Structure
 
@@ -600,15 +600,15 @@ A user must always be able to create an **empty document** without providing any
 
 **MANDATORY**: The global state type name MUST follow this exact pattern:
 
-~~~graphql
+```graphql
 type <DocumentModelName>State {
     # your fields here
 }
-~~~
+```
 
 **DO NOT** append "Global" to the state type name, even when defining global state:
 
-~~~graphql
+```graphql
 // ❌ WRONG - Do not use "GlobalState" suffix
 type TodoListGlobalState {
     todos: [Todo!]!
@@ -623,7 +623,7 @@ type TodoListState {
 type TodoListLocalState {
     localTodos: [Todo!]!
 }
-~~~
+```
 
 **Why this matters:**
 
@@ -686,7 +686,7 @@ type TodoListLocalState {
 - Input types with **zero fields** are not supported by the code generator
 - Workaround: add `_: Boolean` as a dummy optional parameter
 
-~~~graphql
+```graphql
 # ❌ BAD - empty input type breaks codegen
 input ClearAllInput {}
 
@@ -694,7 +694,7 @@ input ClearAllInput {}
 input ClearAllInput {
     _: Boolean
 }
-~~~
+```
 
 ## Working with Drives
 
@@ -720,10 +720,10 @@ When working with drives (adding/removing documents, creating folders, etc.):
 
 1. **Always get the drive schema first**:
 
-   ~~~typescript
+   ```typescript
    mcp__reactor -
      mcp__getDocumentModelSchema({ type: "powerhouse/document-drive" });
-   ~~~
+   ```
 
 2. **Review available operations** in the schema, such as:
    - `ADD_FILE` - Add a document to the drive

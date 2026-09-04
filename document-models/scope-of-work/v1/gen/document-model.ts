@@ -178,7 +178,8 @@ export const documentModel: DocumentModelGlobalState = {
             {
               id: "306568c6-39d1-415b-b096-670ed99eaa04",
               name: "SET_DELIVERABLE_BUDGET_ANCHOR_PROJECT",
-              description: "",
+              description:
+                "Updates a deliverable's quote: unit, unit cost, quantity and margin (all zero or positive, two decimals). A provided margin is pinned unless `marginPinned: false`; `marginPinned` on its own pins or releases the current margin. Budgets and progress are re-derived.",
               schema:
                 "input SetDeliverableBudgetAnchorProjectInput {\n  deliverableId: ID!\n  project: OID\n  unit: Unit\n  unitCost: Float\n  quantity: Float\n  margin: Float\n  # omit: a provided margin pins itself; false: unpin so a fixed project budget derives it\n  marginPinned: Boolean\n}",
               template: "",
@@ -380,7 +381,8 @@ export const documentModel: DocumentModelGlobalState = {
             {
               id: "34a36572-1ad4-4c32-ad31-86988e93a31a",
               name: "ADD_DELIVERABLE_IN_SET",
-              description: "",
+              description:
+                "Links an existing deliverable into a milestone set (when it lands) or a project set (who pays). Linking into a project makes that project fund the deliverable's quote. The deliverable must exist.",
               schema:
                 "input AddDeliverableInSetInput {\n  milestoneId: ID\n  projectId: ID\n  deliverableId: OID!\n}",
               template: "",
@@ -482,7 +484,7 @@ export const documentModel: DocumentModelGlobalState = {
               id: "773aebd7-98af-46f3-8f6a-161be1d2e176",
               name: "ADD_PROJECT",
               description:
-                "Creates a new project in a DRAFT status, initializing its core fields. The status of the new project defaults to DRAFT. The Deliverables list (scope) is initialized as empty.",
+                "Creates a project \u2014 a budget line \u2014 with an empty deliverable set. A `budget` given here fixes the project's envelope from creation (targetBudget); otherwise the budget is derived from the quotes of the deliverables the project funds.",
               schema:
                 "input AddProjectInput {\n  id: OID!\n  code: String!\n  title: String!\n  slug: String\n  projectOwner: ID # Initial project owner\n  abstract: String\n  imageUrl: URL\n  budgetType: PMBudgetTypeInput\n  currency: PMCurrencyInput\n  budget: Float\n}\n\nenum PMBudgetTypeInput {\n  CONTINGENCY\n  OPEX\n  CAPEX\n  OVERHEAD\n}\n\nenum PMCurrencyInput {\n  DAI\n  USDS\n  EUR\n  USD\n}\n\n",
               template:
@@ -512,7 +514,7 @@ export const documentModel: DocumentModelGlobalState = {
               id: "e978628b-ed5f-4867-83f4-45d5ed284f16",
               name: "UPDATE_PROJECT",
               description:
-                "Updates general, non-status-related fields of an existing project. This operation is for minor content adjustments. Project must exist; only allowed if the project status is DRAFT or REJECTED. For projects in other statuses, specific operations for status transitions or scope management should be used.\n\nIf code is updated, it must remain unique.",
+                "Updates a project's descriptive fields (code, slug, title, abstract, image, budget type, currency). `budget` sets the fixed envelope: every unpinned quote margin is then derived so the lines add up to it; `budget: null` releases the envelope and the budget follows the quotes again. Null on a required field is ignored.",
               schema:
                 "input UpdateProjectInput {\n  id: OID! \n  code: String \n  slug: String\n  title: String \n  abstract: String \n  imageUrl: URL \n  budgetType:  PMBudgetTypeInput\n  currency:  PMCurrencyInput\n  budget: Float \n}",
               template:
@@ -566,7 +568,8 @@ export const documentModel: DocumentModelGlobalState = {
             {
               id: "19624daf-39dc-4562-a248-ff1645d301bf",
               name: "SET_PROJECT_MARGIN",
-              description: "",
+              description:
+                "Sets the same margin on every quote the project funds and pins them, so a fixed budget solves around them rather than over them. Margin must be zero or positive.",
               schema:
                 "input SetProjectMarginInput {\n  projectId: OID!\n  margin: Float!\n}",
               template: "",
@@ -586,7 +589,8 @@ export const documentModel: DocumentModelGlobalState = {
             {
               id: "1e97d233-5ac0-4167-97cf-e03e8ac186c1",
               name: "SET_PROJECT_TOTAL_BUDGET",
-              description: "",
+              description:
+                "Fixes the project's budget envelope (targetBudget). Every unpinned quote receives the single margin that makes the lines add up to the envelope; pinned margins are held. Cost above the envelope yields a negative derived margin \u2014 the over-budget signal \u2014 not an error.",
               schema:
                 "input SetProjectTotalBudgetInput {\n  projectId: OID!\n  totalBudget: Float!\n}",
               template: "",
@@ -606,7 +610,8 @@ export const documentModel: DocumentModelGlobalState = {
             {
               id: "abf9ff5b-8339-4a94-92b1-96d843ad5c96",
               name: "ADD_PROJECT_DELIVERABLE",
-              description: "",
+              description:
+                "Creates a deliverable funded by this project (its anchor points at the project) and adds it to the project's deliverable set. Fails if the id already exists.",
               schema:
                 "input AddProjectDeliverableInput {\n  projectId: OID!\n  deliverableId: ID!\n  title: String!\n}",
               template: "",
@@ -627,12 +632,35 @@ export const documentModel: DocumentModelGlobalState = {
             {
               id: "89341293-cdf9-4f88-b085-604a37444be7",
               name: "REMOVE_PROJECT_DELIVERABLE",
-              description: "",
+              description:
+                "Removes a deliverable from the project's set without deleting it; the quote is kept but no longer funded (anchor project cleared). Budgets and progress are re-derived.",
               schema:
                 "input RemoveProjectDeliverableInput {\n  projectId: OID!\n  deliverableId: OID!\n}",
               template: "",
               reducer: "",
               errors: [],
+              examples: [],
+              scope: "global",
+            },
+            {
+              id: "7bd6ba7a-5f8a-468c-bde1-84ef0146315e",
+              name: "SET_PROJECT_EXPENDITURE",
+              description:
+                "Records spending against the project: `actuals` (spent so far) and/or `cap` (an optional hard limit), both zero or positive with two decimals. `expenditure.percentage` is derived \u2014 actuals over the cap when one is set, otherwise over the project budget \u2014 and kept current whenever the budget changes.",
+              schema:
+                "input SetProjectExpenditureInput {\n  projectId: OID!\n  actuals: Float\n  cap: Float\n}",
+              template:
+                "Records spending against the project: `actuals` (spent so far) and/or `cap` (an optional hard limit), both zero or positive with two decimals. `expenditure.percentage` is derived \u2014 actuals over the cap when one is set, otherwise over the project budget \u2014 and kept current whenever the budget changes.",
+              reducer: "",
+              errors: [
+                {
+                  id: "invalid-expenditure",
+                  name: "InvalidExpenditureError",
+                  code: "INVALID_EXPENDITURE",
+                  description: "Actuals and cap must be zero or positive",
+                  template: "Actuals and cap must be zero or positive",
+                },
+              ],
               examples: [],
               scope: "global",
             },

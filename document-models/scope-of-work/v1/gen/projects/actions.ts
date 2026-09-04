@@ -8,6 +8,7 @@ import type {
   AddProjectInput,
   RemoveProjectDeliverableInput,
   RemoveProjectInput,
+  SetProjectExpenditureInput,
   SetProjectMarginInput,
   SetProjectTotalBudgetInput,
   UpdateProjectInput,
@@ -46,6 +47,10 @@ export type RemoveProjectDeliverableAction = Action & {
   type: "REMOVE_PROJECT_DELIVERABLE";
   input: RemoveProjectDeliverableInput;
 };
+export type SetProjectExpenditureAction = Action & {
+  type: "SET_PROJECT_EXPENDITURE";
+  input: SetProjectExpenditureInput;
+};
 
 export type ScopeOfWorkProjectsAction =
   | AddProjectAction
@@ -55,4 +60,5 @@ export type ScopeOfWorkProjectsAction =
   | SetProjectMarginAction
   | SetProjectTotalBudgetAction
   | AddProjectDeliverableAction
-  | RemoveProjectDeliverableAction;
+  | RemoveProjectDeliverableAction
+  | SetProjectExpenditureAction;

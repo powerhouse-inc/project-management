@@ -55,6 +55,7 @@ import type {
   ScopeOfWorkStatusInput,
   SetDeliverableBudgetAnchorProjectInput,
   SetDeliverableProgressInput,
+  SetProjectExpenditureInput,
   SetProjectMarginInput,
   SetProjectTotalBudgetInput,
   StoryPointInput,
@@ -623,6 +624,16 @@ export function SetDeliverableProgressInputSchema(): z.ZodObject<
   return z.object({
     id: z.string(),
     workProgress: z.lazy(() => ProgressInputSchema().nullish()),
+  });
+}
+
+export function SetProjectExpenditureInputSchema(): z.ZodObject<
+  Properties<SetProjectExpenditureInput>
+> {
+  return z.object({
+    actuals: z.number().nullish(),
+    cap: z.number().nullish(),
+    projectId: z.string(),
   });
 }
 

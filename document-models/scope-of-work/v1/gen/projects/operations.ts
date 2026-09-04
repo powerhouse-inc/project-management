@@ -9,6 +9,7 @@ import type {
   AddProjectDeliverableAction,
   RemoveProjectAction,
   RemoveProjectDeliverableAction,
+  SetProjectExpenditureAction,
   SetProjectMarginAction,
   SetProjectTotalBudgetAction,
   UpdateProjectAction,
@@ -54,6 +55,11 @@ export interface ScopeOfWorkProjectsOperations {
   removeProjectDeliverableOperation: (
     state: ScopeOfWorkGlobalState,
     action: RemoveProjectDeliverableAction,
+    dispatch?: SignalDispatch,
+  ) => void;
+  setProjectExpenditureOperation: (
+    state: ScopeOfWorkGlobalState,
+    action: SetProjectExpenditureAction,
     dispatch?: SignalDispatch,
   ) => void;
 }

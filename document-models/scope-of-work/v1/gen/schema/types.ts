@@ -426,6 +426,12 @@ export type SetDeliverableProgressInput = {
   workProgress?: InputMaybe<ProgressInput>;
 };
 
+export type SetProjectExpenditureInput = {
+  actuals?: InputMaybe<Scalars["Float"]["input"]>;
+  cap?: InputMaybe<Scalars["Float"]["input"]>;
+  projectId: Scalars["OID"]["input"];
+};
+
 export type SetProjectMarginInput = {
   margin: Scalars["Float"]["input"];
   projectId: Scalars["OID"]["input"];

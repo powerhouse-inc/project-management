@@ -1,6 +1,7 @@
 import type { ScopeOfWorkProjectsOperations } from "document-models/scope-of-work/v1";
 import {
   InvalidBudgetUpdateError,
+  InvalidExpenditureError,
   InvalidInitialBudgetError,
   InvalidProjectBudgetError,
   InvalidProjectMarginError,
@@ -200,6 +201,29 @@ export const scopeOfWorkProjectsOperations: ScopeOfWorkProjectsOperations = {
     );
     applyInvariants(state);
   },
+  setProjectExpenditureOperation(state, action) {
+    const { actuals, cap } = action.input;
+    if ((actuals ?? 0) < 0 || (cap ?? 0) < 0) {
+      throw new InvalidExpenditureError(
+        "Actuals and cap must be zero or positive",
+      );
+    }
+    const project = state.projects.find((p) => p.id === action.input.projectId);
+    if (!project) {
+      throw new Error("Project not found");
+    }
+    const current = project.expenditure ?? {
+      percentage: 0,
+      actuals: 0,
+      cap: 0,
+    };
+    project.expenditure = {
+      actuals: isSet(actuals) ? round2(actuals) : current.actuals,
+      cap: isSet(cap) ? round2(cap) : current.cap,
+      percentage: current.percentage, // derived by the invariant below
+    };
+    applyInvariants(state);
+  },
 };
 
 /** The anchor a deliverable keeps when it leaves a project or milestone: same quote, no funder. */
@@ -229,6 +253,15 @@ export const applyInvariants = (state: ScopeOfWorkState) => {
       project.budget = round2(
         deliverables.reduce((acc, d) => acc + lineBudget(d), 0),
       );
+    }
+    // spending is read against the cap when one is set, otherwise against the budget
+    if (project.expenditure) {
+      const base =
+        project.expenditure.cap > 0
+          ? project.expenditure.cap
+          : (project.budget ?? 0);
+      project.expenditure.percentage =
+        base > 0 ? round2((project.expenditure.actuals / base) * 100) : 0;
     }
   }
   for (const roadmap of state.roadmaps) {

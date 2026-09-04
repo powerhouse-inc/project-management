@@ -5,7 +5,8 @@ export type ErrorCode =
   | "ProjectNotFoundError"
   | "InvalidProjectMarginError"
   | "InvalidProjectBudgetError"
-  | "ProjectDeliverableAlreadyExistsError";
+  | "ProjectDeliverableAlreadyExistsError"
+  | "InvalidExpenditureError";
 
 export interface ReducerError {
   errorCode: ErrorCode;
@@ -63,6 +64,13 @@ export class ProjectDeliverableAlreadyExistsError
   }
 }
 
+export class InvalidExpenditureError extends Error implements ReducerError {
+  errorCode = "InvalidExpenditureError" as ErrorCode;
+  constructor(message = "InvalidExpenditureError") {
+    super(message);
+  }
+}
+
 export const errors = {
   AddProject: { ProjectAlreadyExistsError, InvalidInitialBudgetError },
 
@@ -75,4 +83,6 @@ export const errors = {
   SetProjectTotalBudget: { InvalidProjectBudgetError },
 
   AddProjectDeliverable: { ProjectDeliverableAlreadyExistsError },
+
+  SetProjectExpenditure: { InvalidExpenditureError },
 };

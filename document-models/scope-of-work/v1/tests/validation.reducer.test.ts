@@ -28,6 +28,7 @@ import {
   updateProjectOwner,
   utils,
   removeProjectDeliverable,
+  setProjectExpenditure,
 } from "document-models/scope-of-work/v1";
 import { describe, expect, it } from "vitest";
 import {
@@ -718,6 +719,86 @@ describe("round2", () => {
     expect(deliverable(next, "d1")?.budgetAnchor).toMatchObject({
       unitCost: 3,
       marginPinned: false,
+    });
+  });
+});
+
+describe("expenditure", () => {
+  it("records actuals and cap with two decimals and derives the percentage against the cap", () => {
+    const doc = apply(
+      base(),
+      setProjectExpenditure({ projectId: "p1", actuals: 250.555, cap: 1000 }),
+    );
+    expect(errors(doc)).toStrictEqual([]);
+    expect(project(doc)?.expenditure).toStrictEqual({
+      actuals: 250.56,
+      cap: 1000,
+      percentage: 25.06,
+    });
+  });
+
+  it("without a cap the percentage reads against the budget and follows it", () => {
+    let doc = apply(
+      base(),
+      addProjectDeliverable({
+        projectId: "p1",
+        deliverableId: "a",
+        title: "a",
+      }),
+      setDeliverableBudgetAnchorProject({
+        deliverableId: "a",
+        unitCost: 100,
+        quantity: 4,
+      }), // budget 400
+      setProjectExpenditure({ projectId: "p1", actuals: 100 }),
+    );
+    expect(project(doc)?.expenditure).toStrictEqual({
+      actuals: 100,
+      cap: 0,
+      percentage: 25,
+    });
+    doc = apply(doc, updateProject({ id: "p1", budget: 800 })); // a fixed envelope doubles the base
+    expect(project(doc)?.expenditure?.percentage).toBe(12.5);
+    doc = apply(doc, setProjectExpenditure({ projectId: "p1", cap: 50 })); // a cap wins once set, even when exceeded
+    expect(project(doc)?.expenditure).toStrictEqual({
+      actuals: 100,
+      cap: 50,
+      percentage: 200,
+    });
+  });
+
+  it("stays at 0% when neither a cap nor a budget exists, and rejects negative values", () => {
+    const doc = apply(
+      base(),
+      setProjectExpenditure({ projectId: "p1", actuals: 10 }),
+      setProjectExpenditure({ projectId: "p1", actuals: -1 }),
+      setProjectExpenditure({ projectId: "p1", cap: -1 }),
+      setProjectExpenditure({ projectId: "nope", actuals: 1 }),
+    );
+    expect(project(doc)?.expenditure).toStrictEqual({
+      actuals: 10,
+      cap: 0,
+      percentage: 0,
+    });
+    expect(errors(doc)).toStrictEqual([
+      "Actuals and cap must be zero or positive",
+      "Actuals and cap must be zero or positive",
+      "Project not found",
+    ]);
+  });
+
+  it("a project without an expenditure record gets one on first use", () => {
+    const doc = craft({
+      projects: [rawProject({ id: "p1", expenditure: null })],
+    });
+    const next = apply(
+      doc,
+      setProjectExpenditure({ projectId: "p1", cap: 300 }),
+    );
+    expect(project(next)?.expenditure).toStrictEqual({
+      actuals: 0,
+      cap: 300,
+      percentage: 0,
     });
   });
 });

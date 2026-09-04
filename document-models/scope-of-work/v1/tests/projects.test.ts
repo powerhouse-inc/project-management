@@ -10,6 +10,8 @@ import {
   removeProjectDeliverable,
   RemoveProjectDeliverableInputSchema,
   RemoveProjectInputSchema,
+  setProjectExpenditure,
+  SetProjectExpenditureInputSchema,
   setProjectMargin,
   SetProjectMarginInputSchema,
   setProjectTotalBudget,
@@ -156,6 +158,23 @@ describe("ProjectsOperations", () => {
     expect(updatedDocument.operations.global).toHaveLength(1);
     expect(updatedDocument.operations.global[0].action.type).toBe(
       "REMOVE_PROJECT_DELIVERABLE",
+    );
+    expect(updatedDocument.operations.global[0].action.input).toStrictEqual(
+      input,
+    );
+    expect(updatedDocument.operations.global[0].index).toEqual(0);
+  });
+
+  it("should handle setProjectExpenditure operation", () => {
+    const document = utils.createDocument();
+    const input = generateMock(SetProjectExpenditureInputSchema());
+
+    const updatedDocument = reducer(document, setProjectExpenditure(input));
+
+    expect(isScopeOfWorkDocument(updatedDocument)).toBe(true);
+    expect(updatedDocument.operations.global).toHaveLength(1);
+    expect(updatedDocument.operations.global[0].action.type).toBe(
+      "SET_PROJECT_EXPENDITURE",
     );
     expect(updatedDocument.operations.global[0].action.input).toStrictEqual(
       input,

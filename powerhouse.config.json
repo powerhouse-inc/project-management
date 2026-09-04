@@ -5,19 +5,13 @@
   "processorsDir": "./processors",
   "subgraphsDir": "./subgraphs",
   "studio": {
-    "port": 3000
+    "port": 6072
   },
   "reactor": {
-    "port": 4001
+    "port": 7072
   },
-  "packages": [
-    {
-      "packageName": "@powerhousedao/vetra",
-      "version": "staging",
-      "provider": "npm"
-    }
-  ],
-  "packageRegistryUrl": "https://registry.dev.vetra.io",
+  "packages": [],
+  "packageRegistryUrl": "https://registry.vetra.io",
   "connect": {
     "branding": {
       "appName": "Powerhouse Connect",
@@ -71,5 +65,8 @@
         "authConditions": false
       }
     }
+  },
+  "vetra": {
+    "connectPort": 2072
   }
 }
